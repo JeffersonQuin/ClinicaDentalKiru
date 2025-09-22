@@ -1,1 +1,469 @@
 // app global css in SCSS form
+
+/* ========================================
+   MODO OSCURO GLOBAL - KIRU ODONTOLOGÍA
+   ======================================== */
+
+/* Variables CSS para modo oscuro */
+:root {
+  --primary-orange: #FF6B35;
+  --primary-orange-dark: #FF5722;
+  --secondary-blue: #2C5AA0;
+  --text-dark: #1A1A1A;
+  --text-light: #6B7280;
+  --border-color: #E5E7EB;
+  --background-white: #FFFFFF;
+  --background-gray: #F9FAFB;
+}
+
+/* ========================================
+   ESTILOS GLOBALES PARA MODO OSCURO
+   ======================================== */
+
+/* Hero Section - Modo Oscuro */
+.body--dark .hero-section {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
+}
+
+.body--dark .hero-section h1 {
+  color: #ffffff !important;
+}
+
+.body--dark .hero-section h2 {
+  color: #ffffff !important;
+}
+
+.body--dark .hero-section h3 {
+  color: #ffffff !important;
+}
+
+.body--dark .hero-section p {
+  color: #e0e0e0 !important;
+}
+
+/* Secciones de Contenido - Modo Oscuro */
+.body--dark .anuncios-section {
+  background: #1a1a1a !important;
+}
+
+.body--dark .anuncios-section h2 {
+  color: #ffffff !important;
+}
+
+.body--dark .anuncios-section p {
+  color: #e0e0e0 !important;
+}
+
+.body--dark .cta-section {
+  background: linear-gradient(135deg, #0d47a1 0%, #1565c0 100%) !important;
+}
+
+/* Cards y Componentes - Modo Oscuro */
+.body--dark .ad-card {
+  background: #2a2a2a !important;
+  border-color: #404040 !important;
+}
+
+.body--dark .ad-card:hover {
+  border-color: #FF6B35 !important;
+  box-shadow: 0 20px 40px rgba(255, 107, 53, 0.2) !important;
+}
+
+.body--dark .ad-card .text-h6 {
+  color: #ffffff !important;
+}
+
+.body--dark .ad-card .text-grey-7 {
+  color: #d1d5db !important;
+}
+
+/* Botones - Modo Oscuro */
+.body--dark .q-btn--primary {
+  color: #FF6B35 !important;
+}
+
+.body--dark .q-btn--primary:hover {
+  background: #404040 !important;
+}
+
+/* Textos Generales - Modo Oscuro */
+.body--dark .text-h1,
+.body--dark .text-h2,
+.body--dark .text-h3,
+.body--dark .text-h4,
+.body--dark .text-h5,
+.body--dark .text-h6 {
+  color: #ffffff !important;
+}
+
+.body--dark .text-body1,
+.body--dark .text-body2 {
+  color: #e0e0e0 !important;
+}
+
+.body--dark .text-grey-7 {
+  color: #d1d5db !important;
+}
+
+/* Fondos de Páginas - Modo Oscuro */
+.body--dark .q-page {
+  background: #121212 !important;
+}
+
+.body--dark .bg-grey-1 {
+  background: #1a1a1a !important;
+}
+
+.body--dark .bg-grey-2 {
+  background: #2a2a2a !important;
+}
+
+/* Cards y Contenedores - Modo Oscuro */
+.body--dark .q-card {
+  background: #2a2a2a !important;
+  color: #ffffff !important;
+}
+
+.body--dark .q-card-section {
+  color: #ffffff !important;
+}
+
+/* Formularios - Modo Oscuro */
+.body--dark .q-field--outlined .q-field__control {
+  background: #2a2a2a !important;
+  border-color: #404040 !important;
+}
+
+.body--dark .q-field--outlined .q-field__control:hover {
+  border-color: #FF6B35 !important;
+}
+
+.body--dark .q-field--outlined .q-field__control:focus {
+  border-color: #FF6B35 !important;
+}
+
+.body--dark .q-field__label {
+  color: #e0e0e0 !important;
+}
+
+.body--dark .q-field__native {
+  color: #ffffff !important;
+}
+
+/* Selectores - Modo Oscuro */
+.body--dark .q-select .q-field__control {
+  background: #2a2a2a !important;
+  border-color: #404040 !important;
+}
+
+.body--dark .q-select .q-field__control:hover {
+  border-color: #FF6B35 !important;
+}
+
+/* Chips - Modo Oscuro */
+.body--dark .q-chip {
+  background: #404040 !important;
+  color: #ffffff !important;
+}
+
+/* Diálogos - Modo Oscuro */
+.body--dark .q-dialog .q-card {
+  background: #2a2a2a !important;
+}
+
+.body--dark .q-dialog .q-card-section {
+  color: #ffffff !important;
+}
+
+/* ========================================
+   ESTILOS ESPECÍFICOS PARA HEADER
+   ======================================== */
+
+/* Header - Modo Oscuro */
+.body--dark .main-navbar {
+  background: #1A1A1A !important;
+  border-bottom: 1px solid #333333 !important;
+}
+
+.body--dark .mobile-menu {
+  background: #1A1A1A !important;
+  border-bottom: 1px solid #333333 !important;
+}
+
+.body--dark .brand-name {
+  color: #FF6B35 !important;
+}
+
+.body--dark .brand-tagline {
+  color: #9CA3AF !important;
+}
+
+.body--dark .nav-link {
+  color: #FFFFFF !important;
+}
+
+.body--dark .nav-link:hover,
+.body--dark .nav-link.active {
+  color: #FF6B35 !important;
+}
+
+.body--dark .login-btn {
+  color: #FFFFFF !important;
+}
+
+.body--dark .login-btn:hover {
+  background: #333333 !important;
+}
+
+.body--dark .mobile-nav-label {
+  color: #FFFFFF !important;
+}
+
+.body--dark .mobile-nav-item:hover {
+  background: #333333 !important;
+}
+
+.body--dark .mobile-login-btn {
+  color: #FFFFFF !important;
+  border: 1px solid #333333 !important;
+}
+
+.body--dark .mobile-menu-btn {
+  color: #FFFFFF !important;
+}
+
+/* ========================================
+   ESTILOS ESPECÍFICOS PARA FOOTER
+   ======================================== */
+
+/* Footer - Modo Oscuro */
+.body--dark .footer-layout {
+  background: #1a1a1a !important;
+}
+
+.body--dark .footer-bottom {
+  background: #0f0f0f !important;
+  border-top: 1px solid #333333 !important;
+}
+
+/* ========================================
+   UTILIDADES GLOBALES
+   ======================================== */
+
+/* Clase helper para forzar colores en modo oscuro */
+.force-light-text {
+  color: #ffffff !important;
+}
+
+.force-light-bg {
+  background: #2a2a2a !important;
+}
+
+.force-orange {
+  color: #FF6B35 !important;
+}
+
+.force-orange-bg {
+  background: #FF6B35 !important;
+}
+
+/* Transiciones suaves para cambios de tema */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* ========================================
+   ESTILOS ESPECÍFICOS PARA PÁGINAS
+   ======================================== */
+
+/* IndexPage - Modo Oscuro */
+.body--dark .index-page {
+  background: #121212 !important;
+}
+
+/* AnunciosPage - Modo Oscuro */
+.body--dark .anuncios-page {
+  background: #121212 !important;
+}
+
+.body--dark .hero-anuncios {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
+}
+
+.body--dark .anuncios-grid {
+  background: #1a1a1a !important;
+}
+
+/* AboutPage - Modo Oscuro */
+.body--dark .about-page {
+  background: #121212 !important;
+}
+
+.body--dark .hero-about {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
+}
+
+.body--dark .quienes-somos {
+  background: #121212 !important;
+}
+
+.body--dark .clinic-gallery {
+  background: #1a1a1a !important;
+}
+
+.body--dark .mission-vision {
+  background: #121212 !important;
+}
+
+.body--dark .staff-section {
+  background: #1a1a1a !important;
+}
+
+.body--dark .value-card {
+  background: #2a2a2a !important;
+  color: #ffffff !important;
+}
+
+.body--dark .staff-member-card {
+  background: #2a2a2a !important;
+  color: #ffffff !important;
+}
+
+.body--dark .floating-badge {
+  background: rgba(42, 42, 42, 0.95) !important;
+  color: #ffffff !important;
+}
+
+.body--dark .doctor-details {
+  color: #ffffff !important;
+}
+
+.body--dark .detail-item {
+  border-bottom: 1px solid #404040 !important;
+}
+
+.body--dark .detail-item:last-child {
+  border-bottom: none !important;
+}
+
+/* ServicesPage - Modo Oscuro */
+.body--dark .services-page {
+  background: #121212 !important;
+}
+
+.body--dark .hero-services {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
+}
+
+.body--dark .services-grid-section {
+  background: #1a1a1a !important;
+}
+
+.body--dark .service-card {
+  background: #2a2a2a !important;
+  color: #ffffff !important;
+}
+
+.body--dark .service-card:hover {
+  box-shadow: 0 15px 35px rgba(255, 107, 53, 0.2) !important;
+}
+
+.body--dark .service-title {
+  color: #ffffff !important;
+}
+
+.body--dark .service-description {
+  color: #d1d5db !important;
+}
+
+.body--dark .info-item {
+  color: #d1d5db !important;
+}
+
+.body--dark .service-actions {
+  border-top: 1px solid #404040 !important;
+}
+
+.body--dark .service-detail-content {
+  color: #ffffff !important;
+}
+
+.body--dark .service-detail-info {
+  background: #2a2a2a !important;
+}
+
+.body--dark .feature-item {
+  color: #ffffff !important;
+}
+
+/* BranchPage - Modo Oscuro */
+.body--dark .branch-page {
+  background: #121212 !important;
+}
+
+.body--dark .hero-branch {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
+}
+
+.body--dark .branches-section {
+  background: #1a1a1a !important;
+}
+
+.body--dark .branch-card {
+  background: #2a2a2a !important;
+  color: #ffffff !important;
+}
+
+.body--dark .branch-card:hover {
+  box-shadow: 0 15px 35px rgba(255, 107, 53, 0.2) !important;
+}
+
+.body--dark .branch-title {
+  color: #ffffff !important;
+}
+
+.body--dark .branch-location {
+  color: #d1d5db !important;
+}
+
+.body--dark .info-item {
+  color: #d1d5db !important;
+}
+
+.body--dark .branch-actions {
+  border-top: 1px solid #404040 !important;
+}
+
+.body--dark .branch-detail-content {
+  color: #ffffff !important;
+}
+
+.body--dark .branch-detail-info {
+  background: #2a2a2a !important;
+}
+
+.body--dark .schedule-item {
+  border-bottom: 1px solid #404040 !important;
+}
+
+.body--dark .schedule-item:last-child {
+  border-bottom: none !important;
+}
+
+/* ========================================
+   RESPONSIVE - MODO OSCURO
+   ======================================== */
+
+@media (max-width: 768px) {
+  .body--dark .hero-section {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
+  }
+  
+  .body--dark .anuncios-section {
+    background: #1a1a1a !important;
+  }
+  
+  .body--dark .hero-anuncios {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
+  }
+}

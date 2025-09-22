@@ -5,8 +5,29 @@ const routes = [
     path: '/',
     component: MainLayout,
     children: [
-      // tus rutas hijas
+      {
+        path: '',
+        component: () => import('pages/IndexPage.vue')
+      },
+      {
+        path: '/about',
+        component: () => import('pages/AboutPage.vue')
+      },
+      {
+        path: '/services',
+        component: () => import('pages/ServicesPage.vue')
+      },
+      {
+        path: '/branch',
+        component: () => import('pages/BranchPage.vue')
+      }
     ]
+  },
+
+  // Siempre dejar esto como último
+  {
+    path: '/:catchAll(.*)*',
+    component: () => import('pages/ErrorNotFound.vue')
   }
 ]
 

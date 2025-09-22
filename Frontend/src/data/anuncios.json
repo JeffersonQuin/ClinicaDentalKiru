@@ -1,0 +1,35 @@
+{
+  "anuncios": [
+    {
+      "id": 1,
+      "title": "PRODUCT EFFICACY",
+      "description": "Descubre la eficacia de nuestros productos dentales. Resultados comprobados en blanqueamiento dental con tecnología avanzada.",
+      "image": "/icons/prueba.jpeg",
+      "category": "Productos",
+      "categoryColor": "blue",
+      "beforeAfter": true,
+      "contactInfo": "Cita Previa 955 26 70 50"
+    },
+    {
+      "id": 2,
+      "title": "BLANQUEAMIENTO DENTAL",
+      "description": "Obtén una sonrisa más blanca y brillante con nuestro tratamiento de blanqueamiento profesional. Resultados visibles desde la primera sesión.",
+      "image": "/icons/prueba.jpeg",
+      "category": "Estética",
+      "categoryColor": "orange",
+      "beforeAfter": true,
+      "contactInfo": "Cita Previa 955 26 70 50",
+      "socialMedia": ["facebook", "instagram", "twitter", "youtube"]
+    },
+    {
+      "id": 3,
+      "title": "BLANQUEAMIENTO DENTAL",
+      "description": "Tratamiento de blanqueamiento dental con resultados garantizados. Técnica avanzada y productos de primera calidad.",
+      "image": "/icons/prueba.jpeg",
+      "category": "Premium",
+      "categoryColor": "pink",
+      "beforeAfter": true,
+      "contactInfo": "Cita Previa 955 26 70 50"
+    }
+  ]
+}

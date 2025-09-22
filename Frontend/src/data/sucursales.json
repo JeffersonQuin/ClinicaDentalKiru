@@ -1,0 +1,115 @@
+{
+  "sucursales": [
+    {
+      "id": 1,
+      "name": "Sucursal Centro",
+      "location": "Oruro",
+      "address": "Av. 6 de Agosto #123, Centro, Oruro",
+      "phone": "78900785",
+      "email": "info@clinicabolivia.com",
+      "image": "/icons/sucursal_centro.jpeg",
+      "schedule": {
+        "monday": "8:00 AM - 6:00 PM",
+        "tuesday": "8:00 AM - 6:00 PM",
+        "wednesday": "8:00 AM - 6:00 PM",
+        "thursday": "8:00 AM - 6:00 PM",
+        "friday": "8:00 AM - 6:00 PM",
+        "saturday": "8:00 AM - 2:00 PM",
+        "sunday": "Cerrado"
+      },
+      "services": [
+        "Odontología General",
+        "Ortodoncia",
+        "Endodoncia",
+        "Cirugía Oral",
+        "Estética Dental"
+      ],
+      "coordinates": {
+        "lat": -17.9758,
+        "lng": -67.1101
+      },
+      "mapUrl": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3825.123456789!2d-67.1101!3d-17.9758!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTfCsDU4JzMzLjAiUyA2N8KwMDYnMzYuNCJX!5e0!3m2!1ses!2sbo!4v1234567890",
+      "features": [
+        "Estacionamiento gratuito",
+        "Acceso para discapacitados",
+        "WiFi gratuito",
+        "Sala de espera cómoda",
+        "Equipos de última tecnología"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Sucursal Norte",
+      "location": "Oruro",
+      "address": "Av. Circunvalación #456, Zona Norte, Oruro",
+      "phone": "78900786",
+      "email": "norte@clinicabolivia.com",
+      "image": "/icons/sucursal_norte.jpeg",
+      "schedule": {
+        "monday": "8:00 AM - 6:00 PM",
+        "tuesday": "8:00 AM - 6:00 PM",
+        "wednesday": "8:00 AM - 6:00 PM",
+        "thursday": "8:00 AM - 6:00 PM",
+        "friday": "8:00 AM - 6:00 PM",
+        "saturday": "8:00 AM - 2:00 PM",
+        "sunday": "Cerrado"
+      },
+      "services": [
+        "Odontología General",
+        "Periodoncia",
+        "Implantes Dentales",
+        "Odontopediatría",
+        "Radiología Dental"
+      ],
+      "coordinates": {
+        "lat": -17.9658,
+        "lng": -67.1001
+      },
+      "mapUrl": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3825.123456789!2d-67.1001!3d-17.9658!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTfCsDU3JzU3LjAiUyA2N8KwMDYnMDAuNCJX!5e0!3m2!1ses!2sbo!4v1234567890",
+      "features": [
+        "Amplio estacionamiento",
+        "Consultorios individuales",
+        "Laboratorio propio",
+        "Emergencias 24/7",
+        "Personal especializado"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Sucursal Sur",
+      "location": "Oruro",
+      "address": "Calle La Paz #789, Zona Sur, Oruro",
+      "phone": "78900787",
+      "email": "sur@clinicabolivia.com",
+      "image": "/icons/sucursal_sur.jpeg",
+      "schedule": {
+        "monday": "8:00 AM - 6:00 PM",
+        "tuesday": "8:00 AM - 6:00 PM",
+        "wednesday": "8:00 AM - 6:00 PM",
+        "thursday": "8:00 AM - 6:00 PM",
+        "friday": "8:00 AM - 6:00 PM",
+        "saturday": "8:00 AM - 2:00 PM",
+        "sunday": "Cerrado"
+      },
+      "services": [
+        "Odontología General",
+        "Blanqueamiento Dental",
+        "Prótesis Dentales",
+        "Cirugía Maxilofacial",
+        "Tratamiento de TMJ"
+      ],
+      "coordinates": {
+        "lat": -17.9858,
+        "lng": -67.1201
+      },
+      "mapUrl": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3825.123456789!2d-67.1201!3d-17.9858!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTfCsDU5JzA5LjAiUyA2N8KwMDcnMTIuNCJX!5e0!3m2!1ses!2sbo!4v1234567890",
+      "features": [
+        "Zona residencial tranquila",
+        "Fácil acceso en transporte público",
+        "Consultorios amplios",
+        "Tecnología digital",
+        "Atención personalizada"
+      ]
+    }
+  ]
+}
