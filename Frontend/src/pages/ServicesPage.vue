@@ -32,7 +32,7 @@
         <div class="col-12 col-md-6 text-center">
           <div class="hero-image-container">
             <q-img
-              src="/icons/prueba.jpeg"
+              src="/KiruIMG/services.png"
               alt="Paciente sonriendo en consulta dental"
               class="hero-image"
             />

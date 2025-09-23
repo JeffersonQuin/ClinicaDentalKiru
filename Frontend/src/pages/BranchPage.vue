@@ -31,7 +31,7 @@
         <div class="col-12 col-md-6 text-center">
           <div class="hero-image-container">
             <q-img
-              src="/icons/prueba.jpeg"
+              src="/KiruIMG/sucursales.png"
               alt="Paciente en consulta dental"
               class="hero-image"
             />
@@ -383,21 +383,6 @@ const onAppointmentSubmit = (formData) => {
   min-height: 60vh;
   display: flex;
   align-items: center;
-}
-
-.hero-image-container {
-  position: relative;
-  display: inline-block;
-  width: 100%;
-  max-width: 500px;
-  margin: 0 auto;
-}
-
-.hero-image {
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  width: 100%;
-  height: auto;
 }
 
 .floating-elements {

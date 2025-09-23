@@ -17,6 +17,29 @@
 }
 
 /* ========================================
+   ESTILOS ESPECÍFICOS PARA PÁGINAS
+   ======================================== */
+.branch-page {
+  padding-bottom: 0;
+}
+
+.hero-branch {
+  background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+}
+
+
+.hero-image {
+  background: url('~assets/hero-image.jpg') no-repeat center center;
+  background-size: cover;
+  width: 500px;
+  height: 500px;
+  border-radius: 20%;
+}
+
+/* ========================================
    ESTILOS GLOBALES PARA MODO OSCURO
    ======================================== */
 
