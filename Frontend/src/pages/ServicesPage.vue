@@ -7,7 +7,7 @@
           <h1 class="text-h2 text-weight-bold text-primary q-mb-md">
             Nuestros Servicios Dentales
           </h1>
-          <p class="text-h6 text-grey-7 q-mb-lg">
+          <p class="text-h6 text-grey-7 text-justify q-mb-lg">
             Ofrecemos una amplia gama de tratamientos para cuidar tu salud bucal y embellecer tu sonrisa. 
             Nuestro equipo de profesionales especializados utiliza tecnología de vanguardia para brindarte 
             la mejor atención dental.

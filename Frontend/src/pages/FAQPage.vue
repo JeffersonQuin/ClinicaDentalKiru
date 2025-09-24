@@ -2,17 +2,20 @@
   <q-page class="service-page">
     <section class="hero-branch q-pa-xl">
       <div class="row items-center">
-        <div class="col-12 col-md-8 text-align-left">
+        <div class="col-12 col-md-6 text-align-left">
           <h1 class="text-h2 text-weight-bold text-primary q-mb-md">
             Preguntas Frecuentes (FAQ)
           </h1>
-          <p class="text-h6 text-grey-7 q-mb-lg">
-            Te sientes perdido, estas preguntas podrían ayudarte a aclarar tus dudas.
+          <p class="text-h6 text-grey-7 text-justify q-mb-lg">
+            En esta sección respondemos las dudas más comunes sobre tratamientos y atención dental.
+            Te ayudamos a entender los procesos, costos y cuidados posteriores a cada procedimiento.
+            Nuestro objetivo es brindarte confianza y claridad antes de tu visita.
           </p>
 
           <div class="row q-gutter-md items-center">
             <q-input
               v-model="query"
+              size="lg"
               color="primary"
               placeholder="Buscar preguntas..."
               dense
@@ -26,7 +29,7 @@
           </div>
         </div>
 
-        <div class="col-12 col-md-4 text-center">
+        <div class="col-12 col-md-6 text-center">
           <div class="hero-image-container">
             <q-img src="/KiruIMG/questions.png" alt="Paciente en consulta dental" class="hero-image" />
           </div>
