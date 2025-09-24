@@ -7,7 +7,7 @@
           <h1 class="text-h2 text-weight-bold text-primary q-mb-md">
             Nuestros Servicios Dentales
           </h1>
-          <p class="text-h6 text-grey-7 q-mb-lg">
+          <p class="text-h6 text-grey-7 text-justify q-mb-lg">
             Ofrecemos una amplia gama de tratamientos para cuidar tu salud bucal y embellecer tu sonrisa. 
             Nuestro equipo de profesionales especializados utiliza tecnología de vanguardia para brindarte 
             la mejor atención dental.
@@ -32,7 +32,7 @@
         <div class="col-12 col-md-6 text-center">
           <div class="hero-image-container">
             <q-img
-              src="/icons/prueba.jpeg"
+              src="/KiruIMG/services.png"
               alt="Paciente sonriendo en consulta dental"
               class="hero-image"
             />

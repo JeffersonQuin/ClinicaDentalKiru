@@ -14,13 +14,25 @@ const routes = [
         component: () => import('pages/AboutPage.vue')
       },
       {
+        path: '/faq',
+        component: () => import('pages/FAQPage.vue')
+      },
+      {
+        path: '/contact',
+        component: () => import('pages/ContactPage.vue')
+      },
+      {
         path: '/services',
         component: () => import('pages/ServicesPage.vue')
       },
       {
         path: '/branch',
         component: () => import('pages/BranchPage.vue')
-      }
+      },
+      {
+        path: '/users',
+        component: () => import('pages/User/UserPage.vue')
+      },
     ]
   },
 

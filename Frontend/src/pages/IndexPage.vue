@@ -31,7 +31,7 @@
         <div class="col-12 col-md-6 text-center">
           <div class="hero-image-container">
             <q-img
-              src="/icons/prueba.jpeg"
+              src="/KiruIMG/inicio.png"
               alt="Sonrisa perfecta"
               class="hero-image"
             />
@@ -196,15 +196,6 @@ const onAppointmentSubmit = (formData) => {
   min-height: 70vh;
 }
 
-.hero-image-container {
-  position: relative;
-  display: inline-block;
-}
-
-.hero-image {
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-}
 
 .floating-elements {
   position: absolute;
