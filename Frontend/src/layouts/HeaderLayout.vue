@@ -224,6 +224,33 @@
         </div>
       </div>
     </q-slide-transition>
+
+    <!-- Modal de Login -->
+    <LoginModal 
+      v-model="loginDialog"
+      @login-success="onLoginSuccess"
+      @register-click="onRegisterClick"
+      @forgot-password-click="onForgotPasswordClick"
+    />
+
+    <!-- Modal de Citas -->
+    <AppointmentModal 
+      v-model="appointmentDialog"
+      @new-appointment="onNewAppointment"
+      @history="onHistory"
+      @cancel="onAppointmentCancel"
+    />
+
+    <!-- Formulario de Nueva Cita -->
+    <NewAppointmentForm 
+      v-model="newAppointmentForm"
+      @appointment-submitted="onAppointmentSubmitted"
+    />
+
+    <!-- Historial de Citas -->
+    <AppointmentHistory 
+      v-model="appointmentHistory"
+    />
   </div>
 </template>
 
@@ -231,6 +258,10 @@
 import { ref } from 'vue'
 import { useQuasar } from 'quasar'
 import { useRouter } from 'vue-router'
+import LoginModal from 'components/LoginModal.vue'
+import AppointmentModal from 'components/AppointmentModal.vue'
+import NewAppointmentForm from 'components/NewAppointmentForm.vue'
+import AppointmentHistory from 'components/AppointmentHistory.vue'
 
 const $q = useQuasar()
 const router = useRouter()
@@ -239,6 +270,10 @@ const router = useRouter()
 const selectedLanguage = ref('es')
 const darkMode = ref(false)
 const mobileMenuOpen = ref(false)
+const loginDialog = ref(false)
+const appointmentDialog = ref(false)
+const newAppointmentForm = ref(false)
+const appointmentHistory = ref(false)
 
 const languages = [
   { label: 'Español', value: 'es' },
@@ -268,14 +303,50 @@ const navigateAndClose = (path) => {
 
 const openLoginDialog = () => {
   mobileMenuOpen.value = false
-  console.log('Abrir login')
-  // Aquí implementarías la lógica del login
+  loginDialog.value = true
 }
 
 const openAppointmentDialog = () => {
   mobileMenuOpen.value = false
-  console.log('Abrir agendar cita')
-  // Aquí implementarías la lógica de agendar cita
+  appointmentDialog.value = true
+}
+
+// Funciones para manejar eventos del modal de login
+const onLoginSuccess = (loginData) => {
+  console.log('Login exitoso:', loginData)
+  // Aquí implementarías la lógica después del login exitoso
+  // Por ejemplo: guardar token, redirigir, actualizar estado del usuario, etc.
+}
+
+const onRegisterClick = () => {
+  console.log('Abrir registro')
+  // Aquí implementarías la lógica para abrir el modal de registro
+}
+
+const onForgotPasswordClick = () => {
+  console.log('Recuperar contraseña')
+  // Aquí implementarías la lógica para recuperar contraseña
+}
+
+// Funciones para manejar eventos del modal de citas
+const onNewAppointment = () => {
+  newAppointmentForm.value = true
+}
+
+const onHistory = () => {
+  appointmentHistory.value = true
+}
+
+const onAppointmentCancel = () => {
+  console.log('Cancelar modal de citas')
+  // Aquí implementarías cualquier lógica adicional al cancelar
+}
+
+// Función para manejar el envío del formulario de nueva cita
+const onAppointmentSubmitted = (appointmentData) => {
+  console.log('Cita agendada exitosamente:', appointmentData)
+  // Aquí implementarías la lógica para procesar la cita agendada
+  // Por ejemplo: guardar en base de datos, enviar notificación, etc.
 }
 
 // Cargar preferencias
