@@ -147,3 +147,4 @@ Los estilos de modo oscuro incluyen media queries para:
 ---
 
 **💡 Tip**: Si necesitas un estilo muy específico que no está en el global, agrégalo a `app.scss` para que esté disponible en toda la aplicación.
+

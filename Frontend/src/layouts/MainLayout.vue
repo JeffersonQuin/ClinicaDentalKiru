@@ -16,9 +16,13 @@
         </q-toolbar-title>
       </q-toolbar>
     </q-footer>
+    
+    <!-- Botón flotante para agendar citas -->
+    <FloatingButton />
   </q-layout>
 </template>
 
 <script setup>
 import HeaderLayout from './HeaderLayout.vue'
+import FloatingButton from '../components/FloatingButton.vue'
 </script>

@@ -124,10 +124,12 @@
       />
     </section>
 
-    <!-- Dialog para Agendar Cita -->
-    <AppointmentForm 
+    <!-- Modal para Agendar Cita -->
+    <AppointmentModal 
       v-model="appointmentDialog"
-      @submit="onAppointmentSubmit"
+      @new-appointment="onNewAppointment"
+      @history="onHistory"
+      @cancel="onAppointmentCancel"
     />
 
     <!-- Dialog de detalle del servicio -->
@@ -223,7 +225,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import AppointmentForm from 'components/AppointmentForm.vue'
+import AppointmentModal from 'components/AppointmentModal.vue'
 import serviciosData from 'src/data/servicios.json'
 
 // Datos reactivos
@@ -247,9 +249,22 @@ const openServiceDetail = (service) => {
   serviceDialog.value = true
 }
 
-const onAppointmentSubmit = (formData) => {
-  console.log('Cita agendada desde ServicesPage:', formData)
-  // Aquí iría la lógica para enviar la cita al backend
+// Funciones para manejar eventos del modal de citas
+const onNewAppointment = () => {
+  console.log('Abrir nueva cita desde ServicesPage')
+  // Aquí implementarías la lógica para abrir el formulario de nueva cita
+  // Por ejemplo: router.push('/appointment/new') o abrir otro modal
+}
+
+const onHistory = () => {
+  console.log('Abrir historial de citas desde ServicesPage')
+  // Aquí implementarías la lógica para abrir el historial de citas
+  // Por ejemplo: router.push('/appointment/history') o abrir otro modal
+}
+
+const onAppointmentCancel = () => {
+  console.log('Cancelar modal de citas desde ServicesPage')
+  // Aquí implementarías cualquier lógica adicional al cancelar
 }
 </script>
 
