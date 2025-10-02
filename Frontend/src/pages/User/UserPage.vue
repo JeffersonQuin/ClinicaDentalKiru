@@ -1,440 +1,514 @@
 <template>
-  <div class="q-pa-md">
-    <!-- Tabla -->
-    <GenericTable
-      title="Gestión de Usuarios"
-      :rows="items"
-      :columns="columns"
-      :loading="loading"
-      @add="openForm()"
-      @action="handleAction"
-    />
-
-    <!-- Formulario -->
-    <GenericDialog
-      v-model="showForm"
-      :title="isEditing ? 'Editar Usuario' : 'Nuevo Usuario'"
-    >
-      <GenericForm
-        :fields="fields"
-        v-model="currentItem"
-        :loading="loading"
-        @submit="handleSubmit"
-        @cancel="showForm = false"
-      />
-    </GenericDialog>
-
-    <!-- Vista de detalles -->
-    <GenericDialog
-      v-model="showDetails"
-      title="Detalles del Usuario"
-      :show-actions="false"
-    >
-      <div class="q-gutter-md">
-        <div><strong>ID:</strong> {{ currentItem.id }}</div>
-        <div><strong>Nombre:</strong> {{ currentItem.nombre }}</div>
-        <div><strong>Email:</strong> {{ currentItem.email }}</div>
-        <div><strong>Edad:</strong> {{ currentItem.edad }} años</div>
-        <div><strong>Teléfono:</strong> {{ currentItem.telefono }}</div>
-        <div><strong>Cargo:</strong> {{ currentItem.cargo }}</div>
-        <div>
-          <strong>Estado:</strong> 
-          <q-chip 
-            :color="currentItem.activo ? 'positive' : 'negative'" 
-            text-color="white"
-            dense
-          >
-            {{ currentItem.activo ? 'Activo' : 'Inactivo' }}
-          </q-chip>
-        </div>
-        <div><strong>Fecha de Registro:</strong> {{ formatDate(currentItem.fecha_registro) }}</div>
-      </div>
-    </GenericDialog>
-
-    <!-- Confirmación de eliminación -->
-    <GenericDialog
-      v-model="showConfirm"
-      title="Confirmar eliminación"
-      :message="`¿Estás seguro de que deseas eliminar al usuario '${currentItem.nombre}'?`"
-      @action="handleConfirmAction"
-    />
-
-    <!-- Notificaciones -->
-    <q-banner
-      v-if="notification.show"
-      :class="`bg-${notification.type} text-white q-mb-md`"
-      dense
-    >
-      {{ notification.message }}
-      <template v-slot:action>
+  <div class="page-container">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="header-content">
+        <h1 class="page-title">
+          <i class="fa-solid fa-users"></i>
+          Gestión de Usuarios
+        </h1>
         <q-btn
-          flat
-          dense
-          icon="close"
-          @click="hideNotification"
+          class="primary-btn"
+          color="primary"
+          icon="fa-solid fa-plus"
+          label="Nuevo Usuario"
+          @click="openNewUserDialog"
+          push
+          no-caps
         />
-      </template>
-    </q-banner>
+      </div>
+    </div>
+
+    <!-- Search Section -->
+    <div class="search-section">
+      <q-input
+        v-model="search"
+        class="search-input"
+        filled
+        type="search"
+        placeholder="Buscar por nombre, email o tipo de usuario..."
+        @input="filterRows"
+        clearable
+      >
+        <template v-slot:prepend>
+          <i class="fa-solid fa-search text-grey-6"></i>
+        </template>
+      </q-input>
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-container">
+      <q-table
+        class="data-table"
+        flat
+        bordered
+        :rows="filteredRows"
+        :columns="columns"
+        row-key="id"
+        :rows-per-page-options="[5, 10, 15, 20, 0]"
+        :pagination="{ rowsPerPage: 5 }"
+        separator="horizontal"
+      >
+        <template v-slot:no-data>
+          <div class="no-data-container">
+            <i class="fa-solid fa-users-slash no-data-icon"></i>
+            <p class="no-data-text">No se encontraron usuarios</p>
+          </div>
+        </template>
+
+        <template v-slot:body-cell-avatar="props">
+          <q-td :props="props">
+            <div class="avatar-container">
+              <q-avatar 
+                :size="props.row.avatar ? '40px' : '40px'"
+                class="user-avatar"
+              >
+                <img 
+                  v-if="props.row.avatar" 
+                  :src="props.row.avatar" 
+                  :alt="props.row.username"
+                  @error="handleImageError"
+                />
+                <span v-else>{{ getInitials(props.row.username) }}</span>
+              </q-avatar>
+            </div>
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-state="props">
+          <q-td :props="props">
+            <q-badge
+              :class="getStateClass(props.row.state)"
+              :label="formatState(props.row.state)"
+            />
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-type="props">
+          <q-td :props="props">
+            <q-chip
+              :class="getTypeClass(props.row.type)"
+              :label="props.row.type"
+              dense
+            />
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-actions="props">
+          <q-td :props="props">
+            <div class="action-buttons">
+              <q-btn
+                class="action-btn view-btn"
+                dense
+                round
+                icon="fa-solid fa-eye"
+                size="sm"
+                @click="viewUser(props.row)"
+                push
+              >
+                <q-tooltip>Ver detalles</q-tooltip>
+              </q-btn>
+              
+              <q-btn
+                class="action-btn edit-btn"
+                dense
+                round
+                icon="fa-solid fa-edit"
+                size="sm"
+                @click="editUser(props.row)"
+                push
+              >
+                <q-tooltip>Editar usuario</q-tooltip>
+              </q-btn>
+              
+              <q-btn
+                class="action-btn delete-btn"
+                dense
+                round
+                icon="fa-solid fa-trash"
+                size="sm"
+                @click="confirmDeleteUser(props.row)"
+                push
+              >
+                <q-tooltip>Eliminar usuario</q-tooltip>
+              </q-btn>
+            </div>
+          </q-td>
+        </template>
+      </q-table>
+    </div>
+
+    <!-- Branding Section -->
+    <div class="branding-section">
+      <q-img
+        src="/KiruIMG/credential.png"
+        class="hero-image"
+        fit="contain"
+      />
+    </div>
+
+    <!-- Dialogs -->
+    <DetailUserDialog
+      v-model="showDetailDialog"
+      :user-data="selectedUser"
+    />
+
+    <EditUserDialog
+      v-model="showEditDialog"
+      :user-data="selectedUser"
+      @user-updated="handleUserUpdate"
+    />
+
+    <NewUserDialog
+      v-model="showNewDialog"
+      @user-created="handleUserCreate"
+    />
+
+    <!-- Delete Confirmation Dialog -->
+    <q-dialog v-model="showDeleteDialog" persistent>
+      <q-card class="confirm-dialog">
+        <q-card-section class="row items-center">
+          <i class="fa-solid fa-exclamation-triangle text-warning q-mr-sm"></i>
+          <span class="text-h6">Confirmar eliminación</span>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          ¿Está seguro que desea eliminar al usuario <strong>{{ selectedUser?.username }}</strong>?
+          Esta acción no se puede deshacer.
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat label="Cancelar" color="grey" v-close-popup />
+          <q-btn 
+            flat 
+            label="Eliminar" 
+            color="negative" 
+            @click="deleteUser"
+            v-close-popup 
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
 <script>
-import { ref, reactive, onMounted } from 'vue'
-import { FIELD_TYPES, VALIDATION_TYPES } from '../fieldConfig.js'
-import GenericTable from '../../components/GenericTable.vue'
-import GenericForm from '../../components/GenericForm.vue'
-import GenericDialog from '../../components/GenericDialog.vue'
+import { ref, onMounted, watch } from 'vue'
+import users from 'src/data/users.json'
+import Fuse from 'fuse.js'
+import DetailUserDialog from './DetailUserDialog.vue'
+import EditUserDialog from './EditUserDialog.vue'
+import NewUserDialog from './NewUserDialog.vue'
 
-import usersData from '../../data/users.json'
+const columns = [
+  {
+    name: 'avatar',
+    required: true,
+    label: 'Avatar',
+    align: 'center',
+    field: 'avatar',
+    sortable: false,
+    style: 'width: 80px'
+  },
+  {
+    name: 'username',
+    required: true,
+    label: 'Usuario',
+    align: 'left',
+    field: 'username',
+    sortable: true
+  },
+  {
+    name: 'email',
+    label: 'Correo Electrónico',
+    field: 'email',
+    sortable: true,
+    align: 'left'
+  },
+  {
+    name: 'type',
+    label: 'Tipo',
+    field: 'type',
+    sortable: true,
+    align: 'center',
+    style: 'width: 120px'
+  },
+  {
+    name: 'state',
+    label: 'Estado',
+    field: 'state',
+    sortable: true,
+    align: 'center',
+    style: 'width: 100px'
+  },
+  {
+    name: 'actions',
+    label: 'Acciones',
+    field: 'actions',
+    align: 'center',
+    sortable: false,
+    style: 'width: 150px'
+  }
+]
 
 export default {
-  name: 'UsersCrudWithTestData',
+  name: 'UserTable',
   components: {
-    GenericTable,
-    GenericForm,
-    GenericDialog
+    DetailUserDialog,
+    EditUserDialog,
+    NewUserDialog
   },
   setup() {
-    // Estado reactivo
-    const loading = ref(false)
-    const items = ref([])
-    const currentItem = reactive({})
-    const showForm = ref(false)
-    const showDetails = ref(false)
-    const showConfirm = ref(false)
-    const isEditing = ref(false)
-    const notification = reactive({
-      show: false,
-      type: 'positive',
-      message: ''
+    const search = ref('')
+    const rows = ref([])
+    const filteredRows = ref([])
+    const selectedUser = ref(null)
+    const showDetailDialog = ref(false)
+    const showEditDialog = ref(false)
+    const showNewDialog = ref(false)
+    const showDeleteDialog = ref(false)
+    let fuse = null
+
+    const fuseOptions = {
+      keys: ['username', 'email', 'type', 'state'],
+      threshold: 0.3,
+      includeScore: true,
+      minMatchCharLength: 1
+    }
+
+    const loadUsers = () => {
+      rows.value = users.users
+      filteredRows.value = users.users.filter(user => user.state !== 'deleted')
+      fuse = new Fuse(users.users.filter(user => user.state !== 'deleted'), fuseOptions)
+    }
+
+    const filterRows = () => {
+      if (!search.value || search.value.trim() === '') {
+        filteredRows.value = rows.value.filter(user => user.state !== 'deleted')
+      } else {
+        const results = fuse.search(search.value.trim())
+        filteredRows.value = results.map(result => result.item)
+      }
+    }
+
+    // Dialog handlers
+    const viewUser = (user) => {
+      selectedUser.value = { ...user }
+      showDetailDialog.value = true
+    }
+
+    const editUser = (user) => {
+      selectedUser.value = { ...user }
+      showEditDialog.value = true
+    }
+
+    const openNewUserDialog = () => {
+      showNewDialog.value = true
+    }
+
+    const confirmDeleteUser = (user) => {
+      selectedUser.value = { ...user }
+      showDeleteDialog.value = true
+    }
+
+    const deleteUser = () => {
+      const index = rows.value.findIndex(u => u.id === selectedUser.value.id)
+      if (index > -1) {
+        rows.value[index].state = 'deleted'
+        filterRows()
+      }
+    }
+
+    const handleUserUpdate = (updatedUser) => {
+      const index = rows.value.findIndex(u => u.id === updatedUser.id)
+      if (index > -1) {
+        rows.value[index] = { ...updatedUser }
+        filterRows()
+      }
+    }
+
+    const handleUserCreate = (newUser) => {
+      const maxId = Math.max(...rows.value.map(u => u.id))
+      newUser.id = maxId + 1
+      rows.value.push(newUser)
+      filterRows()
+    }
+
+    // Utility functions
+    const getInitials = (name) => {
+      if (!name) return '?'
+      const words = name.trim().split(' ')
+      if (words.length === 1) {
+        return words[0].substring(0, 2).toUpperCase()
+      }
+      return (words[0][0] + (words[1] ? words[1][0] : '')).toUpperCase()
+    }
+
+    const getAvatarColor = (name) => {
+      if (!name) return '#9e9e9e'
+      
+      const colors = [
+        '#f44336', '#e91e63', '#9c27b0', '#673ab7',
+        '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4',
+        '#009688', '#4caf50', '#8bc34a', '#cddc39',
+        '#ffeb3b', '#ffc107', '#ff9800', '#ff5722'
+      ]
+      
+      let hash = 0
+      for (let i = 0; i < name.length; i++) {
+        hash = name.charCodeAt(i) + ((hash << 5) - hash)
+      }
+      
+      return colors[Math.abs(hash) % colors.length]
+    }
+
+    const handleImageError = (event) => {
+      // Si la imagen falla al cargar, ocultar el elemento img
+      event.target.style.display = 'none'
+    }
+
+    const formatState = (state) => {
+      const states = {
+        active: 'Activo',
+        inactive: 'Inactivo',
+        pending: 'Pendiente'
+      }
+      return states[state] || state
+    }
+
+    const getStateClass = (state) => {
+      const classes = {
+        active: 'state-active',
+        inactive: 'state-inactive',
+        pending: 'state-pending'
+      }
+      return classes[state] || 'state-default'
+    }
+
+    const getTypeClass = (type) => {
+      const classes = {
+        admin: 'type-admin',
+        user: 'type-user',
+        moderator: 'type-moderator'
+      }
+      return classes[type] || 'type-default'
+    }
+
+    onMounted(() => {
+      loadUsers()
     })
 
-    // Configuración de columnas de la tabla
-    const columns = [
-      { 
-        name: 'id', 
-        label: 'ID', 
-        field: 'id', 
-        align: 'left',
-        sortable: true,
-        style: 'width: 50px'
-      },
-      { 
-        name: 'nombre', 
-        label: 'Nombre', 
-        field: 'nombre', 
-        align: 'left',
-        sortable: true
-      },
-      { 
-        name: 'email', 
-        label: 'Email', 
-        field: 'email', 
-        align: 'left',
-        sortable: true
-      },
-      { 
-        name: 'edad', 
-        label: 'Edad', 
-        field: 'edad', 
-        align: 'center',
-        sortable: true,
-        style: 'width: 70px'
-      },
-      { 
-        name: 'cargo', 
-        label: 'Cargo', 
-        field: 'cargo', 
-        align: 'left',
-        sortable: true
-      },
-      { 
-        name: 'activo', 
-        label: 'Estado', 
-        field: 'activo', 
-        align: 'center',
-        format: (val) => val ? 'Activo' : 'Inactivo',
-        style: 'width: 100px'
-      },
-      { 
-        name: 'actions', 
-        label: 'Acciones', 
-        field: 'actions', 
-        align: 'center',
-        style: 'width: 150px'
-      }
-    ]
-
-    // Configuración de campos del formulario
-    const fields = [
-      {
-        name: 'nombre',
-        label: 'Nombre Completo',
-        type: FIELD_TYPES.TEXT,
-        validations: [
-          { type: VALIDATION_TYPES.REQUIRED, message: 'El nombre es obligatorio' },
-          { type: VALIDATION_TYPES.MIN_LENGTH, value: 2, message: 'Mínimo 2 caracteres' },
-          { type: VALIDATION_TYPES.MAX_LENGTH, value: 50, message: 'Máximo 50 caracteres' }
-        ]
-      },
-      {
-        name: 'email',
-        label: 'Correo Electrónico',
-        type: FIELD_TYPES.EMAIL,
-        validations: [
-          { type: VALIDATION_TYPES.REQUIRED, message: 'El email es obligatorio' },
-          { type: VALIDATION_TYPES.EMAIL, message: 'Formato de email inválido' }
-        ]
-      },
-      {
-        name: 'edad',
-        label: 'Edad',
-        type: FIELD_TYPES.NUMBER,
-        validations: [
-          { type: VALIDATION_TYPES.REQUIRED, message: 'La edad es obligatoria' },
-          { type: VALIDATION_TYPES.MIN_VALUE, value: 18, message: 'Edad mínima 18 años' },
-          { type: VALIDATION_TYPES.MAX_VALUE, value: 65, message: 'Edad máxima 65 años' }
-        ]
-      },
-      {
-        name: 'telefono',
-        label: 'Teléfono',
-        type: FIELD_TYPES.TEXT,
-        validations: [
-          { type: VALIDATION_TYPES.REQUIRED, message: 'El teléfono es obligatorio' }
-        ]
-      },
-      {
-        name: 'cargo',
-        label: 'Cargo',
-        type: FIELD_TYPES.SELECT,
-        options: [
-          { label: 'Desarrolladora Frontend', value: 'Desarrolladora Frontend' },
-          { label: 'Backend Developer', value: 'Backend Developer' },
-          { label: 'Full Stack Developer', value: 'Full Stack Developer' },
-          { label: 'Mobile Developer', value: 'Mobile Developer' },
-          { label: 'DevOps Engineer', value: 'DevOps Engineer' },
-          { label: 'QA Tester', value: 'QA Tester' },
-          { label: 'UX Designer', value: 'UX Designer' },
-          { label: 'UI Designer', value: 'UI Designer' },
-          { label: 'Project Manager', value: 'Project Manager' },
-          { label: 'Product Owner', value: 'Product Owner' },
-          { label: 'Scrum Master', value: 'Scrum Master' },
-          { label: 'Tech Lead', value: 'Tech Lead' },
-          { label: 'Data Analyst', value: 'Data Analyst' },
-          { label: 'Database Administrator', value: 'Database Administrator' },
-          { label: 'Business Analyst', value: 'Business Analyst' },
-          { label: 'Security Specialist', value: 'Security Specialist' }
-        ],
-        validations: [
-          { type: VALIDATION_TYPES.REQUIRED, message: 'El cargo es obligatorio' }
-        ]
-      },
-      {
-        name: 'activo',
-        label: 'Usuario Activo',
-        type: FIELD_TYPES.CHECKBOX
-      },
-      {
-        name: 'fecha_registro',
-        label: 'Fecha de Registro',
-        type: FIELD_TYPES.DATE,
-        validations: [
-          { type: VALIDATION_TYPES.REQUIRED, message: 'La fecha de registro es obligatoria' }
-        ]
-      }
-    ]
-
-    // Funciones CRUD simuladas
-    const fetchItems = async () => {
-      loading.value = true
-      try {
-        // Simular delay de API
-        await new Promise(resolve => setTimeout(resolve, 500))
-        items.value = usersData.users
-        showNotification('Datos cargados correctamente', 'positive')
-      } catch (error) {
-        showNotification('Error al cargar los datos', 'negative')
-        console.error('Error fetching items:', error)
-      } finally {
-        loading.value = false
-      }
-    }
-
-    const createItem = async (data) => {
-      loading.value = true
-      try {
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        const newId = Math.max(...items.value.map(item => item.id)) + 1
-        const newItem = { ...data, id: newId }
-        items.value.push(newItem)
-        showForm.value = false
-        showNotification('Usuario creado exitosamente', 'positive')
-      } catch (error) {
-        showNotification('Error al crear el usuario', 'negative')
-        console.error('Error creating item:', error)
-      } finally {
-        loading.value = false
-      }
-    }
-
-    const updateItem = async (id, data) => {
-      loading.value = true
-      try {
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        const index = items.value.findIndex(item => item.id === id)
-        if (index !== -1) {
-          items.value[index] = { ...data, id }
-        }
-        showForm.value = false
-        showNotification('Usuario actualizado exitosamente', 'positive')
-      } catch (error) {
-        showNotification('Error al actualizar el usuario', 'negative')
-        console.error('Error updating item:', error)
-      } finally {
-        loading.value = false
-      }
-    }
-
-    const deleteItem = async (id) => {
-      loading.value = true
-      try {
-        await new Promise(resolve => setTimeout(resolve, 500))
-        const index = items.value.findIndex(item => item.id === id)
-        if (index !== -1) {
-          items.value.splice(index, 1)
-        }
-        showNotification('Usuario eliminado exitosamente', 'positive')
-      } catch (error) {
-        showNotification('Error al eliminar el usuario', 'negative')
-        console.error('Error deleting item:', error)
-      } finally {
-        loading.value = false
-      }
-    }
-
-    // Funciones de manejo de formulario
-    const openForm = (item = null) => {
-      if (item) {
-        Object.assign(currentItem, item)
-        isEditing.value = true
-      } else {
-        // Resetear el formulario con valores por defecto
-        Object.keys(currentItem).forEach(key => delete currentItem[key])
-        Object.assign(currentItem, {
-          nombre: '',
-          email: '',
-          edad: '',
-          telefono: '',
-          cargo: '',
-          activo: true,
-          fecha_registro: new Date().toISOString().split('T')[0]
-        })
-        isEditing.value = false
-      }
-      showForm.value = true
-    }
-
-    const openDetails = (item) => {
-      Object.assign(currentItem, item)
-      showDetails.value = true
-    }
-
-    const openConfirmDelete = (item) => {
-      Object.assign(currentItem, item)
-      showConfirm.value = true
-    }
-
-    const handleSubmit = (data) => {
-      if (isEditing.value) {
-        updateItem(currentItem.id, data)
-      } else {
-        createItem(data)
-      }
-    }
-
-    const handleAction = ({ action, row }) => {
-      switch (action) {
-        case 'view':
-          openDetails(row)
-          break
-        case 'edit':
-          openForm(row)
-          break
-        case 'delete':
-          openConfirmDelete(row)
-          break
-      }
-    }
-
-    const handleConfirmAction = (action) => {
-      if (action === 'accept') {
-        deleteItem(currentItem.id)
-      }
-    }
-
-    // Funciones de utilidad
-    const formatDate = (dateString) => {
-      if (!dateString) return ''
-      const date = new Date(dateString)
-      return date.toLocaleDateString('es-ES', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      })
-    }
-
-    const showNotification = (message, type = 'positive') => {
-      notification.message = message
-      notification.type = type
-      notification.show = true
-      // Auto-ocultar después de 3 segundos
-      setTimeout(() => {
-        notification.show = false
-      }, 3000)
-    }
-
-    const hideNotification = () => {
-      notification.show = false
-    }
-
-    // Cargar datos al montar el componente
-    onMounted(() => {
-      fetchItems()
+    watch(search, () => {
+      filterRows()
     })
 
     return {
-      loading,
-      items,
-      currentItem,
-      showForm,
-      showDetails,
-      showConfirm,
-      isEditing,
-      notification,
+      search,
       columns,
-      fields,
-      openForm,
-      handleAction,
-      handleConfirmAction,
-      handleSubmit,
-      formatDate,
-      hideNotification
+      rows,
+      filteredRows,
+      selectedUser,
+      showDetailDialog,
+      showEditDialog,
+      showNewDialog,
+      showDeleteDialog,
+      filterRows,
+      viewUser,
+      editUser,
+      openNewUserDialog,
+      confirmDeleteUser,
+      deleteUser,
+      handleUserUpdate,
+      handleUserCreate,
+      getInitials,
+      getAvatarColor,
+      handleImageError,
+      formatState,
+      getStateClass,
+      getTypeClass
     }
   }
 }
 </script>
 
-<style scoped>
-.q-table th {
-  font-weight: bold;
+<style lang="scss" scoped>
+// Page Layout
+.page-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100vh;
 }
 
-.q-banner {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 9999;
-  max-width: 400px;
+// Branding Section
+.branding-section {
+  display: flex;
+  justify-content: center;
+  padding: 24px 0;
+  
+  .brand-image {
+    max-width: 300px;
+    height: auto;
+    opacity: 0.8;
+  }
+}
+
+// Buttons
+.primary-btn {
+  padding: 12px 24px;
+  font-weight: 500;
+  border-radius: 8px;
+  text-transform: none;
+}
+
+// Confirmation Dialog
+.confirm-dialog {
+  min-width: 400px;
+  border-radius: 8px;
+}
+// State Badges
+.state-active {
+  background: #4caf50;
+  color: white;
+  font-weight: 500;
+}
+
+.state-inactive {
+  background: #f44336;
+  color: white;
+  font-weight: 500;
+}
+
+.state-pending {
+  background: #ff9800;
+  color: white;
+  font-weight: 500;
+}
+
+.state-default {
+  background: #9e9e9e;
+  color: white;
+  font-weight: 500;
+}
+
+// Type Chips
+.type-admin {
+  background: #e91e63;
+  color: white;
+}
+
+.type-user {
+  background: #2196f3;
+  color: white;
+}
+
+.type-moderator {
+  background: #9c27b0;
+  color: white;
+}
+
+.type-default {
+  background: #607d8b;
+  color: white;
 }
 </style>

@@ -68,9 +68,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import Fuse from 'fuse.js'
-import questions from 'src/data/questions.json' // <-- archivo estático
-
-const DELAY_MS = 3000 // 3 segundos
+import questions from 'src/data/questions.json'
 
 const query = ref('')
 const selectedTag = ref(null)
@@ -96,18 +94,6 @@ onBeforeUnmount(() => {
     timerId.value = null
   }
 })
-
-// input handler con debounce manual (espera 3s)
-function onInput () {
-  if (timerId.value) {
-    clearTimeout(timerId.value)
-    timerId.value = null
-  }
-  timerId.value = setTimeout(() => {
-    runSearch()
-    timerId.value = null
-  }, DELAY_MS)
-}
 
 // ejecutar búsqueda ahora (Enter)
 function runSearchNow () {
