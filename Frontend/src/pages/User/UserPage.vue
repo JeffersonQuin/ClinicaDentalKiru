@@ -1,440 +1,637 @@
 <template>
-  <div class="q-pa-md">
-    <!-- Tabla -->
-    <GenericTable
-      title="Gestión de Usuarios"
-      :rows="items"
-      :columns="columns"
-      :loading="loading"
-      @add="openForm()"
-      @action="handleAction"
-    />
-
-    <!-- Formulario -->
-    <GenericDialog
-      v-model="showForm"
-      :title="isEditing ? 'Editar Usuario' : 'Nuevo Usuario'"
-    >
-      <GenericForm
-        :fields="fields"
-        v-model="currentItem"
-        :loading="loading"
-        @submit="handleSubmit"
-        @cancel="showForm = false"
-      />
-    </GenericDialog>
-
-    <!-- Vista de detalles -->
-    <GenericDialog
-      v-model="showDetails"
-      title="Detalles del Usuario"
-      :show-actions="false"
-    >
-      <div class="q-gutter-md">
-        <div><strong>ID:</strong> {{ currentItem.id }}</div>
-        <div><strong>Nombre:</strong> {{ currentItem.nombre }}</div>
-        <div><strong>Email:</strong> {{ currentItem.email }}</div>
-        <div><strong>Edad:</strong> {{ currentItem.edad }} años</div>
-        <div><strong>Teléfono:</strong> {{ currentItem.telefono }}</div>
-        <div><strong>Cargo:</strong> {{ currentItem.cargo }}</div>
-        <div>
-          <strong>Estado:</strong> 
-          <q-chip 
-            :color="currentItem.activo ? 'positive' : 'negative'" 
-            text-color="white"
-            dense
-          >
-            {{ currentItem.activo ? 'Activo' : 'Inactivo' }}
-          </q-chip>
+  <div class="page-container">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="header-content">
+        <div class="title-section">
+          <i class="fa-solid fa-users header-icon"></i>
+          <div>
+            <h1 class="page-title">Gestión de Usuarios</h1>
+            <p class="page-subtitle">Administra permisos y accesos del personal de tu clínica</p>
+          </div>
         </div>
-        <div><strong>Fecha de Registro:</strong> {{ formatDate(currentItem.fecha_registro) }}</div>
+        <q-btn
+          class="primary-btn"
+          color="primary"
+          icon="fa-solid fa-plus"
+          label="Agregar Usuario"
+          @click="openNewUserDialog"
+          unelevated
+          no-caps
+          size="md"
+        />
       </div>
-    </GenericDialog>
+    </div>
 
-    <!-- Confirmación de eliminación -->
-    <GenericDialog
-      v-model="showConfirm"
-      title="Confirmar eliminación"
-      :message="`¿Estás seguro de que deseas eliminar al usuario '${currentItem.nombre}'?`"
-      @action="handleConfirmAction"
+    <!-- Stats Section -->
+    <div class="stats-section">
+      <div class="stat-card">
+        <div class="stat-icon-container active">
+          <i class="fa-solid fa-user-check"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ activeUsersCount }}</div>
+          <div class="stat-label">Usuarios Activos</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon-container inactive">
+          <i class="fa-solid fa-user-slash"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ inactiveUsersCount }}</div>
+          <div class="stat-label">Usuarios Inactivos</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon-container admin">
+          <i class="fa-solid fa-user-shield"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ adminUsersCount }}</div>
+          <div class="stat-label">Administradores</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon-container total">
+          <i class="fa-solid fa-users"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ filteredRows.length }}</div>
+          <div class="stat-label">Total de Usuarios</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Section -->
+    <div class="search-section">
+      <q-input
+        v-model="search"
+        class="search-input"
+        outlined
+        type="search"
+        placeholder="Buscar por nombre, email o tipo de usuario..."
+        @input="filterRows"
+        clearable
+        dense
+      >
+        <template v-slot:prepend>
+          <i class="fa-solid fa-search"></i>
+        </template>
+      </q-input>
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-container">
+      <q-table
+        class="data-table"
+        flat
+        :rows="filteredRows"
+        :columns="columns"
+        row-key="id"
+        :rows-per-page-options="[5, 10, 15, 20, 0]"
+        :pagination="{ rowsPerPage: 5 }"
+        separator="cell"
+      >
+        <template v-slot:no-data>
+          <div class="no-data-container">
+            <i class="fa-solid fa-users-slash no-data-icon"></i>
+            <p class="no-data-text">No se encontraron usuarios</p>
+            <p class="no-data-subtext">Intenta ajustar los filtros de búsqueda</p>
+          </div>
+        </template>
+
+        <template v-slot:body-cell-avatar="props">
+          <q-td :props="props">
+            <div class="avatar-container">
+              <q-avatar 
+                size="48px"
+                class="user-avatar"
+                :color="props.row.avatar ? 'transparent' : 'primary'"
+                :text-color="props.row.avatar ? 'transparent' : 'white'"
+              >
+                <img 
+                  v-if="props.row.avatar" 
+                  :src="props.row.avatar" 
+                  :alt="props.row.username"
+                  @error="handleImageError"
+                />
+                <span v-else class="avatar-initials">{{ getInitials(props.row.username) }}</span>
+              </q-avatar>
+            </div>
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-username="props">
+          <q-td :props="props">
+            <div class="user-info">
+              <span class="user-name">{{ props.row.username }}</span>
+            </div>
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-email="props">
+          <q-td :props="props">
+            <span class="user-email">{{ props.row.email }}</span>
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-state="props">
+          <q-td :props="props">
+            <q-badge
+              :class="['state-badge', getStateClass(props.row.state)]"
+              :label="formatState(props.row.state)"
+            />
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-type="props">
+          <q-td :props="props">
+            <q-chip
+              :class="['type-chip', getTypeClass(props.row.type)]"
+              :label="formatType(props.row.type)"
+              :icon="getTypeIcon(props.row.type)"
+              dense
+            />
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-actions="props">
+          <q-td :props="props">
+            <div class="action-buttons">
+              <q-btn
+                class="action-btn view-btn"
+                flat
+                dense
+                round
+                icon="fa-solid fa-eye"
+                size="sm"
+                @click="viewUser(props.row)"
+                color="grey-8"
+              >
+                <q-tooltip>Ver detalles</q-tooltip>
+              </q-btn>
+              
+              <q-btn
+                class="action-btn edit-btn"
+                flat
+                dense
+                round
+                icon="fa-solid fa-edit"
+                size="sm"
+                @click="editUser(props.row)"
+                color="primary"
+              >
+                <q-tooltip>Editar usuario</q-tooltip>
+              </q-btn>
+              
+              <q-btn
+                class="action-btn delete-btn"
+                flat
+                dense
+                round
+                icon="fa-solid fa-trash"
+                size="sm"
+                @click="confirmDeleteUser(props.row)"
+                color="negative"
+              >
+                <q-tooltip>Eliminar usuario</q-tooltip>
+              </q-btn>
+            </div>
+          </q-td>
+        </template>
+      </q-table>
+    </div>
+
+    <!-- Dialogs -->
+    <DetailUserDialog
+      v-model="showDetailDialog"
+      :user-data="selectedUser"
     />
 
-    <!-- Notificaciones -->
-    <q-banner
-      v-if="notification.show"
-      :class="`bg-${notification.type} text-white q-mb-md`"
-      dense
-    >
-      {{ notification.message }}
-      <template v-slot:action>
-        <q-btn
-          flat
-          dense
-          icon="close"
-          @click="hideNotification"
-        />
-      </template>
-    </q-banner>
+    <EditUserDialog
+      v-model="showEditDialog"
+      :user-data="selectedUser"
+      @user-updated="handleUserUpdate"
+    />
+
+    <NewUserDialog
+      v-model="showNewDialog"
+      @user-created="handleUserCreate"
+    />
+
+    <!-- Delete Confirmation Dialog -->
+    <q-dialog v-model="showDeleteDialog" persistent>
+      <q-card class="confirm-dialog">
+        <q-card-section class="dialog-header">
+          <div class="dialog-icon-container">
+            <i class="fa-solid fa-exclamation-triangle dialog-icon"></i>
+          </div>
+          <h3 class="dialog-title">Confirmar Eliminación</h3>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <p class="dialog-text">
+            ¿Está seguro que desea eliminar al usuario <strong>{{ selectedUser?.username }}</strong>?
+          </p>
+          <p class="dialog-subtext">
+            Esta acción no se puede deshacer y el usuario perderá acceso al sistema.
+          </p>
+        </q-card-section>
+
+        <q-card-actions class="dialog-actions">
+          <q-btn 
+            flat 
+            label="Cancelar" 
+            color="grey-7" 
+            v-close-popup 
+            no-caps
+            class="dialog-btn"
+          />
+          <q-btn 
+            unelevated
+            label="Eliminar Usuario" 
+            color="negative" 
+            @click="deleteUser"
+            v-close-popup 
+            no-caps
+            class="dialog-btn"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
 <script>
-import { ref, reactive, onMounted } from 'vue'
-import { FIELD_TYPES, VALIDATION_TYPES } from '../fieldConfig.js'
-import GenericTable from '../../components/GenericTable.vue'
-import GenericForm from '../../components/GenericForm.vue'
-import GenericDialog from '../../components/GenericDialog.vue'
+import { ref, onMounted, watch, computed } from 'vue'
+import users from 'src/data/users.json'
+import Fuse from 'fuse.js'
+import DetailUserDialog from './DetailUserDialog.vue'
+import EditUserDialog from './EditUserDialog.vue'
+import NewUserDialog from './NewUserDialog.vue'
 
-import usersData from '../../data/users.json'
+// Configuración de columnas de la tabla
+const columns = [
+  {
+    name: 'avatar',
+    required: true,
+    label: 'Avatar',
+    align: 'center',
+    field: 'avatar',
+    sortable: false,
+    style: 'width: 70px'
+  },
+  {
+    name: 'username',
+    required: true,
+    label: 'Usuario',
+    align: 'left',
+    field: 'username',
+    sortable: true
+  },
+  {
+    name: 'email',
+    label: 'Correo Electrónico',
+    field: 'email',
+    sortable: true,
+    align: 'left'
+  },
+  {
+    name: 'type',
+    label: 'Tipo',
+    field: 'type',
+    sortable: false,
+    align: 'center',
+    style: 'width: 160px'
+  },
+  {
+    name: 'state',
+    label: 'Estado',
+    field: 'state',
+    sortable: true,
+    align: 'center',
+    style: 'width: 120px'
+  },
+  {
+    name: 'actions',
+    label: 'Acciones',
+    field: 'actions',
+    align: 'center',
+    sortable: false,
+    style: 'width: 140px'
+  }
+]
+
+// Configuración de Fuse.js para búsqueda difusa
+const FUSE_OPTIONS = {
+  keys: ['username', 'email', 'type', 'state'],
+  threshold: 0.3,
+  includeScore: true,
+  minMatchCharLength: 1
+}
+
+// Mapeos de traducción
+const STATE_TRANSLATIONS = {
+  active: 'Activo',
+  inactive: 'Inactivo',
+  pending: 'Pendiente'
+}
+
+const TYPE_TRANSLATIONS = {
+  admin: 'Administrador',
+  user: 'Usuario',
+  moderator: 'Moderador'
+}
+
+const STATE_CLASSES = {
+  active: 'state-active',
+  inactive: 'state-inactive',
+  pending: 'state-pending'
+}
+
+const TYPE_CLASSES = {
+  admin: 'type-admin',
+  user: 'type-user',
+  moderator: 'type-moderator'
+}
+
+const TYPE_ICONS = {
+  admin: 'fa-solid fa-shield-halved',
+  user: 'fa-solid fa-user',
+  moderator: 'fa-solid fa-user-tie'
+}
 
 export default {
-  name: 'UsersCrudWithTestData',
+  name: 'UserTable',
+  
   components: {
-    GenericTable,
-    GenericForm,
-    GenericDialog
+    DetailUserDialog,
+    EditUserDialog,
+    NewUserDialog
   },
+  
   setup() {
-    // Estado reactivo
-    const loading = ref(false)
-    const items = ref([])
-    const currentItem = reactive({})
-    const showForm = ref(false)
-    const showDetails = ref(false)
-    const showConfirm = ref(false)
-    const isEditing = ref(false)
-    const notification = reactive({
-      show: false,
-      type: 'positive',
-      message: ''
-    })
+    // ============================================
+    // Estado Reactivo
+    // ============================================
+    const search = ref('')
+    const rows = ref([])
+    const filteredRows = ref([])
+    const selectedUser = ref(null)
+    const showDetailDialog = ref(false)
+    const showEditDialog = ref(false)
+    const showNewDialog = ref(false)
+    const showDeleteDialog = ref(false)
+    let fuse = null
 
-    // Configuración de columnas de la tabla
-    const columns = [
-      { 
-        name: 'id', 
-        label: 'ID', 
-        field: 'id', 
-        align: 'left',
-        sortable: true,
-        style: 'width: 50px'
-      },
-      { 
-        name: 'nombre', 
-        label: 'Nombre', 
-        field: 'nombre', 
-        align: 'left',
-        sortable: true
-      },
-      { 
-        name: 'email', 
-        label: 'Email', 
-        field: 'email', 
-        align: 'left',
-        sortable: true
-      },
-      { 
-        name: 'edad', 
-        label: 'Edad', 
-        field: 'edad', 
-        align: 'center',
-        sortable: true,
-        style: 'width: 70px'
-      },
-      { 
-        name: 'cargo', 
-        label: 'Cargo', 
-        field: 'cargo', 
-        align: 'left',
-        sortable: true
-      },
-      { 
-        name: 'activo', 
-        label: 'Estado', 
-        field: 'activo', 
-        align: 'center',
-        format: (val) => val ? 'Activo' : 'Inactivo',
-        style: 'width: 100px'
-      },
-      { 
-        name: 'actions', 
-        label: 'Acciones', 
-        field: 'actions', 
-        align: 'center',
-        style: 'width: 150px'
-      }
-    ]
+    // ============================================
+    // Propiedades Computadas
+    // ============================================
+    const activeUsersCount = computed(() => 
+      filteredRows.value.filter(user => user.state === 'active').length
+    )
 
-    // Configuración de campos del formulario
-    const fields = [
-      {
-        name: 'nombre',
-        label: 'Nombre Completo',
-        type: FIELD_TYPES.TEXT,
-        validations: [
-          { type: VALIDATION_TYPES.REQUIRED, message: 'El nombre es obligatorio' },
-          { type: VALIDATION_TYPES.MIN_LENGTH, value: 2, message: 'Mínimo 2 caracteres' },
-          { type: VALIDATION_TYPES.MAX_LENGTH, value: 50, message: 'Máximo 50 caracteres' }
-        ]
-      },
-      {
-        name: 'email',
-        label: 'Correo Electrónico',
-        type: FIELD_TYPES.EMAIL,
-        validations: [
-          { type: VALIDATION_TYPES.REQUIRED, message: 'El email es obligatorio' },
-          { type: VALIDATION_TYPES.EMAIL, message: 'Formato de email inválido' }
-        ]
-      },
-      {
-        name: 'edad',
-        label: 'Edad',
-        type: FIELD_TYPES.NUMBER,
-        validations: [
-          { type: VALIDATION_TYPES.REQUIRED, message: 'La edad es obligatoria' },
-          { type: VALIDATION_TYPES.MIN_VALUE, value: 18, message: 'Edad mínima 18 años' },
-          { type: VALIDATION_TYPES.MAX_VALUE, value: 65, message: 'Edad máxima 65 años' }
-        ]
-      },
-      {
-        name: 'telefono',
-        label: 'Teléfono',
-        type: FIELD_TYPES.TEXT,
-        validations: [
-          { type: VALIDATION_TYPES.REQUIRED, message: 'El teléfono es obligatorio' }
-        ]
-      },
-      {
-        name: 'cargo',
-        label: 'Cargo',
-        type: FIELD_TYPES.SELECT,
-        options: [
-          { label: 'Desarrolladora Frontend', value: 'Desarrolladora Frontend' },
-          { label: 'Backend Developer', value: 'Backend Developer' },
-          { label: 'Full Stack Developer', value: 'Full Stack Developer' },
-          { label: 'Mobile Developer', value: 'Mobile Developer' },
-          { label: 'DevOps Engineer', value: 'DevOps Engineer' },
-          { label: 'QA Tester', value: 'QA Tester' },
-          { label: 'UX Designer', value: 'UX Designer' },
-          { label: 'UI Designer', value: 'UI Designer' },
-          { label: 'Project Manager', value: 'Project Manager' },
-          { label: 'Product Owner', value: 'Product Owner' },
-          { label: 'Scrum Master', value: 'Scrum Master' },
-          { label: 'Tech Lead', value: 'Tech Lead' },
-          { label: 'Data Analyst', value: 'Data Analyst' },
-          { label: 'Database Administrator', value: 'Database Administrator' },
-          { label: 'Business Analyst', value: 'Business Analyst' },
-          { label: 'Security Specialist', value: 'Security Specialist' }
-        ],
-        validations: [
-          { type: VALIDATION_TYPES.REQUIRED, message: 'El cargo es obligatorio' }
-        ]
-      },
-      {
-        name: 'activo',
-        label: 'Usuario Activo',
-        type: FIELD_TYPES.CHECKBOX
-      },
-      {
-        name: 'fecha_registro',
-        label: 'Fecha de Registro',
-        type: FIELD_TYPES.DATE,
-        validations: [
-          { type: VALIDATION_TYPES.REQUIRED, message: 'La fecha de registro es obligatoria' }
-        ]
-      }
-    ]
+    const inactiveUsersCount = computed(() => 
+      filteredRows.value.filter(user => user.state === 'inactive').length
+    )
 
-    // Funciones CRUD simuladas
-    const fetchItems = async () => {
-      loading.value = true
-      try {
-        // Simular delay de API
-        await new Promise(resolve => setTimeout(resolve, 500))
-        items.value = usersData.users
-        showNotification('Datos cargados correctamente', 'positive')
-      } catch (error) {
-        showNotification('Error al cargar los datos', 'negative')
-        console.error('Error fetching items:', error)
-      } finally {
-        loading.value = false
-      }
-    }
+    const adminUsersCount = computed(() => 
+      filteredRows.value.filter(user => user.type === 'admin').length
+    )
 
-    const createItem = async (data) => {
-      loading.value = true
-      try {
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        const newId = Math.max(...items.value.map(item => item.id)) + 1
-        const newItem = { ...data, id: newId }
-        items.value.push(newItem)
-        showForm.value = false
-        showNotification('Usuario creado exitosamente', 'positive')
-      } catch (error) {
-        showNotification('Error al crear el usuario', 'negative')
-        console.error('Error creating item:', error)
-      } finally {
-        loading.value = false
-      }
-    }
-
-    const updateItem = async (id, data) => {
-      loading.value = true
-      try {
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        const index = items.value.findIndex(item => item.id === id)
-        if (index !== -1) {
-          items.value[index] = { ...data, id }
-        }
-        showForm.value = false
-        showNotification('Usuario actualizado exitosamente', 'positive')
-      } catch (error) {
-        showNotification('Error al actualizar el usuario', 'negative')
-        console.error('Error updating item:', error)
-      } finally {
-        loading.value = false
-      }
-    }
-
-    const deleteItem = async (id) => {
-      loading.value = true
-      try {
-        await new Promise(resolve => setTimeout(resolve, 500))
-        const index = items.value.findIndex(item => item.id === id)
-        if (index !== -1) {
-          items.value.splice(index, 1)
-        }
-        showNotification('Usuario eliminado exitosamente', 'positive')
-      } catch (error) {
-        showNotification('Error al eliminar el usuario', 'negative')
-        console.error('Error deleting item:', error)
-      } finally {
-        loading.value = false
-      }
-    }
-
-    // Funciones de manejo de formulario
-    const openForm = (item = null) => {
-      if (item) {
-        Object.assign(currentItem, item)
-        isEditing.value = true
+    // ============================================
+    // Gestión de Búsqueda con Fuse.js
+    // ============================================
+    
+    /**
+     * Reconstruye el índice de búsqueda de Fuse.js
+     * Excluye usuarios eliminados de la colección
+     */
+    const rebuildFuse = () => {
+      const collection = rows.value.filter(user => user.state !== 'deleted')
+      
+      if (fuse && typeof fuse.setCollection === 'function') {
+        fuse.setCollection(collection)
       } else {
-        // Resetear el formulario con valores por defecto
-        Object.keys(currentItem).forEach(key => delete currentItem[key])
-        Object.assign(currentItem, {
-          nombre: '',
-          email: '',
-          edad: '',
-          telefono: '',
-          cargo: '',
-          activo: true,
-          fecha_registro: new Date().toISOString().split('T')[0]
-        })
-        isEditing.value = false
-      }
-      showForm.value = true
-    }
-
-    const openDetails = (item) => {
-      Object.assign(currentItem, item)
-      showDetails.value = true
-    }
-
-    const openConfirmDelete = (item) => {
-      Object.assign(currentItem, item)
-      showConfirm.value = true
-    }
-
-    const handleSubmit = (data) => {
-      if (isEditing.value) {
-        updateItem(currentItem.id, data)
-      } else {
-        createItem(data)
+        fuse = new Fuse(collection, FUSE_OPTIONS)
       }
     }
 
-    const handleAction = ({ action, row }) => {
-      switch (action) {
-        case 'view':
-          openDetails(row)
-          break
-        case 'edit':
-          openForm(row)
-          break
-        case 'delete':
-          openConfirmDelete(row)
-          break
+    /**
+     * Filtra usuarios según el término de búsqueda
+     * Si no hay búsqueda, muestra todos los usuarios activos
+     */
+    const filterRows = () => {
+      if (!search.value?.trim()) {
+        filteredRows.value = rows.value.filter(user => user.state !== 'deleted')
+        return
+      }
+
+      const results = fuse.search(search.value.trim())
+      filteredRows.value = results.map(result => result.item)
+    }
+
+    // ============================================
+    // Operaciones CRUD
+    // ============================================
+    
+    /**
+     * Carga usuarios desde el JSON
+     * Normaliza los IDs a números e inicializa Fuse.js
+     */
+    const loadUsers = () => {
+      rows.value = users.users.map(user => ({ 
+        ...user, 
+        id: Number(user.id) 
+      }))
+      
+      filteredRows.value = rows.value.filter(user => user.state !== 'deleted')
+      fuse = new Fuse(filteredRows.value, FUSE_OPTIONS)
+    }
+
+    /**
+     * Crea un nuevo usuario con valores por defecto
+     * Genera un ID único autoincremental
+     */
+    const handleUserCreate = (newUser) => {
+      const userToAdd = {
+        username: newUser.username || 'sin-nombre',
+        email: newUser.email || '',
+        type: newUser.type || 'user',
+        state: newUser.state || 'active',
+        password: newUser.password || '',
+        notes: newUser.notes || '',
+        createdAt: newUser.createdAt || new Date().toISOString(),
+        lastLogin: newUser.lastLogin || null,
+        avatar: newUser.avatar || null
+      }
+
+      // Genera ID único
+      const numericIds = rows.value
+        .map(u => Number(u.id))
+        .filter(n => !Number.isNaN(n))
+      
+      const maxId = numericIds.length ? Math.max(...numericIds) : 0
+      userToAdd.id = maxId + 1
+
+      rows.value.push(userToAdd)
+      rebuildFuse()
+      filterRows()
+    }
+
+    /**
+     * Actualiza un usuario existente
+     * Mantiene la integridad del ID como número
+     */
+    const handleUserUpdate = (updatedUser) => {
+      const index = rows.value.findIndex(
+        u => Number(u.id) === Number(updatedUser.id)
+      )
+      
+      if (index > -1) {
+        rows.value[index] = { 
+          ...updatedUser, 
+          id: Number(updatedUser.id) 
+        }
+        rebuildFuse()
+        filterRows()
       }
     }
 
-    const handleConfirmAction = (action) => {
-      if (action === 'accept') {
-        deleteItem(currentItem.id)
+    /**
+     * Eliminación logica: marca el estado como 'deleted'
+     * No elimina físicamente el registro
+     */
+    const deleteUser = () => {
+      const index = rows.value.findIndex(
+        u => Number(u.id) === Number(selectedUser.value.id)
+      )
+      
+      if (index > -1) {
+        rows.value[index].state = 'deleted'
+        rebuildFuse()
+        filterRows()
       }
     }
 
-    // Funciones de utilidad
-    const formatDate = (dateString) => {
-      if (!dateString) return ''
-      const date = new Date(dateString)
-      return date.toLocaleDateString('es-ES', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      })
+    // ============================================
+    // Gestión de Diálogos
+    // ============================================
+    
+    const viewUser = (user) => {
+      selectedUser.value = { ...user }
+      showDetailDialog.value = true
     }
 
-    const showNotification = (message, type = 'positive') => {
-      notification.message = message
-      notification.type = type
-      notification.show = true
-      // Auto-ocultar después de 3 segundos
-      setTimeout(() => {
-        notification.show = false
-      }, 3000)
+    const editUser = (user) => {
+      selectedUser.value = { ...user }
+      showEditDialog.value = true
     }
 
-    const hideNotification = () => {
-      notification.show = false
+    const openNewUserDialog = () => {
+      showNewDialog.value = true
     }
 
-    // Cargar datos al montar el componente
+    const confirmDeleteUser = (user) => {
+      selectedUser.value = { ...user }
+      showDeleteDialog.value = true
+    }
+
+    // ============================================
+    // Funciones Utilitarias
+    // ============================================
+    
+    /**
+     * Genera iniciales para el avatar
+     * Ejemplos: "Juan Perez" → "JP", "Ana" → "AN"
+     */
+    const getInitials = (name) => {
+      if (!name) return '?'
+      
+      const words = name.trim().split(' ')
+      
+      if (words.length === 1) {
+        return words[0].substring(0, 2).toUpperCase()
+      }
+      
+      return (words[0][0] + (words[1]?.[0] || '')).toUpperCase()
+    }
+
+    /**
+     * Maneja errores de carga de imágenes
+     * Oculta la imagen y muestra las iniciales
+     */
+    const handleImageError = (event) => {
+      event.target.style.display = 'none'
+    }
+
+    // Funciones de formato y clases CSS
+    const formatState = (state) => STATE_TRANSLATIONS[state] || state
+    const formatType = (type) => TYPE_TRANSLATIONS[type] || type
+    const getStateClass = (state) => STATE_CLASSES[state] || 'state-default'
+    const getTypeClass = (type) => TYPE_CLASSES[type] || 'type-default'
+    const getTypeIcon = (type) => TYPE_ICONS[type] || 'fa-solid fa-user'
+
+    // ============================================
+    // Ciclo de Vida
+    // ============================================
+    
     onMounted(() => {
-      fetchItems()
+      loadUsers()
     })
 
+    watch(search, () => {
+      filterRows()
+    })
+
+    // ============================================
+    // API Pública del Componente
+    // ============================================
+    
     return {
-      loading,
-      items,
-      currentItem,
-      showForm,
-      showDetails,
-      showConfirm,
-      isEditing,
-      notification,
+      // Estado
+      search,
       columns,
-      fields,
-      openForm,
-      handleAction,
-      handleConfirmAction,
-      handleSubmit,
-      formatDate,
-      hideNotification
+      rows,
+      filteredRows,
+      selectedUser,
+      showDetailDialog,
+      showEditDialog,
+      showNewDialog,
+      showDeleteDialog,
+      
+      // Computadas
+      activeUsersCount,
+      inactiveUsersCount,
+      adminUsersCount,
+      
+      // Métodos de búsqueda y filtrado
+      filterRows,
+      
+      // Operaciones CRUD
+      handleUserCreate,
+      handleUserUpdate,
+      deleteUser,
+      
+      // Gestión de diálogos
+      viewUser,
+      editUser,
+      openNewUserDialog,
+      confirmDeleteUser,
+      
+      // Utilidades
+      getInitials,
+      handleImageError,
+      formatState,
+      formatType,
+      getStateClass,
+      getTypeClass,
+      getTypeIcon
     }
   }
 }
 </script>
-
-<style scoped>
-.q-table th {
-  font-weight: bold;
-}
-
-.q-banner {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 9999;
-  max-width: 400px;
-}
-</style>

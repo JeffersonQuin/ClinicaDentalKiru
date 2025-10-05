@@ -41,6 +41,7 @@
       row-key="id"
       flat
       bordered
+      
     >
       <!-- Slot para columnas personalizadas -->
       <template v-slot:body-cell-actions="props">

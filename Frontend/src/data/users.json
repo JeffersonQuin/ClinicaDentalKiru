@@ -2,153 +2,128 @@
   "users": [
     {
       "id": 1,
-      "nombre": "María González",
+      "username": "maria.gonzalez",
+      "password": "pass123",
       "email": "maria.gonzalez@example.com",
-      "edad": 28,
-      "telefono": "+58 414-1234567",
-      "cargo": "Desarrolladora Frontend",
-      "activo": true,
-      "fecha_registro": "2024-01-15"
+      "type": "user",
+      "state": "active",
+      "avatar": "https://i.pravatar.cc/150?img=1"
     },
     {
       "id": 2,
-      "nombre": "Carlos Rodríguez",
+      "username": "carlos.rodriguez",
+      "password": "pass123",
       "email": "carlos.rodriguez@example.com",
-      "edad": 35,
-      "telefono": "+58 424-7654321",
-      "cargo": "Project Manager",
-      "activo": true,
-      "fecha_registro": "2023-11-22"
+      "type": "user",
+      "state": "active",
+      "avatar": "https://i.pravatar.cc/150?img=2"
     },
     {
       "id": 3,
-      "nombre": "Ana Martínez",
+      "username": "ana.martinez",
+      "password": "pass123",
       "email": "ana.martinez@example.com",
-      "edad": 42,
-      "telefono": "+58 412-9876543",
-      "cargo": "UX Designer",
-      "activo": false,
-      "fecha_registro": "2023-08-10"
+      "type": "user",
+      "state": "inactive",
+      "avatar": "https://i.pravatar.cc/150?img=3"
     },
     {
       "id": 4,
-      "nombre": "Pedro Sánchez",
+      "username": "pedro.sanchez",
+      "password": "pass123",
       "email": "pedro.sanchez@example.com",
-      "edad": 29,
-      "telefono": "+58 416-5555555",
-      "cargo": "Backend Developer",
-      "activo": true,
-      "fecha_registro": "2024-02-28"
+      "type": "user",
+      "state": "active",
+      "avatar": "https://i.pravatar.cc/150?img=4"
     },
     {
       "id": 5,
-      "nombre": "Luisa Fernández",
+      "username": "luisa.fernandez",
+      "password": "pass123",
       "email": "luisa.fernandez@example.com",
-      "edad": 31,
-      "telefono": "+58 426-3333333",
-      "cargo": "DevOps Engineer",
-      "activo": true,
-      "fecha_registro": "2023-12-05"
+      "type": "user",
+      "state": "active",
+      "avatar": "https://i.pravatar.cc/150?img=5"
     },
     {
       "id": 6,
-      "nombre": "Roberto Jiménez",
+      "username": "roberto.jimenez",
+      "password": "pass123",
       "email": "roberto.jimenez@example.com",
-      "edad": 45,
-      "telefono": "+58 414-7777777",
-      "cargo": "Tech Lead",
-      "activo": true,
-      "fecha_registro": "2023-06-18"
+      "type": "user",
+      "state": "active"
     },
     {
       "id": 7,
-      "nombre": "Carmen López",
+      "username": "carmen.lopez",
+      "password": "pass123",
       "email": "carmen.lopez@example.com",
-      "edad": 26,
-      "telefono": "+58 424-2222222",
-      "cargo": "QA Tester",
-      "activo": false,
-      "fecha_registro": "2024-03-12"
+      "type": "user",
+      "state": "inactive"
     },
     {
       "id": 8,
-      "nombre": "José Herrera",
+      "username": "jose.herrera",
+      "password": "pass123",
       "email": "jose.herrera@example.com",
-      "edad": 38,
-      "telefono": "+58 412-8888888",
-      "cargo": "Data Analyst",
-      "activo": true,
-      "fecha_registro": "2023-09-30"
+      "type": "user",
+      "state": "active"
     },
     {
       "id": 9,
-      "nombre": "Isabel Torres",
+      "username": "isabel.torres",
+      "password": "pass123",
       "email": "isabel.torres@example.com",
-      "edad": 33,
-      "telefono": "+58 416-1111111",
-      "cargo": "Scrum Master",
-      "activo": true,
-      "fecha_registro": "2024-01-08"
+      "type": "user",
+      "state": "active"
     },
     {
       "id": 10,
-      "nombre": "Miguel Vargas",
+      "username": "miguel.vargas",
+      "password": "pass123",
       "email": "miguel.vargas@example.com",
-      "edad": 27,
-      "telefono": "+58 426-9999999",
-      "cargo": "Mobile Developer",
-      "activo": true,
-      "fecha_registro": "2024-04-20"
+      "type": "user",
+      "state": "active"
     },
     {
       "id": 11,
-      "nombre": "Patricia Mendoza",
+      "username": "patricia.mendoza",
+      "password": "pass123",
       "email": "patricia.mendoza@example.com",
-      "edad": 40,
-      "telefono": "+58 414-4444444",
-      "cargo": "Business Analyst",
-      "activo": false,
-      "fecha_registro": "2023-07-14"
+      "type": "user",
+      "state": "inactive"
     },
     {
       "id": 12,
-      "nombre": "Francisco Ruiz",
+      "username": "francisco.ruiz",
+      "password": "pass123",
       "email": "francisco.ruiz@example.com",
-      "edad": 34,
-      "telefono": "+58 424-6666666",
-      "cargo": "Database Administrator",
-      "activo": true,
-      "fecha_registro": "2023-10-25"
+      "type": "user",
+      "state": "active"
     },
     {
       "id": 13,
-      "nombre": "Gabriela Castro",
+      "username": "gabriela.castro",
+      "password": "pass123",
       "email": "gabriela.castro@example.com",
-      "edad": 25,
-      "telefono": "+58 412-0000000",
-      "cargo": "Junior Developer",
-      "activo": true,
-      "fecha_registro": "2024-05-15"
+      "type": "user",
+      "state": "active"
     },
     {
       "id": 14,
-      "nombre": "Andrés Morales",
+      "username": "andres.morales",
+      "password": "pass123",
       "email": "andres.morales@example.com",
-      "edad": 39,
-      "telefono": "+58 416-3456789",
-      "cargo": "Security Specialist",
-      "activo": true,
-      "fecha_registro": "2023-12-20"
+      "type": "user",
+      "state": "active"
     },
     {
       "id": 15,
-      "nombre": "Valentina Silva",
+      "username": "valentina.silva",
+      "password": "pass123",
       "email": "valentina.silva@example.com",
-      "edad": 30,
-      "telefono": "+58 426-7890123",
-      "cargo": "Product Owner",
-      "activo": false,
-      "fecha_registro": "2024-02-10"
+      "type": "user",
+      "state": "inactive"
     }
   ]
 }
