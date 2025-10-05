@@ -70,6 +70,8 @@
                 filled
                 dense
                 :options="userTypeOptions"
+                emit-value
+                map-options
                 :rules="[val => !!val || 'El tipo de usuario es requerido']"
                 class="form-input"
                 placeholder="Seleccione el tipo"
@@ -87,6 +89,8 @@
                 filled
                 dense
                 :options="stateOptions"
+                emit-value
+                map-options
                 :rules="[val => !!val || 'El estado es requerido']"
                 class="form-input"
                 placeholder="Seleccione el estado"
@@ -154,7 +158,6 @@
 
 <script>
 import { ref, computed, watch } from 'vue'
-import { useQuasar } from 'quasar'
 
 export default {
   name: 'EditUserDialog',
@@ -170,7 +173,6 @@ export default {
   },
   emits: ['update:modelValue', 'user-updated'],
   setup(props, { emit }) {
-    const $q = useQuasar()
     const loading = ref(false)
     const form = ref({
       id: null,
@@ -185,13 +187,12 @@ export default {
     const userTypeOptions = [
       { label: 'Administrador', value: 'admin' },
       { label: 'Usuario', value: 'user' },
-      { label: 'Moderador', value: 'moderator' }
+      { label: 'Moderador', value: 'moderator' },
     ]
 
     const stateOptions = [
       { label: 'Activo', value: 'active' },
-      { label: 'Inactivo', value: 'inactive' },
-      { label: 'Pendiente', value: 'pending' }
+      { label: 'Inactivo', value: 'inactive' }
     ]
 
     const showDialog = computed({
@@ -234,7 +235,6 @@ export default {
       loading.value = true
       
       try {
-        // Simular llamada a API
         await new Promise(resolve => setTimeout(resolve, 1000))
         
         const updatedUser = {
@@ -247,29 +247,16 @@ export default {
           updatedAt: new Date().toISOString()
         }
 
-        // Si se proporcionó una nueva contraseña, incluirla
         if (form.value.password) {
           updatedUser.password = form.value.password
         }
 
         emit('user-updated', updatedUser)
         
-        // Mostrar mensaje de éxito
-        $q.notify({
-          type: 'positive',
-          message: 'Usuario actualizado correctamente',
-          icon: 'fa-solid fa-check-circle'
-        })
-
         closeDialog()
       } catch (error) {
         console.error('Error updating user:', error)
         
-        $q.notify({
-          type: 'negative',
-          message: 'Error al actualizar el usuario',
-          icon: 'fa-solid fa-exclamation-triangle'
-        })
       } finally {
         loading.value = false
       }

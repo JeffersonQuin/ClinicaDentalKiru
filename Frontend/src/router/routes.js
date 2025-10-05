@@ -41,6 +41,14 @@ const routes = [
         path: '/specialties',
         component: () => import('pages/Specialties/SpecialityPage.vue')
       },
+      {
+        path: '/publications',
+        component: () => import('pages/Publication/PublicationsPage.vue')
+      },
+      {
+        path: '/branches',
+        component: () => import('pages/Branch/BranchPage.vue')
+      }
     ]
   },
 

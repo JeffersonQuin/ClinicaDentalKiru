@@ -223,7 +223,7 @@
 
 <script>
 import { ref, computed } from 'vue'
-import { useQuasar } from 'quasar'
+
 export default {
   name: 'NewUserDialog',
   props: {
@@ -234,7 +234,6 @@ export default {
   },
   emits: ['update:modelValue', 'user-created'],
   setup(props, { emit }) {
-    const $q = useQuasar()
     const loading = ref(false)
     const showPassword = ref(false)
     const showConfirmPassword = ref(false)
@@ -242,7 +241,7 @@ export default {
     const form = ref({
       username: '',
       email: '',
-      type: 'user',
+      type: '',
       state: 'active',
       password: '',
       confirmPassword: '',
@@ -253,7 +252,8 @@ export default {
     const userTypeOptions = [
       { label: 'Administrador', value: 'admin' },
       { label: 'Usuario Regular', value: 'user' },
-      { label: 'Moderador', value: 'moderator' }
+      { label: 'Moderador', value: 'moderator' },
+      { label: 'Estándar', value: 'standard' }
     ]
 
     const stateOptions = [
@@ -291,7 +291,6 @@ export default {
       loading.value = true
       
       try {
-        // Simular llamada a API
         await new Promise(resolve => setTimeout(resolve, 1500))
         
         const newUser = {
@@ -299,45 +298,21 @@ export default {
           email: form.value.email,
           type: form.value.type,
           state: form.value.state,
+          password: form.value.password,
           notes: form.value.notes,
           createdAt: new Date().toISOString(),
           lastLogin: null
         }
 
         emit('user-created', newUser)
-        
-        // Mostrar mensaje de éxito
-        $q.notify({
-          type: 'positive',
-          message: `Usuario "${newUser.username}" creado correctamente`,
-          icon: 'fa-solid fa-check-circle',
-          timeout: 3000
-        })
-
-        // Mostrar mensaje adicional si se envía correo
-        if (form.value.sendWelcomeEmail) {
-          $q.notify({
-            type: 'info',
-            message: 'Correo de bienvenida enviado',
-            icon: 'fa-solid fa-envelope',
-            timeout: 2000
-          })
-        }
-
         closeDialog()
       } catch (error) {
         console.error('Error creating user:', error)
-        
-        $q.notify({
-          type: 'negative',
-          message: 'Error al crear el usuario. Inténtelo nuevamente.',
-          icon: 'fa-solid fa-exclamation-triangle',
-          timeout: 4000
-        })
       } finally {
         loading.value = false
       }
     }
+
 
     return {
       showDialog,
@@ -353,4 +328,3 @@ export default {
   }
 }
 </script>
-

@@ -4,18 +4,18 @@
     <div class="page-header">
       <div class="header-content">
         <div class="title-section">
-          <i class="fa-solid fa-tooth header-icon"></i>
+          <i class="fa-solid fa-newspaper header-icon"></i>
           <div>
-            <h1 class="page-title">Gestión de Dentistas</h1>
-            <p class="page-subtitle">Administra el equipo odontológico de tu clínica</p>
+            <h1 class="page-title">Gestión de Publicaciones</h1>
+            <p class="page-subtitle">Administra el contenido educativo de tu clínica</p>
           </div>
         </div>
         <q-btn
           class="primary-btn"
           color="primary"
           icon="fa-solid fa-plus"
-          label="Agregar Dentista"
-          @click="openNewDentistDialog"
+          label="Nueva Publicación"
+          @click="openNewPublicationDialog"
           unelevated
           no-caps
           size="md"
@@ -27,41 +27,41 @@
     <div class="stats-section">
       <div class="stat-card">
         <div class="stat-icon-container active">
-          <i class="fa-solid fa-user-doctor"></i>
+          <i class="fa-solid fa-circle-check"></i>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{ activeDentistsCount }}</div>
-          <div class="stat-label">Dentistas Activos</div>
+          <div class="stat-value">{{ activePublicationsCount }}</div>
+          <div class="stat-label">Publicaciones Activas</div>
         </div>
       </div>
       
       <div class="stat-card">
         <div class="stat-icon-container inactive">
-          <i class="fa-solid fa-user-slash"></i>
+          <i class="fa-solid fa-circle-xmark"></i>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{ inactiveDentistsCount }}</div>
-          <div class="stat-label">Dentistas Inactivos</div>
+          <div class="stat-value">{{ inactivePublicationsCount }}</div>
+          <div class="stat-label">Publicaciones Inactivas</div>
         </div>
       </div>
       
       <div class="stat-card">
         <div class="stat-icon-container admin">
-          <i class="fa-solid fa-graduation-cap"></i>
+          <i class="fa-solid fa-images"></i>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{ totalSpecialties }}</div>
-          <div class="stat-label">Especialidades Totales</div>
+          <div class="stat-value">{{ totalImages }}</div>
+          <div class="stat-label">Imágenes Totales</div>
         </div>
       </div>
       
       <div class="stat-card">
         <div class="stat-icon-container total">
-          <i class="fa-solid fa-users"></i>
+          <i class="fa-solid fa-file-lines"></i>
         </div>
         <div class="stat-content">
           <div class="stat-value">{{ filteredRows.length }}</div>
-          <div class="stat-label">Total de Dentistas</div>
+          <div class="stat-label">Total de Publicaciones</div>
         </div>
       </div>
     </div>
@@ -73,7 +73,7 @@
         class="search-input"
         outlined
         type="search"
-        placeholder="Buscar por nombre, apellido o especialidad..."
+        placeholder="Buscar por título, descripción o autor..."
         @input="filterRows"
         clearable
         dense
@@ -98,53 +98,42 @@
       >
         <template v-slot:no-data>
           <div class="no-data-container">
-            <i class="fa-solid fa-user-doctor-slash no-data-icon"></i>
-            <p class="no-data-text">No se encontraron dentistas</p>
+            <i class="fa-solid fa-newspaper no-data-icon"></i>
+            <p class="no-data-text">No se encontraron publicaciones</p>
             <p class="no-data-subtext">Intenta ajustar los filtros de búsqueda</p>
           </div>
         </template>
 
-        <template v-slot:body-cell-img="props">
+        <template v-slot:body-cell-imagenes="props">
           <q-td :props="props">
-            <div class="avatar-container">
-              <q-avatar 
-                size="48px"
-                class="user-avatar"
-                :color="props.row.img ? 'transparent' : getAvatarColor(props.row.name)"
-                :text-color="props.row.img ? 'transparent' : 'white'"
+            <div class="table-carousel-container">
+              <q-carousel
+                v-model="carouselModels[props.row.id]"
+                animated
+                arrows
+                control-color="primary"
+                height="60px"
+                class="table-carousel"
               >
-                <img 
-                  v-if="props.row.img" 
-                  :src="props.row.img" 
-                  :alt="getFullName(props.row)"
-                  @error="handleImageError"
+                <q-carousel-slide
+                  v-for="(img, index) in props.row.imagenes"
+                  :key="index"
+                  :name="index"
+                  :img-src="img"
+                  class="table-carousel-slide"
                 />
-                <span v-else class="avatar-initials">{{ getInitials(props.row) }}</span>
-              </q-avatar>
+              </q-carousel>
+              <div class="image-counter">
+                {{ (carouselModels[props.row.id] || 0) + 1 }}/{{ props.row.imagenes.length }}
+              </div>
             </div>
           </q-td>
         </template>
 
-        <template v-slot:body-cell-fullName="props">
+        <template v-slot:body-cell-titulo="props">
           <q-td :props="props">
-            <div class="user-info">
-              <span class="user-name">{{ getFullName(props.row) }}</span>
-            </div>
-          </q-td>
-        </template>
-
-        <template v-slot:body-cell-speciality="props">
-          <q-td :props="props">
-            <div style="display: flex; gap: 4px; flex-wrap: wrap;">
-              <q-chip
-                v-for="specId in props.row.speciality"
-                :key="specId"
-                dense
-                class="type-chip type-user"
-                size="sm"
-              >
-                {{ getSpecialtyName(specId) }}
-              </q-chip>
+            <div class="publication-title">
+              <span class="title-text">{{ props.row.titulo }}</span>
             </div>
           </q-td>
         </template>
@@ -155,8 +144,9 @@
               dense
               icon="fa-solid fa-user"
               class="type-chip type-moderator"
+              size="sm"
             >
-              ID: {{ props.row.userId }}
+              {{ getUserName(props.row.userId) }}
             </q-chip>
           </q-td>
         </template>
@@ -180,7 +170,7 @@
                 round
                 icon="fa-solid fa-eye"
                 size="sm"
-                @click="viewDentist(props.row)"
+                @click="viewPublication(props.row)"
                 color="grey-8"
               >
                 <q-tooltip>Ver detalles</q-tooltip>
@@ -193,10 +183,10 @@
                 round
                 icon="fa-solid fa-edit"
                 size="sm"
-                @click="editDentist(props.row)"
+                @click="editPublication(props.row)"
                 color="primary"
               >
-                <q-tooltip>Editar dentista</q-tooltip>
+                <q-tooltip>Editar publicación</q-tooltip>
               </q-btn>
               
               <q-btn
@@ -206,10 +196,10 @@
                 round
                 icon="fa-solid fa-trash"
                 size="sm"
-                @click="confirmDeleteDentist(props.row)"
+                @click="confirmDeletePublication(props.row)"
                 color="negative"
               >
-                <q-tooltip>Eliminar dentista</q-tooltip>
+                <q-tooltip>Eliminar publicación</q-tooltip>
               </q-btn>
             </div>
           </q-td>
@@ -218,21 +208,21 @@
     </div>
 
     <!-- Dialogs -->
-    <DetailDentistDialog
+    <DetailPublicationDialog
       v-model="showDetailDialog"
-      :dentist-data="selectedDentist"
-      @edit-dentist="editDentist"
+      :publication-data="selectedPublication"
+      @edit-publication="editPublication"
     />
 
-    <EditDentistDialog
+    <EditPublicationDialog
       v-model="showEditDialog"
-      :dentist-data="selectedDentist"
-      @dentist-updated="handleDentistUpdate"
+      :publication-data="selectedPublication"
+      @publication-updated="handlePublicationUpdate"
     />
 
-    <NewDentistDialog
+    <NewPublicationDialog
       v-model="showNewDialog"
-      @dentist-created="handleDentistCreate"
+      @publication-created="handlePublicationCreate"
     />
 
     <!-- Delete Confirmation Dialog -->
@@ -247,10 +237,10 @@
 
         <q-card-section class="q-pt-none">
           <p class="dialog-text">
-            ¿Está seguro que desea eliminar al dentista <strong>{{ getFullName(selectedDentist) }}</strong>?
+            ¿Está seguro que desea eliminar la publicación <strong>{{ selectedPublication?.titulo }}</strong>?
           </p>
           <p class="dialog-subtext">
-            Esta acción no se puede deshacer y el dentista perderá acceso al sistema.
+            Esta acción no se puede deshacer y la publicación dejará de ser visible.
           </p>
         </q-card-section>
 
@@ -265,9 +255,9 @@
           />
           <q-btn 
             unelevated
-            label="Eliminar Dentista" 
+            label="Eliminar Publicación" 
             color="negative" 
-            @click="deleteDentist"
+            @click="deletePublication"
             v-close-popup 
             no-caps
             class="dialog-btn"
@@ -280,42 +270,34 @@
 
 <script>
 import { ref, onMounted, watch, computed } from 'vue'
-import dentistas from 'src/data/dentistas.json'
-import especialidades from 'src/data/especialidades.json'
+import publicaciones from 'src/data/publicaciones.json'
+import users from 'src/data/users.json'
 import Fuse from 'fuse.js'
-import DetailDentistDialog from './DetailDentistDialog.vue'
-import EditDentistDialog from './EditDentistDialog.vue'
-import NewDentistDialog from './NewDentistDialog.vue'
+import DetailPublicationDialog from './DetailPublicationDialog.vue'
+import EditPublicationDialog from './EditPublicationDialog.vue'
+import NewPublicationDialog from './NewPublicationDialog.vue'
 
 const columns = [
   {
-    name: 'img',
+    name: 'imagenes',
     required: true,
-    label: 'Foto',
+    label: 'Imágenes',
     align: 'center',
-    field: 'img',
+    field: 'imagenes',
     sortable: false,
-    style: 'width: 70px'
+    style: 'width: 120px'
   },
   {
-    name: 'fullName',
+    name: 'titulo',
     required: true,
-    label: 'Nombre Completo',
+    label: 'Título',
     align: 'left',
-    field: row => `${row.name} ${row.father_last_name}`,
+    field: 'titulo',
     sortable: true
   },
   {
-    name: 'speciality',
-    label: 'Especialidades',
-    field: 'speciality',
-    sortable: false,
-    align: 'left',
-    style: 'min-width: 200px'
-  },
-  {
     name: 'userId',
-    label: 'Usuario Asignado',
+    label: 'Autor',
     field: 'userId',
     sortable: true,
     align: 'center',
@@ -340,104 +322,70 @@ const columns = [
 ]
 
 const FUSE_OPTIONS = {
-  keys: ['name', 'second_name', 'father_last_name', 'mother_last_name'],
+  keys: ['titulo', 'descripcion'],
   threshold: 0.3,
   includeScore: true,
   minMatchCharLength: 1
 }
 
 const STATE_TRANSLATIONS = {
-  active: 'Activo',
-  inactive: 'Inactivo',
-  pending: 'Pendiente'
+  active: 'Activa',
+  inactive: 'Inactiva'
 }
 
 const STATE_CLASSES = {
   active: 'state-active',
-  inactive: 'state-inactive',
-  pending: 'state-pending'
+  inactive: 'state-inactive'
 }
 
 export default {
-  name: 'DentistPage',
+  name: 'PublicationsPage',
   
   components: {
-    DetailDentistDialog,
-    EditDentistDialog,
-    NewDentistDialog
+    DetailPublicationDialog,
+    EditPublicationDialog,
+    NewPublicationDialog
   },
   
   setup() {
     const search = ref('')
     const rows = ref([])
     const filteredRows = ref([])
-    const selectedDentist = ref(null)
+    const selectedPublication = ref(null)
     const showDetailDialog = ref(false)
     const showEditDialog = ref(false)
     const showNewDialog = ref(false)
     const showDeleteDialog = ref(false)
-    const specialtiesMap = ref({})
+    const carouselModels = ref({})
+    const usersMap = ref({})
     let fuse = null
 
-    const activeDentistsCount = computed(() => 
-      filteredRows.value.filter(d => d.state === 'active').length
+    const activePublicationsCount = computed(() => 
+      filteredRows.value.filter(p => p.state === 'active').length
     )
 
-    const inactiveDentistsCount = computed(() => 
-      filteredRows.value.filter(d => d.state === 'inactive').length
+    const inactivePublicationsCount = computed(() => 
+      filteredRows.value.filter(p => p.state === 'inactive').length
     )
 
-    const totalSpecialties = computed(() => {
-      const uniqueSpecs = new Set()
-      filteredRows.value.forEach(d => {
-        d.speciality?.forEach(s => uniqueSpecs.add(s))
-      })
-      return uniqueSpecs.size
+    const totalImages = computed(() => {
+      return filteredRows.value.reduce((sum, p) => sum + (p.imagenes?.length || 0), 0)
     })
 
-    const getAvatarColor = (name) => {
-      if (!name) return '#9e9e9e'
-      
-      const colors = [
-        '#f44336', '#e91e63', '#9c27b0', '#673ab7',
-        '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4',
-        '#009688', '#4caf50', '#8bc34a', '#cddc39',
-        '#ffeb3b', '#ffc107', '#ff9800', '#ff5722'
-      ]
-      
-      let hash = 0
-      for (let i = 0; i < name.length; i++) {
-        hash = name.charCodeAt(i) + ((hash << 5) - hash)
-      }
-      
-      return colors[Math.abs(hash) % colors.length]
+    const truncateText = (text, length) => {
+      if (!text) return ''
+      return text.length > length ? text.substring(0, length) + '...' : text
     }
 
-    const getFullName = (dentist) => {
-      if (!dentist) return ''
-      return `${dentist.name || ''} ${dentist.second_name || ''} ${dentist.father_last_name || ''} ${dentist.mother_last_name || ''}`.trim()
-    }
-
-    const getInitials = (dentist) => {
-      if (!dentist) return '?'
-      const firstName = dentist.name?.charAt(0) || ''
-      const lastName = dentist.father_last_name?.charAt(0) || ''
-      return (firstName + lastName).toUpperCase() || '?'
-    }
-
-    const getSpecialtyName = (id) => {
-      return specialtiesMap.value[id] || `Especialidad ${id}`
-    }
-
-    const handleImageError = (event) => {
-      event.target.style.display = 'none'
+    const getUserName = (userId) => {
+      return usersMap.value[userId] || `Usuario ${userId}`
     }
 
     const formatState = (state) => STATE_TRANSLATIONS[state] || state
     const getStateClass = (state) => STATE_CLASSES[state] || 'state-default'
 
     const rebuildFuse = () => {
-      const collection = rows.value.filter(d => d.state !== 'deleted')
+      const collection = rows.value.filter(p => p.state !== 'deleted')
       
       if (fuse && typeof fuse.setCollection === 'function') {
         fuse.setCollection(collection)
@@ -448,7 +396,7 @@ export default {
 
     const filterRows = () => {
       if (!search.value?.trim()) {
-        filteredRows.value = rows.value.filter(d => d.state !== 'deleted')
+        filteredRows.value = rows.value.filter(p => p.state !== 'deleted')
         return
       }
 
@@ -456,64 +404,69 @@ export default {
       filteredRows.value = results.map(result => result.item)
     }
 
-    const loadDentists = () => {
-      rows.value = dentistas.dentistas.map(d => ({ 
-        ...d, 
-        id: Number(d.id) 
+    const loadPublications = () => {
+      rows.value = publicaciones.publicaciones.map(p => ({ 
+        ...p, 
+        id: Number(p.id) 
       }))
       
-      filteredRows.value = rows.value.filter(d => d.state !== 'deleted')
+      // Inicializar carousels en 0
+      rows.value.forEach(p => {
+        carouselModels.value[p.id] = 0
+      })
+      
+      filteredRows.value = rows.value.filter(p => p.state !== 'deleted')
       fuse = new Fuse(filteredRows.value, FUSE_OPTIONS)
     }
 
-    const loadSpecialties = () => {
-      especialidades.especialidades.forEach(spec => {
-        specialtiesMap.value[spec.id] = spec.name
+    const loadUsers = () => {
+      users.users.forEach(user => {
+        usersMap.value[user.id] = user.username
       })
     }
 
-    const handleDentistCreate = (newDentist) => {
-      const dentistToAdd = {
-        name: newDentist.name || '',
-        second_name: newDentist.second_name || '',
-        father_last_name: newDentist.father_last_name || '',
-        mother_last_name: newDentist.mother_last_name || '',
-        speciality: newDentist.speciality || [],
-        userId: newDentist.userId || null,
-        img: newDentist.img || null,
-        state: newDentist.state || 'active'
+    const handlePublicationCreate = (newPublication) => {
+      const publicationToAdd = {
+        titulo: newPublication.titulo || '',
+        imagenes: newPublication.imagenes || [],
+        descripcion: newPublication.descripcion || '',
+        userId: newPublication.userId || null,
+        state: newPublication.state || 'active'
       }
 
       const numericIds = rows.value
-        .map(d => Number(d.id))
+        .map(p => Number(p.id))
         .filter(n => !Number.isNaN(n))
       
       const maxId = numericIds.length ? Math.max(...numericIds) : 0
-      dentistToAdd.id = maxId + 1
+      publicationToAdd.id = maxId + 1
 
-      rows.value.push(dentistToAdd)
+      carouselModels.value[publicationToAdd.id] = 0
+
+      rows.value.push(publicationToAdd)
       rebuildFuse()
       filterRows()
     }
 
-    const handleDentistUpdate = (updatedDentist) => {
+    const handlePublicationUpdate = (updatedPublication) => {
       const index = rows.value.findIndex(
-        d => Number(d.id) === Number(updatedDentist.id)
+        p => Number(p.id) === Number(updatedPublication.id)
       )
       
       if (index > -1) {
         rows.value[index] = { 
-          ...updatedDentist, 
-          id: Number(updatedDentist.id) 
+          ...updatedPublication, 
+          id: Number(updatedPublication.id) 
         }
+        carouselModels.value[updatedPublication.id] = 0
         rebuildFuse()
         filterRows()
       }
     }
 
-    const deleteDentist = () => {
+    const deletePublication = () => {
       const index = rows.value.findIndex(
-        d => Number(d.id) === Number(selectedDentist.value.id)
+        p => Number(p.id) === Number(selectedPublication.value.id)
       )
       
       if (index > -1) {
@@ -523,29 +476,29 @@ export default {
       }
     }
 
-    const viewDentist = (dentist) => {
-      selectedDentist.value = { ...dentist }
+    const viewPublication = (publication) => {
+      selectedPublication.value = { ...publication }
       showDetailDialog.value = true
     }
 
-    const editDentist = (dentist) => {
-      selectedDentist.value = { ...dentist }
+    const editPublication = (publication) => {
+      selectedPublication.value = { ...publication }
       showEditDialog.value = true
       showDetailDialog.value = false
     }
 
-    const openNewDentistDialog = () => {
+    const openNewPublicationDialog = () => {
       showNewDialog.value = true
     }
 
-    const confirmDeleteDentist = (dentist) => {
-      selectedDentist.value = { ...dentist }
+    const confirmDeletePublication = (publication) => {
+      selectedPublication.value = { ...publication }
       showDeleteDialog.value = true
     }
 
     onMounted(() => {
-      loadSpecialties()
-      loadDentists()
+      loadUsers()
+      loadPublications()
     })
 
     watch(search, () => {
@@ -557,30 +510,77 @@ export default {
       columns,
       rows,
       filteredRows,
-      selectedDentist,
+      selectedPublication,
       showDetailDialog,
       showEditDialog,
       showNewDialog,
       showDeleteDialog,
-      activeDentistsCount,
-      inactiveDentistsCount,
-      totalSpecialties,
+      carouselModels,
+      activePublicationsCount,
+      inactivePublicationsCount,
+      totalImages,
       filterRows,
-      handleDentistCreate,
-      handleDentistUpdate,
-      deleteDentist,
-      viewDentist,
-      editDentist,
-      openNewDentistDialog,
-      confirmDeleteDentist,
-      getFullName,
-      getInitials,
-      handleImageError,
+      handlePublicationCreate,
+      handlePublicationUpdate,
+      deletePublication,
+      viewPublication,
+      editPublication,
+      openNewPublicationDialog,
+      confirmDeletePublication,
       formatState,
       getStateClass,
-      getSpecialtyName,
-      getAvatarColor
+      getUserName,
+      truncateText
     }
   }
 }
 </script>
+
+<style scoped>
+.table-carousel-container {
+  position: relative;
+  width: 100px;
+  margin: 0 auto;
+}
+
+.table-carousel {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.table-carousel-slide {
+  background-size: cover;
+  background-position: center;
+}
+
+.image-counter {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.publication-title {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.title-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.publication-description {
+  color: #7f8c8d;
+  font-size: 13px;
+  line-height: 1.4;
+}
+</style>

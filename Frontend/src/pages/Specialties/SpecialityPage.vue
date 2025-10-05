@@ -7,14 +7,14 @@
           <i class="fa-solid fa-tooth header-icon"></i>
           <div>
             <h1 class="page-title">Gestión de Especialidades</h1>
-            <p class="page-subtitle">Administra y organiza tus servicios dentales</p>
+            <p class="page-subtitle">Configure y administre los servicios odontológicos de su clínica</p>
           </div>
         </div>
         <q-btn
           class="primary-btn"
           color="primary"
           icon="fa-solid fa-plus"
-          label="Nueva Especialidad"
+          label="Agregar Especialidad"
           @click="openNewSpecialityDialog"
           unelevated
           no-caps
@@ -47,23 +47,23 @@
       <div class="info-section">
         <div class="info-card">
           <div class="info-header">
-            <h2 class="info-title">Acerca de Nuestras Especialidades</h2>
+            <h2 class="info-title">Panel de Especialidades</h2>
           </div>
           <div class="info-content">
             <p class="info-description">
-              Ofrecemos una amplia gama de especialidades dentales diseñadas para 
-              brindar el mejor cuidado a nuestros pacientes. Cada especialidad cuenta 
-              con profesionales altamente capacitados y equipamiento de última generación.
+              Administre el catálogo completo de especialidades odontológicas disponibles 
+              en su clínica. Cada especialidad puede ser editada, visualizada o eliminada 
+              según las necesidades de su práctica dental.
             </p>
             
             <div class="stats-grid">
               <div class="stat-item">
                 <div class="stat-value">{{ filteredSpecialities.length }}</div>
-                <div class="stat-label">Especialidades Activas</div>
+                <div class="stat-label">Especialidades Registradas</div>
               </div>
               <div class="stat-item">
-                <div class="stat-value">98.5%</div>
-                <div class="stat-label">Satisfacción del Paciente</div>
+                <div class="stat-value">{{ totalPages }}</div>
+                <div class="stat-label">Páginas Disponibles</div>
               </div>
             </div>
           </div>
@@ -79,27 +79,24 @@
               class="brand-image"
             />
           </div>
+          <p class="branding-text">Sistema de Gestión Dental</p>
         </div>
       </div>
 
       <!-- Right Side - Specialities Grid -->
       <div class="specialities-section">
         <div class="section-header">
-          <h3 class="section-title">Nuestras Especialidades</h3>
-          <div class="pagination-indicator" v-if="totalPages > 1">
-            <span class="page-info">{{ currentPage + 1 }} de {{ totalPages }}</span>
+          <h3 class="section-title">Catálogo de Especialidades</h3>
+          <div class="results-count">
+            <span class="count-badge">{{ filteredSpecialities.length }} especialidad{{ filteredSpecialities.length !== 1 ? 'es' : '' }}</span>
           </div>
         </div>
 
-        <div 
-          class="cards-container"
-          @wheel="handleScroll"
-          ref="cardsContainer"
-        >
+        <div class="cards-container">
           <div v-if="filteredSpecialities.length === 0" class="no-data-container">
             <i class="fa-solid fa-tooth no-data-icon"></i>
             <p class="no-data-text">No se encontraron especialidades</p>
-            <p class="no-data-subtext">Intenta con otros términos de búsqueda</p>
+            <p class="no-data-subtext">Intenta ajustar los filtros de búsqueda o agrega una nueva especialidad</p>
           </div>
           
           <transition-group v-else name="card-fade" tag="div" class="cards-grid">
@@ -131,7 +128,7 @@
                     icon="fa-solid fa-eye"
                     label="Ver"
                     @click="viewSpeciality(speciality)"
-                    class="action-btn"
+                    class="action-btn view-btn"
                     color="grey-8"
                   />
                   <q-btn 
@@ -141,7 +138,7 @@
                     label="Editar"
                     color="primary"
                     @click="editSpeciality(speciality)"
-                    class="action-btn"
+                    class="action-btn edit-btn"
                   />
                   <q-btn 
                     flat 
@@ -150,7 +147,7 @@
                     label="Eliminar"
                     color="negative"
                     @click="confirmDeleteSpeciality(speciality)"
-                    class="action-btn"
+                    class="action-btn delete-btn"
                   />
                 </div>
               </div>
@@ -158,9 +155,48 @@
           </transition-group>
         </div>
 
-        <div class="scroll-hint" v-if="totalPages > 1">
-          <i class="fa-solid fa-computer-mouse"></i>
-          <span>Usa el scroll para ver más especialidades</span>
+        <!-- Pagination Controls -->
+        <div class="pagination-section" v-if="totalPages > 1">
+          <div class="pagination-controls">
+            <q-btn
+              flat
+              round
+              dense
+              icon="fa-solid fa-chevron-left"
+              :disable="currentPage === 0"
+              @click="previousPage"
+              class="pagination-btn"
+              color="primary"
+            />
+            
+            <div class="pagination-pages">
+              <q-btn
+                v-for="page in visiblePages"
+                :key="page"
+                flat
+                dense
+                :label="page + 1"
+                @click="goToPage(page)"
+                :class="['page-btn', { active: currentPage === page }]"
+                :color="currentPage === page ? 'primary' : 'grey-7'"
+              />
+            </div>
+            
+            <q-btn
+              flat
+              round
+              dense
+              icon="fa-solid fa-chevron-right"
+              :disable="currentPage === totalPages - 1"
+              @click="nextPage"
+              class="pagination-btn"
+              color="primary"
+            />
+          </div>
+          
+          <div class="pagination-info">
+            Página {{ currentPage + 1 }} de {{ totalPages }} • Mostrando {{ currentPageSpecialities.length }} de {{ filteredSpecialities.length }}
+          </div>
         </div>
       </div>
     </div>
@@ -190,32 +226,35 @@
           <div class="dialog-icon-container">
             <i class="fa-solid fa-exclamation-triangle dialog-icon"></i>
           </div>
-          <h3 class="dialog-title">Confirmar eliminación</h3>
+          <h3 class="dialog-title">Confirmar Eliminación</h3>
         </q-card-section>
 
-        <q-card-section>
+        <q-card-section class="q-pt-none">
           <p class="dialog-text">
-            ¿Está seguro que desea eliminar la especialidad 
-            <strong>{{ selectedSpeciality?.name }}</strong>?
+            ¿Está seguro que desea eliminar la especialidad <strong>{{ selectedSpeciality?.name }}</strong>?
           </p>
-          <p class="dialog-subtext">Esta acción no se puede deshacer.</p>
+          <p class="dialog-subtext">
+            Esta acción no se puede deshacer y la especialidad dejará de estar disponible en el sistema.
+          </p>
         </q-card-section>
 
-        <q-card-actions align="right" class="dialog-actions">
+        <q-card-actions class="dialog-actions">
           <q-btn 
             flat 
             label="Cancelar" 
             color="grey-7" 
-            v-close-popup
+            v-close-popup 
             no-caps
+            class="dialog-btn"
           />
           <q-btn 
             unelevated
-            label="Eliminar" 
+            label="Eliminar Especialidad" 
             color="negative" 
-            @click="deleteSpeciality"
-            v-close-popup
+            @click="deleteSpeciality"      
+            v-close-popup 
             no-caps
+            class="dialog-btn"
           />
         </q-card-actions>
       </q-card>
@@ -249,9 +288,6 @@ export default {
     const showDeleteDialog = ref(false)
     const currentPage = ref(0)
     const itemsPerPage = 4
-    const cardsContainer = ref(null)
-    const isScrolling = ref(false)
-    let scrollTimeout = null
     let fuse = null
 
     const fuseOptions = {
@@ -271,6 +307,36 @@ export default {
       return filteredSpecialities.value.slice(start, end)
     })
 
+    const visiblePages = computed(() => {
+      const total = totalPages.value
+      const current = currentPage.value
+      const pages = []
+      
+      if (total <= 7) {
+        for (let i = 0; i < total; i++) {
+          pages.push(i)
+        }
+      } else {
+        if (current <= 3) {
+          for (let i = 0; i < 5; i++) pages.push(i)
+          pages.push('...')
+          pages.push(total - 1)
+        } else if (current >= total - 4) {
+          pages.push(0)
+          pages.push('...')
+          for (let i = total - 5; i < total; i++) pages.push(i)
+        } else {
+          pages.push(0)
+          pages.push('...')
+          for (let i = current - 1; i <= current + 1; i++) pages.push(i)
+          pages.push('...')
+          pages.push(total - 1)
+        }
+      }
+      
+      return pages
+    })
+
     const loadSpecialities = () => {
       specialities.value = especialidades.especialidades || []
       filteredSpecialities.value = specialities.value.filter(s => s.state !== 'deleted')
@@ -287,29 +353,21 @@ export default {
       }
     }
 
-    const handleScroll = (event) => {
-      if (isScrolling.value) return
-      
-      event.preventDefault()
-      
-      const delta = event.deltaY
-      
-      if (delta > 0 && currentPage.value < totalPages.value - 1) {
-        isScrolling.value = true
+    const nextPage = () => {
+      if (currentPage.value < totalPages.value - 1) {
         currentPage.value++
-        
-        clearTimeout(scrollTimeout)
-        scrollTimeout = setTimeout(() => {
-          isScrolling.value = false
-        }, 800)
-      } else if (delta < 0 && currentPage.value > 0) {
-        isScrolling.value = true
+      }
+    }
+
+    const previousPage = () => {
+      if (currentPage.value > 0) {
         currentPage.value--
-        
-        clearTimeout(scrollTimeout)
-        scrollTimeout = setTimeout(() => {
-          isScrolling.value = false
-        }, 800)
+      }
+    }
+
+    const goToPage = (page) => {
+      if (page !== '...' && page >= 0 && page < totalPages.value) {
+        currentPage.value = page
       }
     }
 
@@ -389,9 +447,11 @@ export default {
       currentPage,
       totalPages,
       currentPageSpecialities,
-      cardsContainer,
+      visiblePages,
       filterSpecialities,
-      handleScroll,
+      nextPage,
+      previousPage,
+      goToPage,
       truncateText,
       handleImageError,
       viewSpeciality,
@@ -555,8 +615,9 @@ export default {
   padding: 32px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  gap: 16px;
 }
 
 .branding-circle {
@@ -584,6 +645,14 @@ export default {
   height: 100%;
 }
 
+.branding-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  text-align: center;
+  margin: 0;
+}
+
 // Right Side - Specialities Section
 .specialities-section {
   display: flex;
@@ -608,16 +677,18 @@ export default {
   margin: 0;
 }
 
-.pagination-indicator {
-  background: #f8fafc;
-  padding: 8px 16px;
-  border-radius: 20px;
+.results-count {
+  display: flex;
+  align-items: center;
 }
 
-.page-info {
+.count-badge {
+  background: linear-gradient(135deg, #FF6B35 0%, #FF8C61 100%);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
   font-size: 13px;
   font-weight: 600;
-  color: #64748b;
 }
 
 // Cards Container
@@ -626,9 +697,7 @@ export default {
   border-radius: 16px;
   padding: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  min-height: 400px;
-  cursor: pointer;
-  user-select: none;
+  min-height: 500px;
 }
 
 .cards-grid {
@@ -639,7 +708,7 @@ export default {
 
 .card-fade-enter-active,
 .card-fade-leave-active {
-  transition: all 0.4s ease;
+  transition: all 0.3s ease;
 }
 
 .card-fade-enter-from {
@@ -719,25 +788,75 @@ export default {
   flex: 1;
   font-size: 12px;
   font-weight: 600;
+  transition: all 0.2s ease;
+
+  &.view-btn:hover {
+    background: #f8fafc;
+  }
+
+  &.edit-btn:hover {
+    background: #eff6ff;
+  }
+
+  &.delete-btn:hover {
+    background: #fef2f2;
+  }
 }
 
-// Scroll Hint
-.scroll-hint {
+// Pagination
+.pagination-section {
+  background: white;
+  border-radius: 16px;
+  padding: 20px 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.pagination-controls {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px;
-  background: white;
-  border-radius: 12px;
-  font-size: 12px;
-  color: #64748b;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  gap: 12px;
+}
 
-  i {
-    font-size: 16px;
-    color: #94a3b8;
+.pagination-btn {
+  width: 40px;
+  height: 40px;
+  
+  &:disabled {
+    opacity: 0.3;
   }
+}
+
+.pagination-pages {
+  display: flex;
+  gap: 8px;
+}
+
+.page-btn {
+  min-width: 40px;
+  height: 40px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+
+  &.active {
+    background: linear-gradient(135deg, #FF6B35 0%, #FF8C61 100%);
+    color: white;
+  }
+
+  &:not(.active):hover {
+    background: #f8fafc;
+  }
+}
+
+.pagination-info {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+  text-align: center;
 }
 
 // No Data
@@ -746,7 +865,7 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px;
+  padding: 80px 20px;
   text-align: center;
 }
 
@@ -771,19 +890,19 @@ export default {
 
 // Dialog
 .confirm-dialog {
-  min-width: 440px;
+  min-width: 480px;
   border-radius: 16px;
 }
 
 .dialog-header {
   text-align: center;
-  padding-bottom: 16px;
+  padding: 32px 24px 16px;
 }
 
 .dialog-icon-container {
-  width: 64px;
-  height: 64px;
-  margin: 0 auto 16px;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 20px;
   border-radius: 50%;
   background: #fef2f2;
   display: flex;
@@ -792,22 +911,23 @@ export default {
 }
 
 .dialog-icon {
-  font-size: 32px;
+  font-size: 36px;
   color: #ef4444;
 }
 
 .dialog-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   color: #1e293b;
   margin: 0;
 }
 
 .dialog-text {
-  font-size: 14px;
+  font-size: 15px;
   color: #475569;
-  margin: 0 0 8px 0;
+  margin: 0 0 12px 0;
   text-align: center;
+  line-height: 1.5;
 }
 
 .dialog-subtext {
@@ -815,10 +935,18 @@ export default {
   color: #94a3b8;
   margin: 0;
   text-align: center;
+  line-height: 1.4;
 }
 
 .dialog-actions {
-  padding: 16px 24px;
+  padding: 16px 24px 24px;
+  gap: 12px;
+}
+
+.dialog-btn {
+  padding: 10px 24px;
+  font-weight: 600;
+  font-size: 14px;
 }
 
 // Responsive
@@ -869,6 +997,20 @@ export default {
   .branding-circle {
     max-width: 200px;
     padding: 30px;
+  }
+
+  .pagination-pages {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .confirm-dialog {
+    min-width: auto;
+    max-width: 90vw;
+  }
+
+  .card-actions {
+    flex-direction: column;
   }
 }
 </style>

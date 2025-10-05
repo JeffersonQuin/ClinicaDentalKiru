@@ -1,5 +1,5 @@
 <template>
-  <q-dialog maximized v-model="showDialog" persistent>
+  <q-dialog  v-model="showDialog" persistent>
     <q-card class="detail-dialog">
       <q-card-section class="dialog-header">
         <div class="header-content">

@@ -3,19 +3,66 @@
     <!-- Header Section -->
     <div class="page-header">
       <div class="header-content">
-        <h1 class="page-title">
-          <i class="fa-solid fa-users"></i>
-          Gestión de Usuarios
-        </h1>
+        <div class="title-section">
+          <i class="fa-solid fa-users header-icon"></i>
+          <div>
+            <h1 class="page-title">Gestión de Usuarios</h1>
+            <p class="page-subtitle">Administra permisos y accesos del personal de tu clínica</p>
+          </div>
+        </div>
         <q-btn
           class="primary-btn"
           color="primary"
           icon="fa-solid fa-plus"
-          label="Nuevo Usuario"
+          label="Agregar Usuario"
           @click="openNewUserDialog"
-          push
+          unelevated
           no-caps
+          size="md"
         />
+      </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="stats-section">
+      <div class="stat-card">
+        <div class="stat-icon-container active">
+          <i class="fa-solid fa-user-check"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ activeUsersCount }}</div>
+          <div class="stat-label">Usuarios Activos</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon-container inactive">
+          <i class="fa-solid fa-user-slash"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ inactiveUsersCount }}</div>
+          <div class="stat-label">Usuarios Inactivos</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon-container admin">
+          <i class="fa-solid fa-user-shield"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ adminUsersCount }}</div>
+          <div class="stat-label">Administradores</div>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon-container total">
+          <i class="fa-solid fa-users"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ filteredRows.length }}</div>
+          <div class="stat-label">Total de Usuarios</div>
+        </div>
       </div>
     </div>
 
@@ -24,14 +71,15 @@
       <q-input
         v-model="search"
         class="search-input"
-        filled
+        outlined
         type="search"
         placeholder="Buscar por nombre, email o tipo de usuario..."
         @input="filterRows"
         clearable
+        dense
       >
         <template v-slot:prepend>
-          <i class="fa-solid fa-search text-grey-6"></i>
+          <i class="fa-solid fa-search"></i>
         </template>
       </q-input>
     </div>
@@ -41,18 +89,18 @@
       <q-table
         class="data-table"
         flat
-        bordered
         :rows="filteredRows"
         :columns="columns"
         row-key="id"
         :rows-per-page-options="[5, 10, 15, 20, 0]"
         :pagination="{ rowsPerPage: 5 }"
-        separator="horizontal"
+        separator="cell"
       >
         <template v-slot:no-data>
           <div class="no-data-container">
             <i class="fa-solid fa-users-slash no-data-icon"></i>
             <p class="no-data-text">No se encontraron usuarios</p>
+            <p class="no-data-subtext">Intenta ajustar los filtros de búsqueda</p>
           </div>
         </template>
 
@@ -60,8 +108,10 @@
           <q-td :props="props">
             <div class="avatar-container">
               <q-avatar 
-                :size="props.row.avatar ? '40px' : '40px'"
+                size="48px"
                 class="user-avatar"
+                :color="props.row.avatar ? 'transparent' : 'primary'"
+                :text-color="props.row.avatar ? 'transparent' : 'white'"
               >
                 <img 
                   v-if="props.row.avatar" 
@@ -69,16 +119,30 @@
                   :alt="props.row.username"
                   @error="handleImageError"
                 />
-                <span v-else>{{ getInitials(props.row.username) }}</span>
+                <span v-else class="avatar-initials">{{ getInitials(props.row.username) }}</span>
               </q-avatar>
             </div>
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-username="props">
+          <q-td :props="props">
+            <div class="user-info">
+              <span class="user-name">{{ props.row.username }}</span>
+            </div>
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-email="props">
+          <q-td :props="props">
+            <span class="user-email">{{ props.row.email }}</span>
           </q-td>
         </template>
 
         <template v-slot:body-cell-state="props">
           <q-td :props="props">
             <q-badge
-              :class="getStateClass(props.row.state)"
+              :class="['state-badge', getStateClass(props.row.state)]"
               :label="formatState(props.row.state)"
             />
           </q-td>
@@ -87,8 +151,9 @@
         <template v-slot:body-cell-type="props">
           <q-td :props="props">
             <q-chip
-              :class="getTypeClass(props.row.type)"
-              :label="props.row.type"
+              :class="['type-chip', getTypeClass(props.row.type)]"
+              :label="formatType(props.row.type)"
+              :icon="getTypeIcon(props.row.type)"
               dense
             />
           </q-td>
@@ -99,36 +164,39 @@
             <div class="action-buttons">
               <q-btn
                 class="action-btn view-btn"
+                flat
                 dense
                 round
                 icon="fa-solid fa-eye"
                 size="sm"
                 @click="viewUser(props.row)"
-                push
+                color="grey-8"
               >
                 <q-tooltip>Ver detalles</q-tooltip>
               </q-btn>
               
               <q-btn
                 class="action-btn edit-btn"
+                flat
                 dense
                 round
                 icon="fa-solid fa-edit"
                 size="sm"
                 @click="editUser(props.row)"
-                push
+                color="primary"
               >
                 <q-tooltip>Editar usuario</q-tooltip>
               </q-btn>
               
               <q-btn
                 class="action-btn delete-btn"
+                flat
                 dense
                 round
                 icon="fa-solid fa-trash"
                 size="sm"
                 @click="confirmDeleteUser(props.row)"
-                push
+                color="negative"
               >
                 <q-tooltip>Eliminar usuario</q-tooltip>
               </q-btn>
@@ -136,15 +204,6 @@
           </q-td>
         </template>
       </q-table>
-    </div>
-
-    <!-- Branding Section -->
-    <div class="branding-section">
-      <q-img
-        src="/KiruIMG/credential.png"
-        class="hero-image"
-        fit="contain"
-      />
     </div>
 
     <!-- Dialogs -->
@@ -167,24 +226,39 @@
     <!-- Delete Confirmation Dialog -->
     <q-dialog v-model="showDeleteDialog" persistent>
       <q-card class="confirm-dialog">
-        <q-card-section class="row items-center">
-          <i class="fa-solid fa-exclamation-triangle text-warning q-mr-sm"></i>
-          <span class="text-h6">Confirmar eliminación</span>
+        <q-card-section class="dialog-header">
+          <div class="dialog-icon-container">
+            <i class="fa-solid fa-exclamation-triangle dialog-icon"></i>
+          </div>
+          <h3 class="dialog-title">Confirmar Eliminación</h3>
         </q-card-section>
 
         <q-card-section class="q-pt-none">
-          ¿Está seguro que desea eliminar al usuario <strong>{{ selectedUser?.username }}</strong>?
-          Esta acción no se puede deshacer.
+          <p class="dialog-text">
+            ¿Está seguro que desea eliminar al usuario <strong>{{ selectedUser?.username }}</strong>?
+          </p>
+          <p class="dialog-subtext">
+            Esta acción no se puede deshacer y el usuario perderá acceso al sistema.
+          </p>
         </q-card-section>
 
-        <q-card-actions align="right">
-          <q-btn flat label="Cancelar" color="grey" v-close-popup />
+        <q-card-actions class="dialog-actions">
           <q-btn 
             flat 
-            label="Eliminar" 
+            label="Cancelar" 
+            color="grey-7" 
+            v-close-popup 
+            no-caps
+            class="dialog-btn"
+          />
+          <q-btn 
+            unelevated
+            label="Eliminar Usuario" 
             color="negative" 
             @click="deleteUser"
             v-close-popup 
+            no-caps
+            class="dialog-btn"
           />
         </q-card-actions>
       </q-card>
@@ -193,13 +267,14 @@
 </template>
 
 <script>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import users from 'src/data/users.json'
 import Fuse from 'fuse.js'
 import DetailUserDialog from './DetailUserDialog.vue'
 import EditUserDialog from './EditUserDialog.vue'
 import NewUserDialog from './NewUserDialog.vue'
 
+// Configuración de columnas de la tabla
 const columns = [
   {
     name: 'avatar',
@@ -208,7 +283,7 @@ const columns = [
     align: 'center',
     field: 'avatar',
     sortable: false,
-    style: 'width: 80px'
+    style: 'width: 70px'
   },
   {
     name: 'username',
@@ -229,9 +304,9 @@ const columns = [
     name: 'type',
     label: 'Tipo',
     field: 'type',
-    sortable: true,
+    sortable: false,
     align: 'center',
-    style: 'width: 120px'
+    style: 'width: 160px'
   },
   {
     name: 'state',
@@ -239,7 +314,7 @@ const columns = [
     field: 'state',
     sortable: true,
     align: 'center',
-    style: 'width: 100px'
+    style: 'width: 120px'
   },
   {
     name: 'actions',
@@ -247,18 +322,62 @@ const columns = [
     field: 'actions',
     align: 'center',
     sortable: false,
-    style: 'width: 150px'
+    style: 'width: 140px'
   }
 ]
 
+// Configuración de Fuse.js para búsqueda difusa
+const FUSE_OPTIONS = {
+  keys: ['username', 'email', 'type', 'state'],
+  threshold: 0.3,
+  includeScore: true,
+  minMatchCharLength: 1
+}
+
+// Mapeos de traducción
+const STATE_TRANSLATIONS = {
+  active: 'Activo',
+  inactive: 'Inactivo',
+  pending: 'Pendiente'
+}
+
+const TYPE_TRANSLATIONS = {
+  admin: 'Administrador',
+  user: 'Usuario',
+  moderator: 'Moderador'
+}
+
+const STATE_CLASSES = {
+  active: 'state-active',
+  inactive: 'state-inactive',
+  pending: 'state-pending'
+}
+
+const TYPE_CLASSES = {
+  admin: 'type-admin',
+  user: 'type-user',
+  moderator: 'type-moderator'
+}
+
+const TYPE_ICONS = {
+  admin: 'fa-solid fa-shield-halved',
+  user: 'fa-solid fa-user',
+  moderator: 'fa-solid fa-user-tie'
+}
+
 export default {
   name: 'UserTable',
+  
   components: {
     DetailUserDialog,
     EditUserDialog,
     NewUserDialog
   },
+  
   setup() {
+    // ============================================
+    // Estado Reactivo
+    // ============================================
     const search = ref('')
     const rows = ref([])
     const filteredRows = ref([])
@@ -269,29 +388,140 @@ export default {
     const showDeleteDialog = ref(false)
     let fuse = null
 
-    const fuseOptions = {
-      keys: ['username', 'email', 'type', 'state'],
-      threshold: 0.3,
-      includeScore: true,
-      minMatchCharLength: 1
-    }
+    // ============================================
+    // Propiedades Computadas
+    // ============================================
+    const activeUsersCount = computed(() => 
+      filteredRows.value.filter(user => user.state === 'active').length
+    )
 
-    const loadUsers = () => {
-      rows.value = users.users
-      filteredRows.value = users.users.filter(user => user.state !== 'deleted')
-      fuse = new Fuse(users.users.filter(user => user.state !== 'deleted'), fuseOptions)
-    }
+    const inactiveUsersCount = computed(() => 
+      filteredRows.value.filter(user => user.state === 'inactive').length
+    )
 
-    const filterRows = () => {
-      if (!search.value || search.value.trim() === '') {
-        filteredRows.value = rows.value.filter(user => user.state !== 'deleted')
+    const adminUsersCount = computed(() => 
+      filteredRows.value.filter(user => user.type === 'admin').length
+    )
+
+    // ============================================
+    // Gestión de Búsqueda con Fuse.js
+    // ============================================
+    
+    /**
+     * Reconstruye el índice de búsqueda de Fuse.js
+     * Excluye usuarios eliminados de la colección
+     */
+    const rebuildFuse = () => {
+      const collection = rows.value.filter(user => user.state !== 'deleted')
+      
+      if (fuse && typeof fuse.setCollection === 'function') {
+        fuse.setCollection(collection)
       } else {
-        const results = fuse.search(search.value.trim())
-        filteredRows.value = results.map(result => result.item)
+        fuse = new Fuse(collection, FUSE_OPTIONS)
       }
     }
 
-    // Dialog handlers
+    /**
+     * Filtra usuarios según el término de búsqueda
+     * Si no hay búsqueda, muestra todos los usuarios activos
+     */
+    const filterRows = () => {
+      if (!search.value?.trim()) {
+        filteredRows.value = rows.value.filter(user => user.state !== 'deleted')
+        return
+      }
+
+      const results = fuse.search(search.value.trim())
+      filteredRows.value = results.map(result => result.item)
+    }
+
+    // ============================================
+    // Operaciones CRUD
+    // ============================================
+    
+    /**
+     * Carga usuarios desde el JSON
+     * Normaliza los IDs a números e inicializa Fuse.js
+     */
+    const loadUsers = () => {
+      rows.value = users.users.map(user => ({ 
+        ...user, 
+        id: Number(user.id) 
+      }))
+      
+      filteredRows.value = rows.value.filter(user => user.state !== 'deleted')
+      fuse = new Fuse(filteredRows.value, FUSE_OPTIONS)
+    }
+
+    /**
+     * Crea un nuevo usuario con valores por defecto
+     * Genera un ID único autoincremental
+     */
+    const handleUserCreate = (newUser) => {
+      const userToAdd = {
+        username: newUser.username || 'sin-nombre',
+        email: newUser.email || '',
+        type: newUser.type || 'user',
+        state: newUser.state || 'active',
+        password: newUser.password || '',
+        notes: newUser.notes || '',
+        createdAt: newUser.createdAt || new Date().toISOString(),
+        lastLogin: newUser.lastLogin || null,
+        avatar: newUser.avatar || null
+      }
+
+      // Genera ID único
+      const numericIds = rows.value
+        .map(u => Number(u.id))
+        .filter(n => !Number.isNaN(n))
+      
+      const maxId = numericIds.length ? Math.max(...numericIds) : 0
+      userToAdd.id = maxId + 1
+
+      rows.value.push(userToAdd)
+      rebuildFuse()
+      filterRows()
+    }
+
+    /**
+     * Actualiza un usuario existente
+     * Mantiene la integridad del ID como número
+     */
+    const handleUserUpdate = (updatedUser) => {
+      const index = rows.value.findIndex(
+        u => Number(u.id) === Number(updatedUser.id)
+      )
+      
+      if (index > -1) {
+        rows.value[index] = { 
+          ...updatedUser, 
+          id: Number(updatedUser.id) 
+        }
+        rebuildFuse()
+        filterRows()
+      }
+    }
+
+    /**
+     * Eliminación logica: marca el estado como 'deleted'
+     * No elimina físicamente el registro
+     */
+    const deleteUser = () => {
+      const index = rows.value.findIndex(
+        u => Number(u.id) === Number(selectedUser.value.id)
+      )
+      
+      if (index > -1) {
+        rows.value[index].state = 'deleted'
+        rebuildFuse()
+        filterRows()
+      }
+    }
+
+    // ============================================
+    // Gestión de Diálogos
+    // ============================================
+    
     const viewUser = (user) => {
       selectedUser.value = { ...user }
       showDetailDialog.value = true
@@ -311,89 +541,45 @@ export default {
       showDeleteDialog.value = true
     }
 
-    const deleteUser = () => {
-      const index = rows.value.findIndex(u => u.id === selectedUser.value.id)
-      if (index > -1) {
-        rows.value[index].state = 'deleted'
-        filterRows()
-      }
-    }
-
-    const handleUserUpdate = (updatedUser) => {
-      const index = rows.value.findIndex(u => u.id === updatedUser.id)
-      if (index > -1) {
-        rows.value[index] = { ...updatedUser }
-        filterRows()
-      }
-    }
-
-    const handleUserCreate = (newUser) => {
-      const maxId = Math.max(...rows.value.map(u => u.id))
-      newUser.id = maxId + 1
-      rows.value.push(newUser)
-      filterRows()
-    }
-
-    // Utility functions
+    // ============================================
+    // Funciones Utilitarias
+    // ============================================
+    
+    /**
+     * Genera iniciales para el avatar
+     * Ejemplos: "Juan Perez" → "JP", "Ana" → "AN"
+     */
     const getInitials = (name) => {
       if (!name) return '?'
+      
       const words = name.trim().split(' ')
+      
       if (words.length === 1) {
         return words[0].substring(0, 2).toUpperCase()
       }
-      return (words[0][0] + (words[1] ? words[1][0] : '')).toUpperCase()
+      
+      return (words[0][0] + (words[1]?.[0] || '')).toUpperCase()
     }
 
-    const getAvatarColor = (name) => {
-      if (!name) return '#9e9e9e'
-      
-      const colors = [
-        '#f44336', '#e91e63', '#9c27b0', '#673ab7',
-        '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4',
-        '#009688', '#4caf50', '#8bc34a', '#cddc39',
-        '#ffeb3b', '#ffc107', '#ff9800', '#ff5722'
-      ]
-      
-      let hash = 0
-      for (let i = 0; i < name.length; i++) {
-        hash = name.charCodeAt(i) + ((hash << 5) - hash)
-      }
-      
-      return colors[Math.abs(hash) % colors.length]
-    }
-
+    /**
+     * Maneja errores de carga de imágenes
+     * Oculta la imagen y muestra las iniciales
+     */
     const handleImageError = (event) => {
-      // Si la imagen falla al cargar, ocultar el elemento img
       event.target.style.display = 'none'
     }
 
-    const formatState = (state) => {
-      const states = {
-        active: 'Activo',
-        inactive: 'Inactivo',
-        pending: 'Pendiente'
-      }
-      return states[state] || state
-    }
+    // Funciones de formato y clases CSS
+    const formatState = (state) => STATE_TRANSLATIONS[state] || state
+    const formatType = (type) => TYPE_TRANSLATIONS[type] || type
+    const getStateClass = (state) => STATE_CLASSES[state] || 'state-default'
+    const getTypeClass = (type) => TYPE_CLASSES[type] || 'type-default'
+    const getTypeIcon = (type) => TYPE_ICONS[type] || 'fa-solid fa-user'
 
-    const getStateClass = (state) => {
-      const classes = {
-        active: 'state-active',
-        inactive: 'state-inactive',
-        pending: 'state-pending'
-      }
-      return classes[state] || 'state-default'
-    }
-
-    const getTypeClass = (type) => {
-      const classes = {
-        admin: 'type-admin',
-        user: 'type-user',
-        moderator: 'type-moderator'
-      }
-      return classes[type] || 'type-default'
-    }
-
+    // ============================================
+    // Ciclo de Vida
+    // ============================================
+    
     onMounted(() => {
       loadUsers()
     })
@@ -402,7 +588,12 @@ export default {
       filterRows()
     })
 
+    // ============================================
+    // API Pública del Componente
+    // ============================================
+    
     return {
+      // Estado
       search,
       columns,
       rows,
@@ -412,103 +603,35 @@ export default {
       showEditDialog,
       showNewDialog,
       showDeleteDialog,
+      
+      // Computadas
+      activeUsersCount,
+      inactiveUsersCount,
+      adminUsersCount,
+      
+      // Métodos de búsqueda y filtrado
       filterRows,
+      
+      // Operaciones CRUD
+      handleUserCreate,
+      handleUserUpdate,
+      deleteUser,
+      
+      // Gestión de diálogos
       viewUser,
       editUser,
       openNewUserDialog,
       confirmDeleteUser,
-      deleteUser,
-      handleUserUpdate,
-      handleUserCreate,
+      
+      // Utilidades
       getInitials,
-      getAvatarColor,
       handleImageError,
       formatState,
+      formatType,
       getStateClass,
-      getTypeClass
+      getTypeClass,
+      getTypeIcon
     }
   }
 }
 </script>
-
-<style lang="scss" scoped>
-// Page Layout
-.page-container {
-  padding: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-  min-height: 100vh;
-}
-
-// Branding Section
-.branding-section {
-  display: flex;
-  justify-content: center;
-  padding: 24px 0;
-  
-  .brand-image {
-    max-width: 300px;
-    height: auto;
-    opacity: 0.8;
-  }
-}
-
-// Buttons
-.primary-btn {
-  padding: 12px 24px;
-  font-weight: 500;
-  border-radius: 8px;
-  text-transform: none;
-}
-
-// Confirmation Dialog
-.confirm-dialog {
-  min-width: 400px;
-  border-radius: 8px;
-}
-// State Badges
-.state-active {
-  background: #4caf50;
-  color: white;
-  font-weight: 500;
-}
-
-.state-inactive {
-  background: #f44336;
-  color: white;
-  font-weight: 500;
-}
-
-.state-pending {
-  background: #ff9800;
-  color: white;
-  font-weight: 500;
-}
-
-.state-default {
-  background: #9e9e9e;
-  color: white;
-  font-weight: 500;
-}
-
-// Type Chips
-.type-admin {
-  background: #e91e63;
-  color: white;
-}
-
-.type-user {
-  background: #2196f3;
-  color: white;
-}
-
-.type-moderator {
-  background: #9c27b0;
-  color: white;
-}
-
-.type-default {
-  background: #607d8b;
-  color: white;
-}
-</style>

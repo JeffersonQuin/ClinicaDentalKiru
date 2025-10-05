@@ -1,5 +1,5 @@
 <template>
-  <q-dialog maximized v-model="showDialog" persistent>
+  <q-dialog v-model="showDialog" persistent>
     <q-card class="edit-dialog">
       <q-card-section class="dialog-header">
         <div class="header-content">
@@ -115,8 +115,6 @@
 
 <script>
 import { ref, computed, watch } from 'vue'
-import { useQuasar } from 'quasar'
-
 export default {
   name: 'EditSpecialityDialog',
   props: {
@@ -131,7 +129,6 @@ export default {
   },
   emits: ['update:modelValue', 'speciality-updated'],
   setup(props, { emit }) {
-    const $q = useQuasar()
     const loading = ref(false)
     const form = ref({
       id: null,
@@ -189,22 +186,11 @@ export default {
         }
 
         emit('speciality-updated', updatedSpeciality)
-        
-        $q.notify({
-          type: 'positive',
-          message: 'Especialidad actualizada correctamente',
-          icon: 'fa-solid fa-check-circle'
-        })
 
         closeDialog()
       } catch (error) {
         console.error('Error updating speciality:', error)
         
-        $q.notify({
-          type: 'negative',
-          message: 'Error al actualizar la especialidad',
-          icon: 'fa-solid fa-exclamation-triangle'
-        })
       } finally {
         loading.value = false
       }

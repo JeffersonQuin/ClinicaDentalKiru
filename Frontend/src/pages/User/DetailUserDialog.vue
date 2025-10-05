@@ -81,7 +81,7 @@
             <div class="detail-value">
               <q-chip
                 :class="getTypeClass(userData?.type)"
-                :label="userData?.type ?? 'No definido'"
+                :label="formatType(userData?.type)"
                 dense
               />
             </div>
@@ -205,6 +205,16 @@ export default {
       return states[s] || (state ? String(state) : 'No disponible')
     }
 
+    const formatType = (type) => {
+      const t = String(type || '').toLowerCase()
+      const types = {
+        admin: 'Administrador',
+        user: 'Usuario',
+        moderator: 'Moderador'
+      }
+      return types[t] || (type ? String(type) : 'No definido')
+    }
+
     const getStateClass = (state) => {
       const s = String(state || '').toLowerCase()
       const classes = {
@@ -255,6 +265,7 @@ export default {
       imageErrored,
       formatState,
       getStateClass,
+      formatType,
       getTypeClass,
       getInitials,
       handleImageError,
