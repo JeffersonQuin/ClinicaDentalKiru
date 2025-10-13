@@ -48,6 +48,10 @@ const routes = [
       {
         path: '/branches',
         component: () => import('pages/Branch/BranchPage.vue')
+      },
+      {
+        path: '/patients',
+        component: () => import('pages/patient/PatientPage.vue')
       }
     ]
   },
