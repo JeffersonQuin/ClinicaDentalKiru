@@ -949,6 +949,65 @@ export default {
   font-size: 14px;
 }
 
+// Dark Theme Overrides
+body.body--dark {
+  .page-container {
+    background: #18181b;
+  }
+  .header-content,
+  .info-card,
+  .branding-card,
+  .section-header,
+  .cards-container,
+  .speciality-card,
+  .pagination-section {
+    background: #222;
+    color: #fafafa;
+  }
+  .card-title,
+  .info-title,
+  .section-title {
+    color: #fafafa;
+  }
+  .card-description,
+  .info-description,
+  .stat-label,
+  .dialog-title,
+  .dialog-text,
+  .dialog-subtext {
+    color: #bdbdbd;
+  }
+  .card-actions {
+    border-top: 1px solid #333;
+  }
+  .stat-value {
+    color: #FF8C61;
+  }
+  .search-section {
+    background: transparent;
+  }
+  .search-input {
+    background: #222;
+    color: #fafafa;
+
+    :deep(.q-field__control) {
+      background: #222;
+      color: #fafafa;
+      border-radius: 12px;
+      border-color: #444;
+    }
+    :deep(.q-field__native) {
+      color: #fafafa;
+    }
+    :deep(.q-field__label) {
+      color: #bdbdbd;
+    }
+    :deep(.q-icon) {
+      color: #fafafa;
+    }
+  }
+}
+
 // Responsive
 @media (max-width: 1200px) {
   .content-layout {

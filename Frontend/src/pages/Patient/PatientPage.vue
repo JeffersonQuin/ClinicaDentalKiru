@@ -107,6 +107,18 @@
                 <q-tooltip>Ver detalles</q-tooltip>
               </q-btn>
               <q-btn
+                class="action-btn recipe-btn"
+                flat
+                dense
+                round
+                icon="fa-solid fa-file-medical"
+                size="sm"
+                @click="openRecipeDialog(props.row)"
+                color="secondary"
+              >
+                <q-tooltip>Recetar</q-tooltip>
+              </q-btn>
+              <q-btn
                 class="action-btn edit-btn"
                 flat
                 dense
@@ -146,6 +158,10 @@
     />
     <DetailPatientDialog
       v-model="showDetailPatientDialog"
+      :patientData="selectedPatient"
+    />
+    <RecipePatientDialog
+      v-model="showRecipeDialog"
       :patientData="selectedPatient"
     />
     <q-dialog v-model="showDeleteDialog" persistent>
@@ -195,6 +211,7 @@ import Fuse from 'fuse.js'
 import NewPatientDialog from './NewPatientDialog.vue'
 import EditPatientDialog from './EditPatientDialog.vue'
 import DetailPatientDialog from './DetailPatientDialog.vue'
+import RecipePatientDialog from './RecipePatientDialog.vue'
 
 const columns = [
   {
@@ -240,7 +257,7 @@ const columns = [
     field: 'actions',
     align: 'center',
     sortable: false,
-    style: 'width: 140px'
+    style: 'width: 180px'
   }
 ]
 
@@ -256,7 +273,8 @@ export default {
   components: {
     NewPatientDialog,
     EditPatientDialog,
-    DetailPatientDialog
+    DetailPatientDialog,
+    RecipePatientDialog
   },
   setup() {
     const search = ref('')
@@ -267,6 +285,7 @@ export default {
     const showDeleteDialog = ref(false)
     const showEditPatientDialog = ref(false)
     const showDetailPatientDialog = ref(false)
+    const showRecipeDialog = ref(false)
     let fuse = null
 
     const loadPacientes = () => {
@@ -326,6 +345,10 @@ export default {
       selectedPatient.value = { ...patient }
       showEditPatientDialog.value = true
     }
+    const openRecipeDialog = (patient) => {
+      selectedPatient.value = { ...patient }
+      showRecipeDialog.value = true
+    }
     const handlePatientUpdate = (updatedPatient) => {
       const index = rows.value.findIndex(u => Number(u.id) === Number(updatedPatient.id))
       if (index > -1) {
@@ -359,11 +382,13 @@ export default {
       showDeleteDialog,
       showEditPatientDialog,
       showDetailPatientDialog,
+      showRecipeDialog,
       filterRows,
       handlePatientCreate,
       deletePatient,
       viewPatient,
       editPatient,
+      openRecipeDialog,
       handlePatientUpdate,
       openNewPatientDialog,
       confirmDeletePatient
