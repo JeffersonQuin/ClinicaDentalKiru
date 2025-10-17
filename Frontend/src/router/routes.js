@@ -47,7 +47,7 @@ const routes = [
       },
       {
         path: '/branches',
-        component: BranchPage
+        component: () => import('pages/Branch/BranchPage.vue')
       }
     ]
   },
