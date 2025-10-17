@@ -1,5 +1,5 @@
 import MainLayout from 'layouts/MainLayout.vue'
-
+import BranchPage from 'pages/Branch/BranchPage.vue'
 const routes = [
   {
     path: '/',
@@ -47,7 +47,7 @@ const routes = [
       },
       {
         path: '/branches',
-        component: () => import('pages/Branch/BranchPage.vue')
+        component: BranchPage
       }
     ]
   },
