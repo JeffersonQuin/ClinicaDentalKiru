@@ -1,5 +1,5 @@
 import MainLayout from 'layouts/MainLayout.vue'
-
+import BranchPage from 'pages/Branch/BranchPage.vue'
 const routes = [
   {
     path: '/',
@@ -48,36 +48,7 @@ const routes = [
       {
         path: '/branches',
         component: () => import('pages/Branch/BranchPage.vue')
-      },
-      {
-        path: '/patients',
-        component: () => import('pages/patient/PatientPage.vue')
-      },
-      {
-        path: '/reserves',
-        component: () => import('pages/Reserve/ReservePage.vue')
-      },
-      {
-        path: '/quotes',
-        component: () => import('pages/quotes/QuotesPage.vue')
-      },
-      {
-        path: '/HistoryQuotes',
-        component: () => import('pages/HistoryQuotes/HistoryQuotesPage.vue')
-      },
-      {
-        path: '/Calendar-Month',
-        component: () => import('pages/Calendar/CalendarMonthPage.vue')
-      },
-      {
-        path: '/Calendar-Week',
-        component: () => import('pages/Calendar/CalendarWeekPage.vue')
-      },
-      {
-        path: '/Calendar-Day',
-        component: () => import('pages/Calendar/CalendarDayPage.vue')
       }
-
     ]
   },
 
