@@ -1,5 +1,5 @@
 import MainLayout from 'layouts/MainLayout.vue'
-import BranchPage from 'pages/Branch/BranchPage.vue'
+//import BranchPage from 'pages/Branch/BranchPage.vue'
 const routes = [
   {
     path: '/',
@@ -48,6 +48,10 @@ const routes = [
       {
         path: '/branches',
         component: () => import('pages/Branch/BranchPage.vue')
+      },
+      {
+        path: '/login',
+        component: () => import('pages/Login/LoginPage.vue')
       }
     ]
   },
