@@ -270,8 +270,12 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
-    <!-- Segundo odontograma más pequeño -->
-    <DienteSVG  :maxWidth="140" :scale="0.9" position="inferior" />
+    <Tooth
+      :pieza="miPieza"
+      posicion="superior"
+      escala="0.25"
+      @select-face="handleSelectFace"
+    />
 
   </div>
 </template>
@@ -283,7 +287,7 @@ import Fuse from 'fuse.js'
 import DetailBranchDialog from './DetailBranchDialog.vue'
 import EditBranchDialog from './EditBranchDialog.vue'
 import NewBranchDialog from './NewBranchDialog.vue'
-import DienteSVG from 'src/components/DienteSVG.vue'
+import Tooth from 'src/components/Tooth.vue'
 
 const FUSE_OPTIONS = {
   keys: ['name', 'location', 'address', 'services'],
@@ -299,7 +303,7 @@ export default {
     DetailBranchDialog,
     EditBranchDialog,
     NewBranchDialog,
-    DienteSVG
+    Tooth
   },
   
   setup() {

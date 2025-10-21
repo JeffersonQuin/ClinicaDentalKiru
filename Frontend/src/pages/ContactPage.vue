@@ -25,7 +25,7 @@
     </section>
 
     <!-- Información de Contacto Rápido -->
-    <section class="quick-contact q-pa-xl bg-grey-1">
+    <section class="quick-contact q-pa-xl">
       <div class="row q-col-gutter-lg">
         <div class="col-12 col-md-4 col-sm-6">
           <q-card class="contact-card text-center" flat>
