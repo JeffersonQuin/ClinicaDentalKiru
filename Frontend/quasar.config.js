@@ -90,12 +90,51 @@ export default defineConfig((/* ctx */) => {
       // directives: [],
 
       // Quasar plugins
-      plugins: []
+      plugins: [
+        'Notify',        // notificaciones rápidas
+        'Dialog',        // confirmaciones / modales
+        'Loading',       // spinner global
+        'LoadingBar',    // barra de progreso top (útil en rutas/API)
+        'LocalStorage',  // persistencia rápida (token, prefs)
+        'SessionStorage',// para datos temporales
+        'Screen',        // helpers responsive (xs, sm, lg)
+        'AppFullscreen', // UI nativa para fullscreen (p. ej. mapas)
+        'Cookies',       // para pequeñas persistencias
+        'Meta'           // gestión de meta tags (SEO/PWA)
+      ]
     },
 
     // animations: 'all', // --- includes all animations
     // https://v2.quasar.dev/options/animations
-    animations: [],
+    animations: [        'fadeIn',
+        'fadeOut',
+        'fadeInUp',
+        'fadeInDown',
+        'fadeInLeft',
+        'fadeInRight',
+        'fadeOutUp',
+        'fadeOutDown',
+        
+        // Slide animations
+        'slideInUp',
+        'slideInDown',
+        'slideInLeft',
+        'slideInRight',
+        'slideOutUp',
+        'slideOutDown',
+        
+        // Zoom animations
+        'zoomIn',
+        'zoomOut',
+        
+        // Bounce animations (con moderación)
+        'bounceIn',
+        'bounceOut',
+        
+        // Flip animations
+        'flipInX',
+        'flipOutX'
+      ],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#sourcefiles
     // sourceFiles: {

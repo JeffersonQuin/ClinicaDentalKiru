@@ -180,7 +180,7 @@ export default {
     })
 
     const dentistaOptions = dentistas.dentistas.map(d => ({
-      label: `${d.nombre} ${d.apellidoPaterno}${d.apellidoMaterno ? ' ' + d.apellidoMaterno : ''}`,
+      label: `${d.name} ${d.father_last_name}${d.mother_last_name }`,
       value: d.id
     }))
 

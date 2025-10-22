@@ -115,12 +115,13 @@
 
         <!-- Botones de Acción -->
         <div class="action-buttons">
-          <q-btn 
-            flat
-            label="Iniciar Sesión" 
+          <router-link 
+            to="/login" 
             class="login-btn"
-            @click="openLoginDialog"
-          />
+            :class="{ 'active': $route.path === '/login' }"
+          >
+          Iniciar Sesión
+          </router-link>
           <q-btn 
             unelevated
             label="Agendar Cita" 

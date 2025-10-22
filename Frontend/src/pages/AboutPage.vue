@@ -1,97 +1,110 @@
 <template>
   <q-page class="about-page">
     <!-- Hero Section -->
-    <section class="hero-about q-pa-xl">
-      <div class="text-center">
-        <h1 class="text-h2 text-weight-bold text-primary q-mb-md">
-          Quiénes Somos
-        </h1>
-        <p class="text-h6 text-grey-7">
-          Conoce más sobre KIRU Odontología Integral y nuestro compromiso con tu salud dental
-        </p>
-      </div>
+    <section class="hero-about">
+      <q-container class="q-pa-xl">
+        <div class="text-center">
+          <h1 class="text-h2 text-weight-bold text-primary q-mb-md animated fadeInDown">
+            Quiénes Somos
+          </h1>
+          <p class="text-h6 text-grey-7 animated fadeInUp" style="animation-delay: 0.2s">
+            Conoce más sobre KIRU Odontología Integral y nuestro compromiso con tu salud dental
+          </p>
+        </div>
+      </q-container>
     </section>
 
     <!-- Sección Principal - Quiénes Somos -->
     <section class="quienes-somos q-pa-xl">
-      <div class="row items-center q-col-gutter-xl">
-        <div class="col-12 col-md-6">
-          <div class="about-content">
-            <h2 class="text-h3 text-weight-bold q-mb-lg">Quiénes Somos</h2>
-            <p class="text-body1 text-grey-7 q-mb-lg">
-              Odontología Integral Kiru está conformada por un equipo de profesionales especialistas, 
-              comprometidos en brindar a cada paciente la más alta calidad en atención odontológica. 
-              Contamos con una amplia gama de servicios, que abarcan desde la odontología general 
-              hasta tratamientos especializados, siempre incorporando los últimos avances en tecnología dental.
-            </p>
-            <div class="q-gutter-md">
-              <q-btn 
-                color="primary" 
-                size="lg" 
-                label="Agendar Cita" 
-                icon="calendar_today"
-                @click="openAppointmentDialog"
-              />
-              <q-btn 
-                outline 
-                color="primary" 
-                size="lg" 
-                label="Ver Servicios"
-                to="/services"
+      <q-container>
+        <div class="row items-center q-col-gutter-xl">
+          <div class="col-12 col-md-6">
+            <div class="about-content animated fadeInLeft">
+              <h2 class="text-h3 text-weight-bold q-mb-lg">Quiénes Somos</h2>
+              <p class="text-body1 text-grey-7 q-mb-lg">
+                Odontología Integral Kiru está conformada por un equipo de profesionales especialistas, 
+                comprometidos en brindar a cada paciente la más alta calidad en atención odontológica. 
+                Contamos con una amplia gama de servicios, que abarcan desde la odontología general 
+                hasta tratamientos especializados, siempre incorporando los últimos avances en tecnología dental.
+              </p>
+              <div class="q-gutter-md">
+                <q-btn 
+                  color="primary" 
+                  size="lg" 
+                  label="Agendar Cita" 
+                  icon="calendar_today"
+                  @click="openAppointmentDialog"
+                  push
+                  no-caps
+                  class="primary-btn"
+                />
+                <q-btn 
+                  outline 
+                  color="primary" 
+                  size="lg" 
+                  label="Ver Servicios"
+                  to="/services"
+                  no-caps
+                  class="secondary-btn"
+                />
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-12 col-md-6">
+            <div class="about-image-container animated zoomIn" style="animation-delay: 0.3s">
+              <q-img
+                src="/icons/prueba.jpeg"
+                alt="Paciente en consulta dental"
+                class="about-main-image"
               />
             </div>
           </div>
         </div>
-        <div class="col-12 col-md-6">
-          <div class="about-image-container">
-            <q-img
-              src="/icons/prueba.jpeg"
-              alt="Paciente en consulta dental"
-              class="about-main-image"
-            />
-          </div>
-        </div>
-      </div>
+      </q-container>
     </section>
 
     <!-- Galería de la Clínica -->
-    <section class="clinic-gallery q-pa-xl bg-grey-1">
-      <div class="text-center q-mb-xl">
-        <h2 class="text-h3 text-weight-bold q-mb-md">Nuestra Clínica</h2>
-        <p class="text-h6 text-grey-7">Instalaciones modernas y equipos de última tecnología</p>
-      </div>
-      
-      <div class="gallery-container">
-        <div class="gallery-grid">
-          <div 
-            v-for="(image, index) in clinicImages" 
-            :key="index"
-            class="gallery-item"
-            @click="openImageDialog(image)"
-          >
-            <q-img
-              :src="image.src"
-              :alt="image.alt"
-              class="gallery-image"
+    <section class="clinic-gallery q-pa-xl">
+      <q-container>
+        <div class="text-center q-mb-xl animated fadeIn">
+          <h2 class="text-h3 text-weight-bold q-mb-md">Nuestra Clínica</h2>
+          <p class="text-h6 text-grey-7">Instalaciones modernas y equipos de última tecnología</p>
+        </div>
+        
+        <div class="gallery-container">
+          <div class="gallery-grid">
+            <div 
+              v-for="(image, index) in clinicImages" 
+              :key="index"
+              class="gallery-item animated fadeInUp"
+              :style="{ animationDelay: `${index * 0.1}s` }"
+              @click="openImageDialog(image)"
             >
-              <div class="gallery-overlay">
-                <q-icon name="zoom_in" color="white" size="2em" />
-              </div>
-            </q-img>
+              <q-img
+                :src="image.src"
+                :alt="image.alt"
+                class="gallery-image"
+              >
+                <div class="gallery-overlay">
+                  <q-icon name="zoom_in" color="white" size="2em" />
+                </div>
+              </q-img>
+            </div>
           </div>
         </div>
-      </div>
+      </q-container>
     </section>
 
     <!-- Misión y Visión -->
     <section class="mission-vision q-pa-xl">
-      <div class="container">
-        <div class="text-center q-mb-xl">
+      <q-container>
+        <div class="text-center q-mb-xl animated fadeIn">
           <h2 class="text-h3 text-weight-bold q-mb-md">Nuestra Misión</h2>
         </div>
         
         <div class="mission-content">
-          <div class="mission-text">
+          <div class="mission-text animated fadeInUp">
             <p class="text-body1 text-grey-7 q-mb-lg">
               Odontología Integral Kiru es un proyecto que ha crecido rápidamente gracias al compromiso 
               y dedicación de nuestro equipo. Nos motiva la frase que guía nuestro trabajo: 
@@ -107,11 +120,11 @@
             </p>
           </div>
           
-          <div class="mission-values">
-            <div class="row q-gutter-lg">
-              <div class="col-12 col-md-4">
-                <q-card class="value-card text-center">
-                  <q-card-section>
+          <div class="mission-values q-mt-xl">
+            <div class="row q-col-gutter-lg">
+              <div class="col-12 col-md-4 animated fadeInUp" style="animation-delay: 0.1s">
+                <q-card class="value-card text-center" flat bordered>
+                  <q-card-section class="q-pa-xl">
                     <q-icon name="favorite" color="red" size="3em" class="q-mb-md" />
                     <h4 class="text-h6 text-weight-bold q-mb-sm">Compromiso</h4>
                     <p class="text-body2 text-grey-7">
@@ -121,9 +134,9 @@
                 </q-card>
               </div>
               
-              <div class="col-12 col-md-4">
-                <q-card class="value-card text-center">
-                  <q-card-section>
+              <div class="col-12 col-md-4 animated fadeInUp" style="animation-delay: 0.2s">
+                <q-card class="value-card text-center" flat bordered>
+                  <q-card-section class="q-pa-xl">
                     <q-icon name="family_restroom" color="blue" size="3em" class="q-mb-md" />
                     <h4 class="text-h6 text-weight-bold q-mb-sm">Familia</h4>
                     <p class="text-body2 text-grey-7">
@@ -133,9 +146,9 @@
                 </q-card>
               </div>
               
-              <div class="col-12 col-md-4">
-                <q-card class="value-card text-center">
-                  <q-card-section>
+              <div class="col-12 col-md-4 animated fadeInUp" style="animation-delay: 0.3s">
+                <q-card class="value-card text-center" flat bordered>
+                  <q-card-section class="q-pa-xl">
                     <q-icon name="science" color="green" size="3em" class="q-mb-md" />
                     <h4 class="text-h6 text-weight-bold q-mb-sm">Tecnología</h4>
                     <p class="text-body2 text-grey-7">
@@ -147,67 +160,74 @@
             </div>
           </div>
         </div>
-      </div>
+      </q-container>
     </section>
 
     <!-- Personal de KIRU -->
-    <section class="staff-section q-pa-xl bg-grey-1">
-      <div class="text-center q-mb-xl">
-        <h2 class="text-h3 text-weight-bold q-mb-md">Personal de KIRU</h2>
-        <p class="text-h6 text-grey-7">Conoce a nuestro equipo de profesionales especializados</p>
-      </div>
-      
-      <div class="staff-grid">
-        <div 
-          v-for="doctor in staff" 
-          :key="doctor.id"
-          class="staff-card"
-          @click="openDoctorDetail(doctor)"
-        >
-          <q-card class="staff-member-card">
-            <q-card-section class="text-center">
-              <div class="staff-avatar">
-                <q-avatar size="120px" class="q-mb-md">
-                  <q-img :src="doctor.image" :alt="doctor.name" />
-                </q-avatar>
-              </div>
-              <h4 class="text-h6 text-weight-bold q-mb-sm">{{ doctor.name }}</h4>
-              <p class="text-body2 text-grey-7 q-mb-sm">{{ doctor.specialty }}</p>
-              <p class="text-caption text-grey-6 q-mb-md">{{ doctor.experience }} de experiencia</p>
-              <div class="staff-info">
-                <q-chip 
-                  v-for="cert in doctor.certifications" 
-                  :key="cert.name"
-                  :color="cert.color" 
-                  text-color="white" 
-                  size="sm"
-                  class="q-mr-xs q-mb-xs"
-                >
-                  {{ cert.name }}
-                </q-chip>
-              </div>
-            </q-card-section>
-          </q-card>
+    <section class="staff-section q-pa-xl">
+      <q-container>
+        <div class="text-center q-mb-xl animated fadeIn">
+          <h2 class="text-h3 text-weight-bold q-mb-md">Personal de KIRU</h2>
+          <p class="text-h6 text-grey-7">Conoce a nuestro equipo de profesionales especializados</p>
         </div>
-      </div>
+        
+        <div class="staff-grid">
+          <div 
+            v-for="(doctor, index) in staff" 
+            :key="doctor.id"
+            class="staff-card animated fadeInUp"
+            :style="{ animationDelay: `${index * 0.1}s` }"
+            @click="openDoctorDetail(doctor)"
+          >
+            <q-card class="staff-member-card" flat bordered>
+              <q-card-section class="text-center q-pa-xl">
+                <div class="staff-avatar">
+                  <q-avatar size="120px" class="q-mb-md">
+                    <q-img :src="doctor.image" :alt="doctor.name" />
+                  </q-avatar>
+                </div>
+                <h4 class="text-h6 text-weight-bold q-mb-sm">{{ doctor.name }}</h4>
+                <p class="text-body2 text-grey-7 q-mb-sm">{{ doctor.specialty }}</p>
+                <p class="text-caption text-grey-6 q-mb-md">{{ doctor.experience }} de experiencia</p>
+                <div class="staff-info">
+                  <q-chip 
+                    v-for="cert in doctor.certifications" 
+                    :key="cert.name"
+                    :color="cert.color" 
+                    text-color="white" 
+                    size="sm"
+                    class="q-mr-xs q-mb-xs"
+                  >
+                    {{ cert.name }}
+                  </q-chip>
+                </div>
+              </q-card-section>
+            </q-card>
+          </div>
+        </div>
+      </q-container>
     </section>
 
     <!-- Call to Action -->
-    <section class="cta-section bg-primary text-white q-pa-xl text-center">
-      <h2 class="text-h3 text-weight-bold q-mb-md">
-        ¿Listo para conocer más sobre nosotros?
-      </h2>
-      <p class="text-h6 q-mb-lg">
-        Agenda una cita y descubre por qué somos la mejor opción para tu salud dental
-      </p>
-      <q-btn
-        color="white"
-        text-color="primary"
-        size="lg"
-        label="Agendar Cita"
-        icon="calendar_today"
-        @click="openAppointmentDialog"
-      />
+    <section class="cta-section q-pa-xl text-center">
+      <q-container class="animated fadeIn">
+        <h2 class="text-h3 text-weight-bold q-mb-md text-white">
+          ¿Listo para conocer más sobre nosotros?
+        </h2>
+        <p class="text-h6 q-mb-lg text-white">
+          Agenda una cita y descubre por qué somos la mejor opción para tu salud dental
+        </p>
+        <q-btn
+          color="white"
+          text-color="primary"
+          size="lg"
+          label="Agendar Cita"
+          icon="calendar_today"
+          @click="openAppointmentDialog"
+          push
+          no-caps
+        />
+      </q-container>
     </section>
 
     <!-- Modal para Agendar Cita -->
@@ -219,15 +239,15 @@
     />
 
     <!-- Dialog para ver imagen en grande -->
-    <q-dialog v-model="imageDialog" maximized>
+    <q-dialog v-model="imageDialog" maximized transition-show="scale" transition-hide="scale">
       <q-card v-if="selectedImage">
-        <q-card-section class="row items-center q-pb-none">
+        <q-card-section class="row items-center q-pb-none bg-primary text-white">
           <div class="text-h6">{{ selectedImage.alt }}</div>
           <q-space />
-          <q-btn icon="close" flat round dense v-close-popup />
+          <q-btn icon="close" flat round dense v-close-popup color="white" />
         </q-card-section>
         
-        <q-card-section class="text-center">
+        <q-card-section class="text-center q-pa-xl">
           <q-img
             :src="selectedImage.src"
             :alt="selectedImage.alt"
@@ -238,16 +258,21 @@
     </q-dialog>
 
     <!-- Dialog para detalles del doctor -->
-    <q-dialog v-model="doctorDialog" maximized>
+    <q-dialog v-model="doctorDialog" maximized transition-show="slide-up" transition-hide="slide-down">
       <q-card v-if="selectedDoctor">
-        <q-card-section class="row items-center q-pb-none">
-          <div class="text-h6">{{ selectedDoctor.name }}</div>
-          <q-space />
-          <q-btn icon="close" flat round dense v-close-popup />
+        <q-card-section class="dialog-header">
+          <div class="row items-center">
+            <div class="col">
+              <div class="text-h6">{{ selectedDoctor.name }}</div>
+            </div>
+            <div class="col-auto">
+              <q-btn icon="close" flat round dense v-close-popup color="white" />
+            </div>
+          </div>
         </q-card-section>
         
-        <q-card-section>
-          <div class="row">
+        <q-card-section class="dialog-content">
+          <div class="row q-col-gutter-xl">
             <div class="col-12 col-md-4 text-center">
               <q-avatar size="200px" class="q-mb-md">
                 <q-img :src="selectedDoctor.image" :alt="selectedDoctor.name" />
@@ -258,11 +283,15 @@
                 color="primary" 
                 label="Agendar Cita" 
                 size="lg"
+                icon="calendar_today"
                 @click="openAppointmentDialog"
+                push
+                no-caps
+                class="full-width"
               />
             </div>
             
-            <div class="col-12 col-md-8 q-pl-md">
+            <div class="col-12 col-md-8">
               <div class="doctor-details">
                 <h4 class="text-h6 text-weight-bold q-mb-md">Información Profesional</h4>
                 
@@ -321,8 +350,11 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useNotifications } from 'src/composables/useNotifications'
 import AppointmentModal from 'components/AppointmentModal.vue'
 import personalData from 'src/data/personal.json'
+
+const { notifyInfo } = useNotifications()
 
 // Datos reactivos
 const appointmentDialog = ref(false)
@@ -334,26 +366,11 @@ const staff = ref([])
 
 // Datos de la galería de la clínica
 const clinicImages = ref([
-  {
-    src: '/icons/prueba.jpeg',
-    alt: 'Consultorio dental moderno'
-  },
-  {
-    src: '/icons/prueba.jpeg',
-    alt: 'Sala de espera cómoda'
-  },
-  {
-    src: '/icons/prueba.jpeg',
-    alt: 'Equipos de última tecnología'
-  },
-  {
-    src: '/icons/prueba.jpeg',
-    alt: 'Área de consulta especializada'
-  },
-  {
-    src: '/icons/prueba.jpeg',
-    alt: 'Instalaciones modernas'
-  }
+  { src: '/icons/prueba.jpeg', alt: 'Consultorio dental moderno' },
+  { src: '/icons/prueba.jpeg', alt: 'Sala de espera cómoda' },
+  { src: '/icons/prueba.jpeg', alt: 'Equipos de última tecnología' },
+  { src: '/icons/prueba.jpeg', alt: 'Área de consulta especializada' },
+  { src: '/icons/prueba.jpeg', alt: 'Instalaciones modernas' }
 ])
 
 // Cargar datos del personal al montar el componente
@@ -378,24 +395,19 @@ const openDoctorDetail = (doctor) => {
 
 // Funciones para manejar eventos del modal de citas
 const onNewAppointment = () => {
-  console.log('Abrir nueva cita desde AboutPage')
-  // Aquí implementarías la lógica para abrir el formulario de nueva cita
-  // Por ejemplo: router.push('/appointment/new') o abrir otro modal
+  notifyInfo('Abriendo formulario de nueva cita...')
 }
 
 const onHistory = () => {
-  console.log('Abrir historial de citas desde AboutPage')
-  // Aquí implementarías la lógica para abrir el historial de citas
-  // Por ejemplo: router.push('/appointment/history') o abrir otro modal
+  notifyInfo('Abriendo historial de citas...')
 }
 
 const onAppointmentCancel = () => {
-  console.log('Cancelar modal de citas desde AboutPage')
-  // Aquí implementarías cualquier lógica adicional al cancelar
+  console.log('Cancelar modal de citas')
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .about-page {
   padding-bottom: 0;
 }
@@ -406,6 +418,10 @@ const onAppointmentCancel = () => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.body--dark .hero-about {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
 }
 
 .quienes-somos {
@@ -420,31 +436,17 @@ const onAppointmentCancel = () => {
 .about-image-container {
   position: relative;
   display: inline-block;
+  width: 100%;
 }
 
 .about-main-image {
-  border-radius: 20px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-}
-
-.floating-badge {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: rgba(255, 255, 255, 0.95);
-  padding: 12px 16px;
-  border-radius: 25px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-}
-
-.badge-text {
-  font-weight: 600;
-  color: #333;
-  font-size: 14px;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  transition: transform var(--transition-normal);
+  
+  &:hover {
+    transform: scale(1.05);
+  }
 }
 
 .clinic-gallery {
@@ -459,23 +461,30 @@ const onAppointmentCancel = () => {
 
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-lg);
 }
 
 .gallery-item {
   cursor: pointer;
-  transition: transform 0.3s ease;
-}
-
-.gallery-item:hover {
-  transform: translateY(-5px);
+  transition: transform var(--transition-normal);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  
+  &:hover {
+    transform: translateY(-8px);
+  }
 }
 
 .gallery-image {
-  border-radius: 15px;
-  height: 200px;
+  border-radius: var(--radius-lg);
+  height: 250px;
   object-fit: cover;
+  transition: transform var(--transition-normal);
+}
+
+.gallery-item:hover .gallery-image {
+  transform: scale(1.1);
 }
 
 .gallery-overlay {
@@ -489,8 +498,8 @@ const onAppointmentCancel = () => {
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: opacity 0.3s ease;
-  border-radius: 15px;
+  transition: opacity var(--transition-normal);
+  border-radius: var(--radius-lg);
 }
 
 .gallery-item:hover .gallery-overlay {
@@ -500,11 +509,6 @@ const onAppointmentCancel = () => {
 .mission-vision {
   padding-top: 80px;
   padding-bottom: 80px;
-}
-
-.container {
-  max-width: 1000px;
-  margin: 0 auto;
 }
 
 .mission-content {
@@ -519,12 +523,14 @@ const onAppointmentCancel = () => {
 
 .value-card {
   height: 100%;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.value-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transition: all var(--transition-normal);
+  border-radius: var(--radius-xl);
+  
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--primary-color);
+  }
 }
 
 .staff-section {
@@ -535,19 +541,26 @@ const onAppointmentCancel = () => {
 .staff-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 30px;
-  max-width: 1000px;
+  gap: var(--spacing-xl);
+  max-width: 1200px;
   margin: 0 auto;
+}
+
+.staff-card {
+  cursor: pointer;
+  transition: transform var(--transition-normal);
 }
 
 .staff-member-card {
   height: 100%;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.staff-member-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-xl);
+  transition: all var(--transition-normal);
+  
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--primary-color);
+  }
 }
 
 .staff-avatar {
@@ -555,7 +568,7 @@ const onAppointmentCancel = () => {
 }
 
 .staff-info {
-  margin-top: 16px;
+  margin-top: var(--spacing-md);
 }
 
 .cta-section {
@@ -567,19 +580,19 @@ const onAppointmentCancel = () => {
 .full-image {
   max-width: 100%;
   max-height: 80vh;
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
 }
 
 /* Estilos para el modal del doctor */
 .doctor-details {
-  padding: 20px 0;
+  padding: var(--spacing-lg) 0;
 }
 
 .detail-item {
   display: flex;
   align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid #e0e0e0;
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .detail-item:last-child {
@@ -589,16 +602,7 @@ const onAppointmentCancel = () => {
 .certifications-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-}
-
-.staff-card {
-  cursor: pointer;
-  transition: transform 0.3s ease;
-}
-
-.staff-card:hover {
-  transform: translateY(-5px);
+  gap: var(--spacing-xs);
 }
 
 /* Responsive */
@@ -617,7 +621,7 @@ const onAppointmentCancel = () => {
   
   .gallery-grid {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 15px;
+    gap: var(--spacing-md);
   }
   
   .gallery-image {
@@ -626,13 +630,7 @@ const onAppointmentCancel = () => {
   
   .staff-grid {
     grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  
-  .floating-badge {
-    position: static;
-    margin-top: 16px;
-    justify-content: center;
+    gap: var(--spacing-lg);
   }
 }
 </style>
