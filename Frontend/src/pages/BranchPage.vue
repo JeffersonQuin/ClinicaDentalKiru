@@ -1,154 +1,175 @@
 <template>
   <q-page class="branch-page">
     <!-- Hero Section para Sucursales -->
-    <section class="hero-branch q-pa-xl">
-      <div class="row items-center">
-        <div class="col-12 col-md-6">
-          <h1 class="text-h2 text-weight-bold text-primary q-mb-md">
-            Nuestras Sucursales
-          </h1>
-          <p class="text-h6 text-grey-7 q-mb-lg">
-            Encuentra la sucursal más cercana a ti. Contamos con múltiples ubicaciones estratégicas 
-            en Oruro para brindarte la mejor atención dental con la comodidad que mereces.
-          </p>
-          <div class="q-gutter-md">
-            <q-btn 
-              color="primary" 
-              size="lg" 
-              label="Agendar Cita" 
-              icon="calendar_today"
-              @click="openAppointmentDialog"
-            />
-            <q-btn 
-              outline 
-              color="primary" 
-              size="lg" 
-              label="Ver Mapa Completo"
-              @click="openMapDialog"
-            />
+    <section class="hero-branch">
+      <q-container class="q-pa-xl">
+        <div class="row items-center q-col-gutter-xl">
+          <div class="col-12 col-md-6">
+            <h1 class="text-h2 text-weight-bold text-primary q-mb-md animated fadeInLeft">
+              Nuestras Sucursales
+            </h1>
+            <p class="text-h6 text-grey-7 q-mb-lg animated fadeInLeft" style="animation-delay: 0.2s">
+              Encuentra la sucursal más cercana a ti. Contamos con múltiples ubicaciones estratégicas 
+              en Oruro para brindarte la mejor atención dental con la comodidad que mereces.
+            </p>
+            <div class="q-gutter-md animated fadeInUp" style="animation-delay: 0.4s">
+              <q-btn 
+                color="primary" 
+                size="lg" 
+                label="Agendar Cita" 
+                icon="calendar_today"
+                @click="openAppointmentDialog"
+                push
+                no-caps
+                class="primary-btn"
+              />
+              <q-btn 
+                outline 
+                color="primary" 
+                size="lg" 
+                label="Ver Mapa Completo"
+                @click="openMapDialog"
+                no-caps
+                class="secondary-btn"
+              />
+            </div>
           </div>
-        </div>
-        <div class="col-12 col-md-6 text-center">
-          <div class="hero-image-container">
-            <q-img
-              src="/KiruIMG/sucursales.png"
-              alt="Paciente en consulta dental"
-              class="hero-image"
-            />
-            <div class="floating-elements">
-              <q-icon name="location_on" color="red" size="2em" class="floating-icon-1" />
-              <q-icon name="schedule" color="blue" size="1.5em" class="floating-icon-2" />
+          
+          <div class="col-12 col-md-6 text-center">
+            <div class="hero-image-container animated zoomIn" style="animation-delay: 0.3s">
+              <q-img
+                src="/KiruIMG/sucursales.png"
+                alt="Sucursales KIRU"
+                class="hero-image"
+                fit="contain"
+              />
+              <div class="floating-elements">
+                <q-icon name="location_on" color="red" size="2em" class="floating-icon-1" />
+                <q-icon name="schedule" color="blue" size="1.5em" class="floating-icon-2" />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </q-container>
     </section>
 
     <!-- Sección de Sucursales -->
-    <section class="branches-section q-pa-xl bg-grey-1">
-      <div class="text-center q-mb-xl">
-        <h2 class="text-h3 text-weight-bold">Ubicaciones Disponibles</h2>
-        <p class="text-h6 text-grey-7">Selecciona la sucursal que mejor se adapte a tus necesidades</p>
-      </div>
-      
-      <div class="row q-col-gutter-lg justify-center">
-        <div 
-          v-for="branch in branches" 
-          :key="branch.id" 
-          class="col-12 col-md-6 col-lg-4"
-        >
-          <q-card class="branch-card" flat bordered @click="openBranchDetail(branch)">
-            <div class="branch-image-container">
-              <q-img :src="branch.image" :alt="branch.name" class="branch-image" />
-              <div class="branch-overlay">
-                <q-icon name="visibility" color="white" size="2em" />
-              </div>
-              <div class="branch-status">
-                <q-chip 
-                  color="green" 
-                  text-color="white" 
-                  size="sm"
-                  class="status-chip"
-                >
-                  Abierto
-                </q-chip>
-              </div>
-            </div>
-            
-            <q-card-section class="branch-content">
-              <div class="text-h6 text-weight-bold q-mb-sm branch-title">{{ branch.name }}</div>
-              <div class="branch-location q-mb-md">
-                <q-icon name="location_on" color="primary" size="16px" class="q-mr-xs" />
-                <span class="text-grey-7">{{ branch.location }}</span>
-              </div>
-              
-              <div class="branch-info q-mb-md">
-                <div class="info-item">
-                  <q-icon name="phone" color="primary" size="16px" class="q-mr-xs" />
-                  <span class="text-caption">{{ branch.phone }}</span>
-                </div>
-                <div class="info-item">
-                  <q-icon name="email" color="primary" size="16px" class="q-mr-xs" />
-                  <span class="text-caption">{{ branch.email }}</span>
-                </div>
-              </div>
-              
-              <div class="branch-services q-mb-md">
-                <div class="text-caption text-weight-bold q-mb-xs">Servicios disponibles:</div>
-                <div class="services-tags">
-                  <q-chip 
-                    v-for="service in branch.services.slice(0, 3)" 
-                    :key="service"
-                    color="blue" 
-                    text-color="white" 
-                    size="xs"
-                    class="q-mr-xs q-mb-xs"
-                  >
-                    {{ service }}
-                  </q-chip>
-                  <q-chip 
-                    v-if="branch.services.length > 3"
-                    color="grey" 
-                    text-color="white" 
-                    size="xs"
-                    class="q-mr-xs q-mb-xs"
-                  >
-                    +{{ branch.services.length - 3 }} más
-                  </q-chip>
-                </div>
-              </div>
-            </q-card-section>
-            
-            <q-card-actions align="right" class="branch-actions">
-              <q-btn 
-                flat 
-                label="Ver Detalles" 
-                color="primary" 
-                icon-right="arrow_forward"
-                class="details-btn"
-              />
-            </q-card-actions>
-          </q-card>
+    <section class="branches-section q-pa-xl">
+      <q-container>
+        <div class="text-center q-mb-xl animated fadeIn">
+          <h2 class="text-h3 text-weight-bold">Ubicaciones Disponibles</h2>
+          <p class="text-h6 text-grey-7">Selecciona la sucursal que mejor se adapte a tus necesidades</p>
         </div>
-      </div>
+        
+        <div class="row q-col-gutter-lg">
+          <div 
+            v-for="(branch, index) in branches" 
+            :key="branch.id" 
+            class="col-12 col-sm-6 col-lg-4 animated fadeInUp"
+            :style="{ animationDelay: `${index * 0.1}s` }"
+          >
+            <q-card class="branch-card" flat bordered @click="openBranchDetail(branch)">
+              <div class="branch-image-container">
+                <q-img :src="branch.image" :alt="branch.name" class="branch-image" />
+                <div class="branch-overlay">
+                  <q-icon name="visibility" color="white" size="2em" />
+                </div>
+                <div class="branch-status">
+                  <q-chip 
+                    color="green" 
+                    text-color="white" 
+                    size="sm"
+                    class="status-chip"
+                  >
+                    Abierto
+                  </q-chip>
+                </div>
+              </div>
+              
+              <q-card-section class="branch-content">
+                <div class="text-h6 text-weight-bold q-mb-sm branch-title">
+                  {{ branch.name }}
+                </div>
+                <div class="branch-location q-mb-md">
+                  <q-icon name="location_on" color="primary" size="16px" class="q-mr-xs" />
+                  <span class="text-grey-7">{{ branch.location }}</span>
+                </div>
+                
+                <div class="branch-info q-mb-md">
+                  <div class="info-item">
+                    <q-icon name="phone" color="primary" size="16px" class="q-mr-xs" />
+                    <span class="text-caption">{{ branch.phone }}</span>
+                  </div>
+                  <div class="info-item">
+                    <q-icon name="email" color="primary" size="16px" class="q-mr-xs" />
+                    <span class="text-caption">{{ branch.email }}</span>
+                  </div>
+                </div>
+                
+                <div class="branch-services q-mb-md">
+                  <div class="text-caption text-weight-bold q-mb-xs">Servicios disponibles:</div>
+                  <div class="services-tags">
+                    <q-chip 
+                      v-for="service in branch.services.slice(0, 3)" 
+                      :key="service"
+                      color="blue" 
+                      text-color="white" 
+                      size="xs"
+                      class="q-mr-xs q-mb-xs"
+                    >
+                      {{ service }}
+                    </q-chip>
+                    <q-chip 
+                      v-if="branch.services.length > 3"
+                      color="grey" 
+                      text-color="white" 
+                      size="xs"
+                      class="q-mr-xs q-mb-xs"
+                    >
+                      +{{ branch.services.length - 3 }} más
+                    </q-chip>
+                  </div>
+                </div>
+              </q-card-section>
+              
+              <q-separator />
+              
+              <q-card-actions align="right" class="branch-actions">
+                <q-btn 
+                  flat 
+                  label="Ver Detalles" 
+                  color="primary" 
+                  icon-right="arrow_forward"
+                  no-caps
+                  class="details-btn"
+                />
+              </q-card-actions>
+            </q-card>
+          </div>
+        </div>
+      </q-container>
     </section>
 
     <!-- Call to Action Section -->
-    <section class="cta-section bg-primary text-white q-pa-xl text-center">
-      <h2 class="text-h3 text-weight-bold q-mb-md">
-        ¿No encuentras la sucursal que buscas?
-      </h2>
-      <p class="text-h6 q-mb-lg">
-        Contáctanos y te ayudaremos a encontrar la ubicación más conveniente para ti.
-      </p>
-      <q-btn
-        color="white"
-        text-color="primary"
-        size="lg"
-        label="Contactar"
-        icon="phone"
-        to="/contact"
-      />
+    <section class="cta-section q-pa-xl text-center">
+      <q-container class="animated fadeIn">
+        <h2 class="text-h3 text-weight-bold q-mb-md text-white">
+          ¿No encuentras la sucursal que buscas?
+        </h2>
+        <p class="text-h6 q-mb-lg text-white">
+          Contáctanos y te ayudaremos a encontrar la ubicación más conveniente para ti.
+        </p>
+        <q-btn
+          color="white"
+          text-color="primary"
+          size="lg"
+          label="Contactar"
+          icon="phone"
+          to="/contact"
+          push
+          no-caps
+        />
+      </q-container>
     </section>
 
     <!-- Modal para Agendar Cita -->
@@ -160,16 +181,21 @@
     />
 
     <!-- Dialog de detalle de la sucursal -->
-    <q-dialog v-model="branchDialog" maximized>
+    <q-dialog v-model="branchDialog" maximized transition-show="slide-up" transition-hide="slide-down">
       <q-card v-if="selectedBranch">
-        <q-card-section class="row items-center q-pb-none">
-          <div class="text-h6">{{ selectedBranch.name }}</div>
-          <q-space />
-          <q-btn icon="close" flat round dense v-close-popup />
+        <q-card-section class="dialog-header">
+          <div class="row items-center">
+            <div class="col">
+              <div class="text-h6">{{ selectedBranch.name }}</div>
+            </div>
+            <div class="col-auto">
+              <q-btn icon="close" flat round dense v-close-popup color="white" />
+            </div>
+          </div>
         </q-card-section>
         
-        <q-card-section>
-          <div class="row">
+        <q-card-section class="dialog-content">
+          <div class="row q-col-gutter-xl">
             <div class="col-12 col-md-6">
               <q-img
                 :src="selectedBranch.image"
@@ -195,7 +221,7 @@
               </div>
             </div>
             
-            <div class="col-12 col-md-6 q-pl-md">
+            <div class="col-12 col-md-6">
               <div class="branch-detail-content">
                 <div class="text-h5 text-weight-bold q-mb-md">
                   {{ selectedBranch.name }}
@@ -223,7 +249,7 @@
                 
                 <div class="q-mb-md">
                   <h5 class="text-h6 text-weight-bold q-mb-sm">Horarios de Atención</h5>
-                  <q-list dense>
+                  <q-list dense bordered separator class="rounded-borders">
                     <q-item 
                       v-for="(time, day) in selectedBranch.schedule" 
                       :key="day"
@@ -255,9 +281,9 @@
                   </div>
                 </div>
                 
-                <div class="q-mb-md">
+                <div class="q-mb-md" v-if="selectedBranch.features">
                   <h5 class="text-h6 text-weight-bold q-mb-sm">Características</h5>
-                  <q-list dense>
+                  <q-list dense bordered class="rounded-borders">
                     <q-item 
                       v-for="feature in selectedBranch.features" 
                       :key="feature"
@@ -280,6 +306,8 @@
                     size="lg"
                     icon="calendar_today"
                     @click="openAppointmentDialog"
+                    push
+                    no-caps
                     class="q-mr-sm"
                   />
                   <q-btn 
@@ -288,6 +316,8 @@
                     size="lg"
                     icon="phone"
                     :href="`tel:${selectedBranch.phone}`"
+                    push
+                    no-caps
                   />
                 </div>
               </div>
@@ -298,12 +328,12 @@
     </q-dialog>
 
     <!-- Dialog del mapa completo -->
-    <q-dialog v-model="mapDialog" maximized>
+    <q-dialog v-model="mapDialog" maximized transition-show="scale" transition-hide="scale">
       <q-card>
-        <q-card-section class="row items-center q-pb-none">
+        <q-card-section class="row items-center q-pb-none bg-primary text-white">
           <div class="text-h6">Mapa de Todas las Sucursales</div>
           <q-space />
-          <q-btn icon="close" flat round dense v-close-popup />
+          <q-btn icon="close" flat round dense v-close-popup color="white" />
         </q-card-section>
         
         <q-card-section>
@@ -327,8 +357,11 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useNotifications } from 'src/composables/useNotifications'
 import AppointmentModal from 'components/AppointmentModal.vue'
 import sucursalesData from 'src/data/sucursales.json'
+
+const { notifyInfo } = useNotifications()
 
 // Datos reactivos
 const appointmentDialog = ref(false)
@@ -371,24 +404,19 @@ const getDayName = (day) => {
 
 // Funciones para manejar eventos del modal de citas
 const onNewAppointment = () => {
-  console.log('Abrir nueva cita desde BranchPage')
-  // Aquí implementarías la lógica para abrir el formulario de nueva cita
-  // Por ejemplo: router.push('/appointment/new') o abrir otro modal
+  notifyInfo('Abriendo formulario de nueva cita...')
 }
 
 const onHistory = () => {
-  console.log('Abrir historial de citas desde BranchPage')
-  // Aquí implementarías la lógica para abrir el historial de citas
-  // Por ejemplo: router.push('/appointment/history') o abrir otro modal
+  notifyInfo('Abriendo historial de citas...')
 }
 
 const onAppointmentCancel = () => {
-  console.log('Cancelar modal de citas desde BranchPage')
-  // Aquí implementarías cualquier lógica adicional al cancelar
+  console.log('Cancelar modal de citas')
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .branch-page {
   padding-bottom: 0;
 }
@@ -400,6 +428,17 @@ const onAppointmentCancel = () => {
   align-items: center;
 }
 
+.body--dark .hero-branch {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+
+.hero-image-container {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
 .floating-elements {
   position: absolute;
   top: 0;
@@ -409,18 +448,21 @@ const onAppointmentCancel = () => {
   pointer-events: none;
 }
 
-.floating-icon-1 {
+.floating-icon-1,
+.floating-icon-2 {
   position: absolute;
-  top: 20px;
-  left: 20px;
   animation: float 3s ease-in-out infinite;
 }
 
+.floating-icon-1 {
+  top: 20px;
+  left: 20px;
+}
+
 .floating-icon-2 {
-  position: absolute;
   bottom: 30px;
   right: 30px;
-  animation: float 3s ease-in-out infinite reverse;
+  animation-direction: reverse;
 }
 
 @keyframes float {
@@ -429,38 +471,40 @@ const onAppointmentCancel = () => {
 }
 
 .branches-section {
-  padding-top: 60px;
-  padding-bottom: 60px;
+  padding-top: 80px;
+  padding-bottom: 80px;
 }
 
 .branch-card {
-  border-radius: 12px;
+  border-radius: var(--radius-xl);
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: all var(--transition-normal);
   height: 100%;
   display: flex;
   flex-direction: column;
   cursor: pointer;
-}
-
-.branch-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--primary-orange);
+  }
 }
 
 .branch-image-container {
   position: relative;
   overflow: hidden;
+  height: 200px;
 }
 
 .branch-image {
-  height: 200px;
+  height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: transform var(--transition-normal);
 }
 
 .branch-card:hover .branch-image {
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 
 .branch-overlay {
@@ -474,7 +518,7 @@ const onAppointmentCancel = () => {
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity var(--transition-normal);
 }
 
 .branch-card:hover .branch-overlay {
@@ -489,41 +533,42 @@ const onAppointmentCancel = () => {
 
 .status-chip {
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-md);
 }
 
 .branch-content {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+  padding: var(--spacing-lg);
 }
 
 .branch-title {
   font-size: 1.25rem;
   line-height: 1.3;
-  color: #1A1A1A;
+  color: var(--text-primary);
 }
 
 .branch-location {
   display: flex;
   align-items: center;
-  color: #6B7280;
+  color: var(--text-secondary);
 }
 
 .branch-info {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--spacing-xs);
 }
 
 .info-item {
   display: flex;
   align-items: center;
-  color: #6B7280;
+  color: var(--text-secondary);
 }
 
 .branch-services {
-  margin-top: 12px;
+  margin-top: auto;
 }
 
 .services-tags {
@@ -533,17 +578,17 @@ const onAppointmentCancel = () => {
 }
 
 .branch-actions {
-  padding: 16px;
-  border-top: 1px solid #E5E7EB;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: 1px solid var(--border-light);
 }
 
 .details-btn {
   font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.details-btn:hover {
-  transform: translateX(4px);
+  transition: all var(--transition-fast);
+  
+  &:hover {
+    transform: translateX(4px);
+  }
 }
 
 .cta-section {
@@ -554,93 +599,68 @@ const onAppointmentCancel = () => {
 
 /* Estilos para el modal de detalles */
 .branch-detail-image {
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
 }
 
 .branch-detail-content {
-  padding: 20px 0;
+  padding: var(--spacing-lg) 0;
 }
 
 .branch-detail-info {
-  background: #F9FAFB;
-  padding: 16px;
-  border-radius: 8px;
-  margin-bottom: 20px;
+  background: var(--bg-secondary);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
 }
 
 .detail-row {
   display: flex;
   align-items: center;
-  margin-bottom: 8px;
-}
-
-.detail-row:last-child {
-  margin-bottom: 0;
+  margin-bottom: var(--spacing-sm);
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 
 .schedule-item {
-  padding: 8px 0;
-  border-bottom: 1px solid #E5E7EB;
-}
-
-.schedule-item:last-child {
-  border-bottom: none;
+  padding: var(--spacing-sm) 0;
 }
 
 .services-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--spacing-xs);
 }
 
 .feature-item {
-  padding: 8px 0;
+  padding: var(--spacing-sm) 0;
 }
 
 .branch-detail-actions {
-  margin-top: 24px;
-  text-align: center;
+  margin-top: var(--spacing-xl);
+  display: flex;
+  gap: var(--spacing-sm);
 }
 
-.map-container {
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-.map-iframe {
-  border-radius: 8px;
-}
-
+.map-container,
 .map-container-full {
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-lg);
 }
 
+.map-iframe,
 .map-iframe-full {
-  border-radius: 8px;
+  border-radius: var(--radius-md);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .hero-branch {
     min-height: auto;
-    padding-top: 40px;
-    padding-bottom: 40px;
-  }
-  
-  .hero-branch .col-md-6 {
-    text-align: center;
-  }
-  
-  .hero-branch .q-gutter-md {
-    justify-content: center;
-  }
-  
-  .hero-image-container {
-    margin-top: 30px;
+    padding: 40px 20px;
   }
   
   .branches-section {
@@ -653,11 +673,10 @@ const onAppointmentCancel = () => {
   
   .branch-detail-actions {
     flex-direction: column;
-    gap: 12px;
-  }
-  
-  .branch-detail-actions .q-btn {
-    width: 100%;
+    
+    .q-btn {
+      width: 100%;
+    }
   }
 }
 </style>

@@ -1,439 +1,516 @@
 <template>
-  <div class="login-container">
-    <div class="login-card">
-      <!-- Logo/Header -->
-      <div class="login-header">
-        <h1 class="text-h4 text-weight-bold text-primary">
-          Sistema Dental
-        </h1>
-        <p class="text-subtitle2 text-grey-7">
-          Portal de Autenticación Segura
-        </p>
-      </div>
-
-      <!-- Login Form -->
-      <q-form @submit="handleLogin" class="login-form">
-        <!-- Email Input -->
-        <div class="form-group">
-          <label for="email" class="text-weight-medium">Correo Electrónico</label>
-          <q-input
-            id="email"
-            v-model="formState.email"
-            type="email"
-            outlined
-            dense
-            :disable="formState.isLoading"
-            :rules="[val => val && val.length > 0 || 'El correo es requerido']"
-            class="input-field"
-            @keyup.enter="handleLogin"
-          >
-            <template v-slot:prepend>
-              <q-icon name="email" />
-            </template>
-          </q-input>
+  <div class="login-page flex flex-center">
+    <q-card class="login-card row no-wrap animated zoomIn">
+      <!-- Formulario de Login -->
+      <div class="col-12 col-md-6 login-form-section">
+        <div class="row items-center justify-center q-mb-lg animated fadeInDown">
+          <q-img 
+            :src="logo" 
+            fit="contain"  
+            style="width: 120px; height: 120px;"  
+          />
         </div>
 
-        <!-- Password Input -->
-        <div class="form-group">
-          <label for="password" class="text-weight-medium">Contraseña</label>
-          <q-input
-            id="password"
-            v-model="formState.password"
-            :type="formState.showPassword ? 'text' : 'password'"
+        <div class="text-center q-mb-md animated fadeInUp" style="animation-delay: 0.2s">
+          <h5 class="text-h5 q-my-sm text-weight-bold">Iniciar Sesión</h5>
+          <p class="text-grey-7">Accede a tu panel de control</p>
+        </div>
+
+        <q-form @submit="onSubmit" class="column q-gutter-md animated fadeInUp" style="animation-delay: 0.3s">
+          <q-input 
+            v-model="email" 
+            label="Correo Electrónico" 
             outlined
-            dense
-            :disable="formState.isLoading"
-            :rules="[val => val && val.length > 0 || 'La contraseña es requerida']"
-            class="input-field"
-            @keyup.enter="handleLogin"
+            autofocus
+            type="email"
+            :rules="[
+              val => !!val || 'El correo es requerido',
+              val => isValidEmail(val) || 'Correo inválido'
+            ]"
+            lazy-rules
+            class="form-input"
           >
             <template v-slot:prepend>
-              <q-icon name="lock" />
+              <q-icon name="email" color="primary" />
+            </template>
+          </q-input>
+
+          <q-input 
+            v-model="password" 
+            label="Contraseña" 
+            outlined
+            :type="showPassword ? 'text' : 'password'"
+            :rules="[
+              val => !!val || 'La contraseña es requerida',
+              val => val.length >= 6 || 'Mínimo 6 caracteres'
+            ]"
+            lazy-rules
+            class="form-input"
+          >
+            <template v-slot:prepend>
+              <q-icon name="lock" color="primary" />
             </template>
             <template v-slot:append>
-              <q-icon
-                :name="formState.showPassword ? 'visibility_off' : 'visibility'"
+              <q-icon 
+                :name="showPassword ? 'visibility_off' : 'visibility'"
                 class="cursor-pointer"
-                @click="togglePasswordVisibility"
+                color="grey-6"
+                @click="showPassword = !showPassword"
               />
             </template>
           </q-input>
-        </div>
 
-        <!-- Submit Button -->
-        <q-btn
-          type="submit"
-          color="primary"
-          label="Iniciar Sesión"
-          size="lg"
-          class="full-width login-button"
-          :loading="formState.isLoading"
-          :disable="formState.isLoading"
-        />
-      </q-form>
+          <div class="row items-center justify-between">
+            <q-checkbox 
+              v-model="rememberMe" 
+              label="Recordarme" 
+              color="primary"
+            />
+            <q-btn 
+              flat 
+              dense 
+              label="¿Olvidaste tu contraseña?" 
+              color="primary"
+              size="sm"
+              @click="forgotPassword"
+              no-caps
+            />
+          </div>
 
-      <!-- Error Message (Sanitized) -->
-      <q-banner
-        v-if="formState.errorMessage"
-        class="bg-negative text-white q-mt-md"
-        dense
-      >
-        <template v-slot:avatar>
-          <q-icon name="warning" />
-        </template>
-        <div v-text="formState.errorMessage"></div>
-      </q-banner>
+          <q-btn 
+            unelevated 
+            label="INGRESAR" 
+            color="primary" 
+            type="submit"
+            :loading="isLoading"
+            :disable="isLoading"
+            class="primary-btn"
+            size="lg"
+            push
+            no-caps
+          />
 
-      <!-- Success Message -->
-      <q-banner
-        v-if="formState.successMessage"
-        class="bg-positive text-white q-mt-md"
-        dense
-      >
-        <template v-slot:avatar>
-          <q-icon name="check_circle" />
-        </template>
-        <div v-text="formState.successMessage"></div>
-      </q-banner>
+          <q-btn 
+            flat 
+            label="CANCELAR" 
+            color="grey-7"
+            @click="goBack"
+            :disable="isLoading"
+            no-caps
+            class="secondary-btn"
+            
+          />
+        </q-form>
 
-      <!-- Development Credentials Section -->
-      <div v-if="isDevelopmentMode" class="dev-credentials q-mt-lg">
-        <q-expansion-item
-          header-class="text-weight-bold text-info"
-          icon="info"
-          label="Credenciales de Desarrollo (Eliminar en Producción)"
-          class="bg-blue-1"
-        >
-          <div class="q-pa-md">
-            <p class="text-caption text-grey-8 q-mb-md">
-              <q-icon name="warning" class="text-warning" />
-              Estas credenciales son solo para pruebas y no deben usarse en producción.
-            </p>
-
-            <!-- Credentials Table -->
-            <div class="credentials-list">
-              <div
-                v-for="(cred, index) in mockCredentials"
-                :key="index"
-                class="credential-item"
+        <!-- Credenciales de prueba (solo desarrollo) -->
+        <transition name="fade">
+          <div v-if="isDevelopment" class="q-mt-lg">
+            <q-separator class="q-mb-md" />
+            <div class="text-caption text-grey-7 q-mb-sm">
+              <q-icon name="info" size="xs" /> Credenciales de prueba:
+            </div>
+            <div class="test-credentials">
+              <q-chip 
+                v-for="(cred, index) in mockCredentials" 
+                :key="cred.email"
+                clickable
+                @click="fillCredentials(cred)"
+                :color="getRoleColor(cred.role)"
+                text-color="white"
+                size="sm"
+                class="q-ma-xs animated bounceIn"
+                :style="{ animationDelay: `${index * 0.1}s` }"
               >
-                <div class="role-badge">
-                  <q-chip
-                    :color="getRoleColor(cred.role)"
-                    text-color="white"
-                    size="sm"
-                    icon="person"
-                  >
-                    {{ getSpanishRole(cred.role) }}
-                  </q-chip>
-                </div>
-
-                <div class="credential-details">
-                  <p class="text-weight-medium q-mb-xs">
-                    {{ cred.name }}
-                  </p>
-                  <p class="text-caption text-grey-7 q-mb-xs">
-                    <span class="text-weight-bold">Correo:</span>
-                    <code v-text="cred.email"></code>
-                  </p>
-                  <p class="text-caption text-grey-7">
-                    <span class="text-weight-bold">Contraseña:</span>
-                    <code v-text="cred.password"></code>
-                  </p>
-                </div>
-
-                <!-- Copy Button -->
-                <q-btn
-                  flat
-                  dense
-                  round
-                  icon="content_copy"
-                  size="sm"
-                  @click="copyToClipboard(cred.email)"
-                  class="copy-btn"
-                >
-                  <q-tooltip>Copiar correo</q-tooltip>
-                </q-btn>
-              </div>
+                <q-avatar :color="getRoleColor(cred.role)" text-color="white">
+                  {{ cred.role.charAt(0) }}
+                </q-avatar>
+                {{ cred.role }}
+              </q-chip>
             </div>
           </div>
-        </q-expansion-item>
+        </transition>
+
+        <div class="q-mt-lg text-center">
+          <small class="text-grey">© 2025 KIRU Odontología</small>
+        </div>
       </div>
 
-      <!-- Footer -->
-      <div class="login-footer q-mt-lg text-center">
-        <p class="text-caption text-grey-7">
-          © 2025 Sistema Dental. Todos los derechos reservados.
-        </p>
+      <!-- Panel decorativo -->
+      <div class="col-12 col-md-6 flex flex-center welcome-panel">
+        <div class="q-pa-lg text-center welcome-content">
+          <div class="welcome-icon q-mb-md animated bounceIn">
+            <q-icon name="favorite" size="64px" color="white" />
+          </div>
+          <div class="text-h5 welcome-title animated fadeInUp" style="animation-delay: 0.2s">
+            ¡Bienvenido de vuelta!
+          </div>
+          <div class="text-subtitle2 q-mt-md welcome-subtitle animated fadeInUp" style="animation-delay: 0.3s">
+            Accede rápido a tu panel para administrar citas, pacientes y más.
+          </div>
+          <div class="q-mt-lg features-list">
+            <div class="feature-item animated slideInLeft" style="animation-delay: 0.4s">
+              <q-icon name="event" size="24px" />
+              <span>Gestión de Citas</span>
+            </div>
+            <div class="feature-item animated slideInLeft" style="animation-delay: 0.5s">
+              <q-icon name="people" size="24px" />
+              <span>Control de Pacientes</span>
+            </div>
+            <div class="feature-item animated slideInLeft" style="animation-delay: 0.6s">
+              <q-icon name="analytics" size="24px" />
+              <span>Reportes y Estadísticas</span>
+            </div>
+          </div>
+          <div class="q-mt-lg animated fadeIn" style="animation-delay: 0.7s">
+            <q-btn 
+              flat 
+              round 
+              dense 
+              icon="info" 
+              color="white" 
+              class="q-mr-sm"
+              @click="showInfo"
+            >
+              <q-tooltip>Información</q-tooltip>
+            </q-btn>
+            <q-btn 
+              flat 
+              round 
+              dense 
+              icon="phone" 
+              color="white"
+              @click="contactSupport"
+            >
+              <q-tooltip>Contactar Soporte</q-tooltip>
+            </q-btn>
+          </div>
+        </div>
       </div>
-    </div>
+    </q-card>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { useQuasar } from 'quasar'
+import { ref, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from 'stores/authStore'
+import { useNotifications } from 'src/composables/useNotifications'
+import { useQuasar } from 'quasar'
 
+const $q = useQuasar()
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
-const quasar = useQuasar()
+const { notifySuccess, notifyError, notifyInfo, showLoading, hideLoading } = useNotifications()
 
-// Form state
-const formState = reactive({
-  email: '',
-  password: '',
-  showPassword: false,
-  isLoading: false,
-  errorMessage: '',
-  successMessage: ''
-})
+// Datos del formulario
+const logo = '/KiruIMG/LogoKiru.png'
+const email = ref('')
+const password = ref('')
+const rememberMe = ref(false)
+const showPassword = ref(false)
 
-const mockCredentials = ref([])
+// Estado de carga
+const isLoading = computed(() => authStore.isLoading)
+const isDevelopment = import.meta.env.DEV
 
-// Computed
-const isDevelopmentMode = computed(() => import.meta.env.MODE !== 'production')
+// Credenciales mock para desarrollo
+const mockCredentials = computed(() => authStore.getMockCredentials())
 
-// Methods
-const togglePasswordVisibility = () => {
-  formState.showPassword = !formState.showPassword
+// Validación de email
+const isValidEmail = (email) => {
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return emailPattern.test(email)
 }
 
-const handleLogin = async () => {
+// Obtener color según rol
+const getRoleColor = (role) => {
+  const colors = {
+    ADMIN: 'deep-purple',
+    DENTIST: 'blue',
+    CLIENT: 'teal'
+  }
+  return colors[role] || 'grey'
+}
+
+// Llenar credenciales de prueba
+const fillCredentials = (cred) => {
+  email.value = cred.email
+  password.value = cred.password
+  notifyInfo(`Credenciales de ${cred.role} cargadas`)
+}
+
+// Enviar formulario
+const onSubmit = async () => {
   try {
-    // Clear previous messages
-    formState.errorMessage = ''
-    formState.successMessage = ''
-
-    // Validate form
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(formState.email)) {
-      formState.errorMessage = 'Por favor ingrese un correo válido'
-      return
-    }
-
-    if (formState.password.length < 1) {
-      formState.errorMessage = 'Por favor ingrese su contraseña'
-      return
-    }
-
-    formState.isLoading = true
-
-    // Attempt login
-    const result = await authStore.login(formState.email, formState.password)
-
+    showLoading('Iniciando sesión...')
+    
+    const result = await authStore.login(email.value, password.value)
+    
+    hideLoading()
+    
     if (result.success) {
-      // Show success message
-      formState.successMessage = '¡Inicio de sesión exitoso!'
-      
-      // Clear form
-      formState.email = ''
-      formState.password = ''
+      notifySuccess(`¡Bienvenido ${result.user.name}!`)
 
-      // Show notification using Quasar
-      quasar.notify({
-        type: 'positive',
-        message: '¡Bienvenido al Sistema Dental!',
-        position: 'top',
-        timeout: 2000
-      })
-
-      // Redirect based on role
-      setTimeout(() => {
-        const roleRedirects = {
-          ADMIN: '/admin-dashboard',
-          DENTIST: '/dentist-dashboard',
-          CLIENT: '/client-dashboard'
-        }
-
-        const redirectPath = roleRedirects[authStore.userRole] || '/dashboard'
-        router.push(redirectPath)
-      }, 500)
+      // Redirigir a la ruta guardada o al dashboard
+      const redirectTo = route.query.redirect || result.redirectTo
+      router.push(redirectTo)
     } else {
-      formState.errorMessage = result.message || 'Error en la autenticación'
-      quasar.notify({
-        type: 'negative',
-        message: formState.errorMessage,
-        position: 'top',
-        timeout: 3000
-      })
+      notifyError(result.message || 'Error al iniciar sesión')
     }
   } catch (error) {
-    formState.errorMessage = 'Error inesperado durante el inicio de sesión'
-    quasar.notify({
-      type: 'negative',
-      message: formState.errorMessage,
-      position: 'top',
-      timeout: 3000
-    })
-    console.error('Login error:', error)
-  } finally {
-    formState.isLoading = false
+    hideLoading()
+    console.error('Error en login:', error)
+    notifyError('Error inesperado al iniciar sesión')
   }
 }
 
-const getRoleColor = (role) => {
-  const colorMap = {
-    ADMIN: 'negative',
-    DENTIST: 'primary',
-    CLIENT: 'info'
-  }
-  return colorMap[role] || 'grey'
+// Volver atrás
+const goBack = () => {
+  router.push('/')
 }
 
-const getSpanishRole = (role) => {
-  const roleMap = {
-    ADMIN: 'Administrador',
-    DENTIST: 'Dentista',
-    CLIENT: 'Cliente'
-  }
-  return roleMap[role] || role
-}
-
-const copyToClipboard = (text) => {
-  navigator.clipboard.writeText(text).then(() => {
-    quasar.notify({
-      type: 'positive',
-      message: '¡Copiado al portapapeles!',
-      position: 'top',
-      timeout: 1500
-    })
-  }).catch(err => {
-    console.error('Error al copiar:', err)
-    quasar.notify({
-      type: 'negative',
-      message: 'Error al copiar',
-      position: 'top',
-      timeout: 1500
-    })
+// Olvidé mi contraseña
+const forgotPassword = () => {
+  $q.dialog({
+    title: 'Recuperar Contraseña',
+    message: 'Ingresa tu correo electrónico para recibir instrucciones de recuperación.',
+    prompt: {
+      model: '',
+      type: 'email',
+      label: 'Correo electrónico',
+      isValid: val => isValidEmail(val)
+    },
+    cancel: {
+      flat: true,
+      label: 'Cancelar'
+    },
+    ok: {
+      push: true,
+      label: 'Enviar'
+    },
+    persistent: true
+  }).onOk(data => {
+    notifySuccess(`Se han enviado las instrucciones a ${data}`)
   })
 }
 
-// Lifecycle
-onMounted(() => {
-  // Get mock credentials for development
-  if (isDevelopmentMode.value) {
-    mockCredentials.value = authStore.getMockCredentials()
-  }
-})
+// Mostrar información
+const showInfo = () => {
+  $q.dialog({
+    title: 'Sistema de Gestión KIRU',
+    message: 'Plataforma integral para la gestión de clínicas odontológicas. Administra pacientes, citas, tratamientos y más desde un solo lugar.',
+    ok: {
+      push: true,
+      label: 'Entendido'
+    }
+  })
+}
+
+// Contactar soporte
+const contactSupport = () => {
+  $q.dialog({
+    title: 'Contactar Soporte',
+    message: '¿Necesitas ayuda? Contáctanos:',
+    options: {
+      type: 'radio',
+      model: 'phone',
+      items: [
+        { label: 'Teléfono: +591 78900785', value: 'phone' },
+        { label: 'Email: soporte@kiruodontologia.com', value: 'email' },
+        { label: 'WhatsApp', value: 'whatsapp' }
+      ]
+    },
+    cancel: {
+      flat: true,
+      label: 'Cancelar'
+    },
+    ok: {
+      push: true,
+      label: 'Seleccionar'
+    }
+  }).onOk(data => {
+    if (data === 'whatsapp') {
+      window.open('https://wa.me/59178900785?text=Necesito ayuda con el sistema', '_blank')
+    }
+  })
+}
 </script>
 
-<style scoped>
-.login-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+<style lang="scss" scoped>
+.login-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 16px;
+  background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-orange-dark) 100%);
 }
 
 .login-card {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-  padding: 40px;
+  max-width: 900px;
   width: 100%;
-  max-width: 420px;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-xl);
 }
 
-.login-header {
-  text-align: center;
-  margin-bottom: 32px;
-}
-
-.login-header h1 {
-  margin: 0 0 8px 0;
-}
-
-.login-header p {
-  margin: 0;
-  color: #999;
-}
-
-.login-form {
-  margin-bottom: 24px;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  color: #333;
-  font-size: 14px;
-}
-
-.input-field {
-  width: 100%;
-}
-
-.login-button {
-  height: 48px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-}
-
-.dev-credentials {
-  border-left: 3px solid #2196f3;
-}
-
-.credentials-list {
+.login-form-section {
+  background: var(--bg-primary);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  justify-content: center;
+  padding: 20px;
 }
 
-.credential-item {
+.body--dark .login-form-section {
+  background: var(--bg-secondary);
+}
+
+.form-input {
+  :deep(.q-field__control) {
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    
+    &:hover {
+      border-color: var(--primary-color);
+    }
+    
+    &:focus-within {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px var(--primary-color-light);
+    }
+  }
+}
+
+/* Panel de bienvenida */
+.welcome-panel {
+  background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-orange-dark) 100%);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.welcome-panel::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  animation: pulse 15s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.1) rotate(180deg); }
+}
+
+.welcome-content {
+  position: relative;
+  z-index: 1;
+  max-width: 350px;
+}
+
+.welcome-icon {
+  animation: float 3s ease-in-out infinite;
+}
+
+.welcome-title {
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.welcome-subtitle {
+  opacity: 0.95;
+  line-height: 1.6;
+}
+
+/* Features list */
+.features-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.feature-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
-  background: white;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(10px);
+  transition: all var(--transition-normal);
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(5px);
+  }
 }
 
-.role-badge {
-  flex-shrink: 0;
+/* Credenciales de prueba */
+.test-credentials {
+  padding: var(--spacing-md);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border: 2px dashed var(--border-medium);
 }
 
-.credential-details {
-  flex: 1;
-  min-width: 0;
+.body--dark .test-credentials {
+  background: var(--bg-tertiary);
+  border-color: var(--border-dark);
 }
 
-.credential-details code {
-  background: #f5f5f5;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-family: 'Courier New', monospace;
-  font-size: 12px;
-  color: #d32f2f;
+/* Transitions */
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.3s ease;
 }
 
-.copy-btn {
-  flex-shrink: 0;
-}
-
-.login-footer {
-  border-top: 1px solid #eee;
-  padding-top: 16px;
-  margin-top: 24px;
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 
 /* Responsive */
-@media (max-width: 600px) {
+@media (max-width: 959px) {
   .login-card {
-    padding: 24px;
+    flex-direction: column;
   }
 
-  .credential-item {
-    flex-direction: column;
-    align-items: flex-start;
+  .welcome-panel {
+    min-height: 250px;
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  }
+
+  .login-form-section {
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  }
+}
+
+@media (max-width: 599px) {
+  .login-page {
+    padding: 10px;
+  }
+
+  .login-card {
+    border-radius: var(--radius-lg);
+  }
+
+  .login-form-section {
+    padding: var(--spacing-xl) var(--spacing-lg);
+  }
+
+  .welcome-panel {
+    min-height: 200px;
+  }
+
+  .features-list {
+    gap: var(--spacing-xs);
+  }
+
+  .feature-item {
+    padding: 6px 12px;
+    font-size: 14px;
   }
 }
 </style>

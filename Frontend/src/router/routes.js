@@ -1,209 +1,382 @@
-// routes.js
+// router/routes.js
 import MainLayout from 'layouts/MainLayout.vue'
+import DashboardLayout from 'layouts/DashboardLayout.vue'
 
-// Define which routes each role can view
-const rolePermissions = {
+/**
+ * Define qué secciones puede ver cada rol
+ * Esto se usa para filtrar el menú de navegación dinámicamente
+ */
+export const rolePermissions = {
   DENTIST: ['dashboard', 'patients', 'reserves', 'calendar', 'odontogram', 'quotes', 'historyQuotes'],
   CLIENT: ['dashboard', 'reserves', 'quotes', 'historyQuotes'],
-  ADMIN: ['dashboard', 'users', 'dentist', 'specialties', 'publications', 'branches', 'patients', 'reserves', 'quotes', 'historyQuotes']
+  ADMIN: ['dashboard', 'users', 'dentist', 'specialties', 'publications', 'branches', 'patients', 'reserves', 'quotes', 'historyQuotes', 'calendar', 'odontogram']
+}
+
+/**
+ * Configuración del menú del dashboard por rol
+ * Esto define qué items aparecen en el sidebar
+ */
+export const dashboardMenuConfig = {
+  ADMIN: [
+    {
+      title: 'Panel Principal',
+      icon: 'dashboard',
+      to: '/dashboard',
+      permission: 'dashboard'
+    },
+    {
+      title: 'Gestión',
+      icon: 'settings',
+      children: [
+        { title: 'Usuarios', icon: 'people', to: '/users', permission: 'users' },
+        { title: 'Dentistas', icon: 'medical_services', to: '/dentist', permission: 'dentist' },
+        { title: 'Especialidades', icon: 'school', to: '/specialties', permission: 'specialties' },
+        { title: 'Publicaciones', icon: 'article', to: '/publications', permission: 'publications' },
+        { title: 'Sucursales', icon: 'business', to: '/branches', permission: 'branches' }
+      ]
+    },
+    {
+      title: 'Pacientes',
+      icon: 'person',
+      to: '/patients',
+      permission: 'patients'
+    },
+    {
+      title: 'Reservas',
+      icon: 'event',
+      to: '/reserves',
+      permission: 'reserves'
+    },
+    {
+      title: 'Calendario',
+      icon: 'calendar_month',
+      children: [
+        { title: 'Vista Mensual', icon: 'calendar_view_month', to: '/Calendar-Month', permission: 'calendar' },
+        { title: 'Vista Semanal', icon: 'calendar_view_week', to: '/Calendar-Week', permission: 'calendar' },
+        { title: 'Vista Diaria', icon: 'calendar_view_day', to: '/Calendar-Day', permission: 'calendar' }
+      ]
+    },
+    {
+      title: 'Tratamientos',
+      icon: 'healing',
+      children: [
+        { title: 'Cotizaciones', icon: 'attach_money', to: '/quotes', permission: 'quotes' },
+        { title: 'Historial', icon: 'history', to: '/HistoryQuotes', permission: 'historyQuotes' },
+        { title: 'Odontograma', icon: 'emoji_emotions', to: '/Odontogram', permission: 'odontogram' }
+      ]
+    }
+  ],
+  DENTIST: [
+    {
+      title: 'Panel Principal',
+      icon: 'dashboard',
+      to: '/dashboard',
+      permission: 'dashboard'
+    },
+    {
+      title: 'Pacientes',
+      icon: 'person',
+      to: '/patients',
+      permission: 'patients'
+    },
+    {
+      title: 'Reservas',
+      icon: 'event',
+      to: '/reserves',
+      permission: 'reserves'
+    },
+    {
+      title: 'Calendario',
+      icon: 'calendar_month',
+      children: [
+        { title: 'Vista Mensual', icon: 'calendar_view_month', to: '/Calendar-Month', permission: 'calendar' },
+        { title: 'Vista Semanal', icon: 'calendar_view_week', to: '/Calendar-Week', permission: 'calendar' },
+        { title: 'Vista Diaria', icon: 'calendar_view_day', to: '/Calendar-Day', permission: 'calendar' }
+      ]
+    },
+    {
+      title: 'Tratamientos',
+      icon: 'healing',
+      children: [
+        { title: 'Cotizaciones', icon: 'attach_money', to: '/quotes', permission: 'quotes' },
+        { title: 'Historial', icon: 'history', to: '/HistoryQuotes', permission: 'historyQuotes' },
+        { title: 'Odontograma', icon: 'emoji_emotions', to: '/Odontogram', permission: 'odontogram' }
+      ]
+    }
+  ],
+  CLIENT: [
+    {
+      title: 'Panel Principal',
+      icon: 'dashboard',
+      to: '/dashboard',
+      permission: 'dashboard'
+    },
+    {
+      title: 'Mis Reservas',
+      icon: 'event',
+      to: '/reserves',
+      permission: 'reserves'
+    },
+    {
+      title: 'Mis Tratamientos',
+      icon: 'healing',
+      children: [
+        { title: 'Cotizaciones', icon: 'attach_money', to: '/quotes', permission: 'quotes' },
+        { title: 'Historial', icon: 'history', to: '/HistoryQuotes', permission: 'historyQuotes' }
+      ]
+    }
+  ]
 }
 
 const routes = [
+  // ============================================
+  // RUTAS PÚBLICAS (MainLayout)
+  // ============================================
   {
     path: '/',
     component: MainLayout,
     children: [
-      // Public routes (no authentication required)
       {
         path: '',
+        name: 'Home',
         component: () => import('pages/IndexPage.vue'),
         meta: { requiresAuth: false }
       },
       {
-        path: '/about',
+        path: 'about',
+        name: 'About',
         component: () => import('pages/AboutPage.vue'),
         meta: { requiresAuth: false }
       },
       {
-        path: '/faq',
+        path: 'faq',
+        name: 'FAQ',
         component: () => import('pages/FAQPage.vue'),
         meta: { requiresAuth: false }
       },
       {
-        path: '/contact',
+        path: 'contact',
+        name: 'Contact',
         component: () => import('pages/ContactPage.vue'),
         meta: { requiresAuth: false }
       },
       {
-        path: '/services',
+        path: 'services',
+        name: 'Services',
         component: () => import('pages/ServicesPage.vue'),
         meta: { requiresAuth: false }
       },
       {
-        path: '/branch',
+        path: 'branch',
+        name: 'Branch',
         component: () => import('pages/BranchPage.vue'),
         meta: { requiresAuth: false }
-      },
+      }
+    ]
+  },
 
-      // Protected routes (require authentication and specific role)
-      // DASHBOARD - for all authenticated users
+  // ============================================
+  // RUTAS DE AUTENTICACIÓN
+  // ============================================
+  {
+    path: '/login',
+    name: 'Login',
+    component: () => import('pages/Auth/LoginPage.vue'),
+    meta: { 
+      requiresAuth: false,
+      redirectIfAuthenticated: true // Redirigir al dashboard si ya está logueado
+    }
+  },
+
+  // ============================================
+  // RUTAS PRIVADAS (DashboardLayout)
+  // ============================================
+  {
+    path: '/dashboard',
+    component: DashboardLayout,
+    meta: { 
+      requiresAuth: true,
+      roles: ['ADMIN', 'DENTIST', 'CLIENT']
+    },
+    children: [
+      // DASHBOARD - Todos los usuarios autenticados
       {
-        path: '/dashboard',
+        path: '',
+        name: 'Dashboard',
         component: () => import('pages/DashboardPage.vue'),
         meta: { 
           requiresAuth: true,
-          roles: ['DENTIST', 'CLIENT', 'ADMIN']
+          roles: ['DENTIST', 'CLIENT', 'ADMIN'],
+          title: 'Panel Principal'
         }
       },
 
-      // USERS - Admin only
+      // GESTIÓN - Solo ADMIN
       {
         path: '/users',
+        name: 'Users',
         component: () => import('pages/User/UserPage.vue'),
         meta: { 
           requiresAuth: true,
-          roles: ['ADMIN']
+          roles: ['ADMIN'],
+          title: 'Gestión de Usuarios'
         }
       },
-
-      // DENTISTS - Admin only
       {
         path: '/dentist',
+        name: 'Dentists',
         component: () => import('pages/Dentist/DentistPage.vue'),
         meta: { 
           requiresAuth: true,
-          roles: ['ADMIN']
+          roles: ['ADMIN'],
+          title: 'Gestión de Dentistas'
         }
       },
-
-      // SPECIALTIES - Admin only
       {
         path: '/specialties',
+        name: 'Specialties',
         component: () => import('pages/Specialties/SpecialityPage.vue'),
         meta: { 
           requiresAuth: true,
-          roles: ['ADMIN']
+          roles: ['ADMIN'],
+          title: 'Especialidades'
         }
       },
-
-      // PUBLICATIONS - Admin only
       {
         path: '/publications',
+        name: 'Publications',
         component: () => import('pages/Publication/PublicationsPage.vue'),
         meta: { 
           requiresAuth: true,
-          roles: ['ADMIN']
+          roles: ['ADMIN'],
+          title: 'Publicaciones'
         }
       },
-
-      // BRANCHES - Admin only
       {
         path: '/branches',
+        name: 'Branches',
         component: () => import('pages/Branch/BranchPage.vue'),
         meta: { 
           requiresAuth: true,
-          roles: ['ADMIN']
+          roles: ['ADMIN'],
+          title: 'Sucursales'
         }
       },
 
-      // PATIENTS - Dentist and Admin
+      // PACIENTES - DENTIST y ADMIN
       {
         path: '/patients',
+        name: 'Patients',
         component: () => import('pages/Patient/PatientPage.vue'),
         meta: { 
           requiresAuth: true,
-          roles: ['DENTIST', 'ADMIN']
+          roles: ['DENTIST', 'ADMIN'],
+          title: 'Pacientes'
         }
       },
 
-      // RESERVES - All authenticated roles
+      // RESERVAS - Todos los autenticados
       {
         path: '/reserves',
+        name: 'Reserves',
         component: () => import('pages/Reserve/ReservePage.vue'),
         meta: { 
           requiresAuth: true,
-          roles: ['DENTIST', 'CLIENT', 'ADMIN']
+          roles: ['DENTIST', 'CLIENT', 'ADMIN'],
+          title: 'Reservas'
         }
       },
 
-      // QUOTES - All authenticated roles
+      // COTIZACIONES - Todos los autenticados
       {
         path: '/quotes',
+        name: 'Quotes',
         component: () => import('pages/quotes/QuotesPage.vue'),
         meta: { 
           requiresAuth: true,
-          roles: ['DENTIST', 'CLIENT', 'ADMIN']
+          roles: ['DENTIST', 'CLIENT', 'ADMIN'],
+          title: 'Cotizaciones'
         }
       },
-
-      // HISTORY QUOTES - All authenticated roles
       {
         path: '/HistoryQuotes',
+        name: 'HistoryQuotes',
         component: () => import('pages/HistoryQuotes/HistoryQuotesPage.vue'),
         meta: { 
           requiresAuth: true,
-          roles: ['DENTIST', 'CLIENT', 'ADMIN']
+          roles: ['DENTIST', 'CLIENT', 'ADMIN'],
+          title: 'Historial de Cotizaciones'
         }
       },
 
-      // CALENDAR - Dentist and Admin
+      // CALENDARIO - DENTIST y ADMIN
       {
         path: '/Calendar-Month',
+        name: 'CalendarMonth',
         component: () => import('pages/Calendar/CalendarMonthPage.vue'),
         meta: { 
           requiresAuth: true,
-          roles: ['DENTIST', 'ADMIN']
+          roles: ['DENTIST', 'ADMIN'],
+          title: 'Calendario Mensual'
         }
       },
       {
         path: '/Calendar-Week',
+        name: 'CalendarWeek',
         component: () => import('pages/Calendar/CalendarWeekPage.vue'),
         meta: { 
           requiresAuth: true,
-          roles: ['DENTIST', 'ADMIN']
+          roles: ['DENTIST', 'ADMIN'],
+          title: 'Calendario Semanal'
         }
       },
       {
         path: '/Calendar-Day',
+        name: 'CalendarDay',
         component: () => import('pages/Calendar/CalendarDayPage.vue'),
         meta: { 
           requiresAuth: true,
-          roles: ['DENTIST', 'ADMIN']
+          roles: ['DENTIST', 'ADMIN'],
+          title: 'Calendario Diario'
         }
       },
 
-      // ODONTOGRAM - Dentist and Admin
+      // ODONTOGRAMA - DENTIST y ADMIN
       {
         path: '/Odontogram',
+        name: 'Odontogram',
         component: () => import('pages/Odontogram/OdontogramPage.vue'),
         meta: { 
           requiresAuth: true,
-          roles: ['DENTIST', 'ADMIN']
+          roles: ['DENTIST', 'ADMIN'],
+          title: 'Odontograma'
         }
       }
     ]
   },
 
-  // Authentication routes
-  {
-    path: '/login',
-    component: () => import('pages/Auth/LoginPage.vue'),
-    meta: { requiresAuth: false }
-  },
-
-  // Unauthorized page
+  // ============================================
+  // PÁGINAS ESPECIALES
+  // ============================================
   {
     path: '/unauthorized',
+    name: 'Unauthorized',
     component: () => import('pages/UnauthorizedPage.vue'),
-    meta: { requiresAuth: false }
+    meta: { 
+      requiresAuth: false,
+      title: 'Acceso Denegado'
+    }
   },
 
-  // Always leave this as last
+  // ============================================
+  // 404 - Siempre al final
+  // ============================================
   {
-    path: '/:catchAll(.)',
-    component: () => import('pages/ErrorNotFound.vue')
+    path: '/:catchAll(.*)*',
+    name: 'NotFound',
+    component: () => import('pages/ErrorNotFound.vue'),
+    meta: { title: 'Página No Encontrada' }
   }
 ]
 
-export { rolePermissions }
 export default routes

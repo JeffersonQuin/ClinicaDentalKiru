@@ -1,127 +1,150 @@
 <template>
   <q-page class="services-page">
     <!-- Hero Section para Servicios -->
-    <section class="hero-services q-pa-xl">
-      <div class="row items-center">
-        <div class="col-12 col-md-6">
-          <h1 class="text-h2 text-weight-bold text-primary q-mb-md">
-            Nuestros Servicios Dentales
-          </h1>
-          <p class="text-h6 text-grey-7 text-justify q-mb-lg">
-            Ofrecemos una amplia gama de tratamientos para cuidar tu salud bucal y embellecer tu sonrisa. 
-            Nuestro equipo de profesionales especializados utiliza tecnología de vanguardia para brindarte 
-            la mejor atención dental.
-          </p>
-          <div class="q-gutter-md">
-            <q-btn 
-              color="primary" 
-              size="lg" 
-              label="Agendar Cita" 
-              icon="calendar_today"
-              @click="openAppointmentDialog"
-            />
-            <q-btn 
-              outline 
-              color="primary" 
-              size="lg" 
-              label="Contáctanos"
-              to="/contact"
-            />
+    <section class="hero-services">
+      <q-container class="q-pa-xl">
+        <div class="row items-center q-col-gutter-xl">
+          <div class="col-12 col-md-6">
+            <h1 class="text-h2 text-weight-bold text-primary q-mb-md animated fadeInLeft">
+              Nuestros Servicios Dentales
+            </h1>
+            <p class="text-h6 text-grey-7 q-mb-lg animated fadeInLeft" style="animation-delay: 0.2s">
+              Ofrecemos una amplia gama de tratamientos para cuidar tu salud bucal y embellecer tu sonrisa. 
+              Nuestro equipo de profesionales especializados utiliza tecnología de vanguardia para brindarte 
+              la mejor atención dental.
+            </p>
+            <div class="q-gutter-md animated fadeInUp" style="animation-delay: 0.4s">
+              <q-btn 
+                color="primary" 
+                size="lg" 
+                label="Agendar Cita" 
+                icon="calendar_today"
+                @click="openAppointmentDialog"
+                push
+                no-caps
+                class="primary-btn"
+              />
+              <q-btn 
+                outline 
+                color="primary" 
+                size="lg" 
+                label="Contáctanos"
+                to="/contact"
+                no-caps
+                class="secondary-btn"
+              />
+            </div>
           </div>
-        </div>
-        <div class="col-12 col-md-6 text-center">
-          <div class="hero-image-container">
-            <q-img
-              src="/KiruIMG/services.png"
-              alt="Paciente sonriendo en consulta dental"
-              class="hero-image"
-            />
-            <div class="floating-elements">
-              <q-icon name="favorite" color="red" size="2em" class="floating-icon-1" />
-              <q-icon name="star" color="amber" size="1.5em" class="floating-icon-2" />
+          
+          <div class="col-12 col-md-6 text-center">
+            <div class="hero-image-container animated zoomIn" style="animation-delay: 0.3s">
+              <q-img
+                src="/KiruIMG/services.png"
+                alt="Paciente sonriendo en consulta dental"
+                class="hero-image"
+                fit="contain"
+              />
+              <div class="floating-elements">
+                <q-icon name="favorite" color="red" size="2em" class="floating-icon-1" />
+                <q-icon name="star" color="amber" size="1.5em" class="floating-icon-2" />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </q-container>
     </section>
 
     <!-- Sección de Servicios -->
-    <section class="services-grid-section q-pa-xl bg-grey-1">
-      <div class="text-center q-mb-xl">
-        <h2 class="text-h3 text-weight-bold">Explora Nuestros Tratamientos</h2>
-        <p class="text-h6 text-grey-7">Encuentra el servicio dental que necesitas para mantener una sonrisa perfecta</p>
-      </div>
-      
-      <div class="row q-col-gutter-lg justify-center">
-        <div 
-          v-for="service in services" 
-          :key="service.id" 
-          class="col-12 col-sm-6 col-md-4"
-        >
-          <q-card class="service-card" flat bordered @click="openServiceDetail(service)">
-            <div class="service-image-container">
-              <q-img :src="service.image" :alt="service.title" class="service-image" />
-              <div class="service-overlay">
-                <q-icon :name="service.icon" color="white" size="2em" />
-              </div>
-              <div class="service-category">
-                <q-chip 
-                  :color="service.categoryColor" 
-                  text-color="white" 
-                  size="sm"
-                  class="category-chip"
-                >
-                  {{ service.category }}
-                </q-chip>
-              </div>
-            </div>
-            
-            <q-card-section class="service-content">
-              <div class="text-h6 text-weight-bold q-mb-sm service-title">{{ service.title }}</div>
-              <p class="text-grey-7 service-description">{{ service.description }}</p>
-              
-              <div class="service-info q-mb-md">
-                <div class="info-item">
-                  <q-icon name="schedule" size="16px" class="q-mr-xs" />
-                  <span class="text-caption">{{ service.duration }}</span>
-                </div>
-                <div class="info-item">
-                  <q-icon name="attach_money" size="16px" class="q-mr-xs" />
-                  <span class="text-caption">{{ service.price }}</span>
-                </div>
-              </div>
-            </q-card-section>
-            
-            <q-card-actions align="right" class="service-actions">
-              <q-btn 
-                flat 
-                label="Más Detalles" 
-                color="primary" 
-                icon-right="arrow_forward"
-                class="details-btn"
-              />
-            </q-card-actions>
-          </q-card>
+    <section class="services-grid-section q-pa-xl">
+      <q-container>
+        <div class="text-center q-mb-xl animated fadeIn">
+          <h2 class="text-h3 text-weight-bold">Explora Nuestros Tratamientos</h2>
+          <p class="text-h6 text-grey-7">Encuentra el servicio dental que necesitas para mantener una sonrisa perfecta</p>
         </div>
-      </div>
+        
+        <div class="row q-col-gutter-lg">
+          <div 
+            v-for="(service, index) in services" 
+            :key="service.id" 
+            class="col-12 col-sm-6 col-md-4 animated fadeInUp"
+            :style="{ animationDelay: `${index * 0.1}s` }"
+          >
+            <q-card class="service-card" flat bordered @click="openServiceDetail(service)">
+              <div class="service-image-container">
+                <q-img :src="service.image" :alt="service.title" class="service-image" />
+                <div class="service-overlay">
+                  <q-icon :name="service.icon" color="white" size="2em" />
+                </div>
+                <div class="service-category">
+                  <q-chip 
+                    :color="service.categoryColor" 
+                    text-color="white" 
+                    size="sm"
+                    class="category-chip"
+                  >
+                    {{ service.category }}
+                  </q-chip>
+                </div>
+              </div>
+              
+              <q-card-section class="service-content">
+                <div class="text-h6 text-weight-bold q-mb-sm service-title">
+                  {{ service.title }}
+                </div>
+                <p class="text-grey-7 service-description">
+                  {{ service.description }}
+                </p>
+                
+                <div class="service-info q-mb-md">
+                  <div class="info-item">
+                    <q-icon name="schedule" size="16px" class="q-mr-xs" color="primary" />
+                    <span class="text-caption">{{ service.duration }}</span>
+                  </div>
+                  <div class="info-item">
+                    <q-icon name="attach_money" size="16px" class="q-mr-xs" color="primary" />
+                    <span class="text-caption">{{ service.price }}</span>
+                  </div>
+                </div>
+              </q-card-section>
+              
+              <q-separator />
+              
+              <q-card-actions align="right" class="service-actions">
+                <q-btn 
+                  flat 
+                  label="Más Detalles" 
+                  color="primary" 
+                  icon-right="arrow_forward"
+                  no-caps
+                  class="details-btn"
+                />
+              </q-card-actions>
+            </q-card>
+          </div>
+        </div>
+      </q-container>
     </section>
 
     <!-- Call to Action Section -->
-    <section class="cta-section bg-primary text-white q-pa-xl text-center">
-      <h2 class="text-h3 text-weight-bold q-mb-md">
-        ¿Listo para transformar tu sonrisa?
-      </h2>
-      <p class="text-h6 q-mb-lg">
-        Agenda una consulta hoy mismo y déjanos cuidar de tu salud dental con la mejor tecnología y profesionalismo.
-      </p>
-      <q-btn
-        color="white"
-        text-color="primary"
-        size="lg"
-        label="Agendar Cita"
-        icon="calendar_today"
-        @click="openAppointmentDialog"
-      />
+    <section class="cta-section q-pa-xl text-center">
+      <q-container class="animated fadeIn">
+        <h2 class="text-h3 text-weight-bold q-mb-md text-white">
+          ¿Listo para transformar tu sonrisa?
+        </h2>
+        <p class="text-h6 q-mb-lg text-white">
+          Agenda una consulta hoy mismo y déjanos cuidar de tu salud dental con la mejor tecnología y profesionalismo.
+        </p>
+        <q-btn
+          color="white"
+          text-color="primary"
+          size="lg"
+          label="Agendar Cita"
+          icon="calendar_today"
+          @click="openAppointmentDialog"
+          push
+          no-caps
+        />
+      </q-container>
     </section>
 
     <!-- Modal para Agendar Cita -->
@@ -133,16 +156,21 @@
     />
 
     <!-- Dialog de detalle del servicio -->
-    <q-dialog v-model="serviceDialog" maximized>
-      <q-card v-if="selectedService">
-        <q-card-section class="row items-center q-pb-none">
-          <div class="text-h6">{{ selectedService.title }}</div>
-          <q-space />
-          <q-btn icon="close" flat round dense v-close-popup />
+    <q-dialog v-model="serviceDialog" maximized transition-show="slide-up" transition-hide="slide-down">
+      <q-card v-if="selectedService" class="dialog-container">
+        <q-card-section class="dialog-header">
+          <div class="row items-center">
+            <div class="col">
+              <div class="text-h6">{{ selectedService.title }}</div>
+            </div>
+            <div class="col-auto">
+              <q-btn icon="close" flat round dense v-close-popup color="white" />
+            </div>
+          </div>
         </q-card-section>
         
-        <q-card-section>
-          <div class="row">
+        <q-card-section class="dialog-content">
+          <div class="row q-col-gutter-xl">
             <div class="col-12 col-md-6">
               <q-img
                 :src="selectedService.image"
@@ -150,7 +178,8 @@
                 class="service-detail-image"
               />
             </div>
-            <div class="col-12 col-md-6 q-pl-md">
+            
+            <div class="col-12 col-md-6">
               <div class="service-detail-content">
                 <div class="text-h5 text-weight-bold q-mb-md">
                   {{ selectedService.title }}
@@ -187,12 +216,12 @@
                   {{ selectedService.description }}
                 </p>
                 
-                <div class="q-mb-md">
+                <div class="q-mb-md" v-if="selectedService.features">
                   <h5 class="text-h6 text-weight-bold q-mb-sm">Características del Tratamiento</h5>
-                  <q-list dense>
+                  <q-list dense bordered class="rounded-borders">
                     <q-item 
-                      v-for="feature in selectedService.features" 
-                      :key="feature"
+                      v-for="(feature, index) in selectedService.features" 
+                      :key="index"
                       class="feature-item"
                     >
                       <q-item-section avatar>
@@ -212,6 +241,9 @@
                     size="lg"
                     icon="calendar_today"
                     @click="openAppointmentDialog"
+                    push
+                    no-caps
+                    class="full-width"
                   />
                 </div>
               </div>
@@ -225,8 +257,11 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useQuasar } from 'quasar'
 import AppointmentModal from 'components/AppointmentModal.vue'
 import serviciosData from 'src/data/servicios.json'
+
+const $q = useQuasar()
 
 // Datos reactivos
 const appointmentDialog = ref(false)
@@ -251,24 +286,27 @@ const openServiceDetail = (service) => {
 
 // Funciones para manejar eventos del modal de citas
 const onNewAppointment = () => {
-  console.log('Abrir nueva cita desde ServicesPage')
-  // Aquí implementarías la lógica para abrir el formulario de nueva cita
-  // Por ejemplo: router.push('/appointment/new') o abrir otro modal
+  $q.notify({
+    type: 'info',
+    message: 'Abriendo formulario de nueva cita...',
+    icon: 'calendar_today'
+  })
 }
 
 const onHistory = () => {
-  console.log('Abrir historial de citas desde ServicesPage')
-  // Aquí implementarías la lógica para abrir el historial de citas
-  // Por ejemplo: router.push('/appointment/history') o abrir otro modal
+  $q.notify({
+    type: 'info',
+    message: 'Abriendo historial de citas...',
+    icon: 'history'
+  })
 }
 
 const onAppointmentCancel = () => {
-  console.log('Cancelar modal de citas desde ServicesPage')
-  // Aquí implementarías cualquier lógica adicional al cancelar
+  console.log('Cancelar modal de citas')
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .services-page {
   padding-bottom: 0;
 }
@@ -280,9 +318,12 @@ const onAppointmentCancel = () => {
   align-items: center;
 }
 
+.body--dark .hero-services {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+
 .hero-image-container {
   position: relative;
-  display: inline-block;
   width: 100%;
   max-width: 500px;
   margin: 0 auto;
@@ -297,18 +338,21 @@ const onAppointmentCancel = () => {
   pointer-events: none;
 }
 
-.floating-icon-1 {
+.floating-icon-1,
+.floating-icon-2 {
   position: absolute;
-  top: 20px;
-  left: 20px;
   animation: float 3s ease-in-out infinite;
 }
 
+.floating-icon-1 {
+  top: 20px;
+  left: 20px;
+}
+
 .floating-icon-2 {
-  position: absolute;
   bottom: 30px;
   right: 30px;
-  animation: float 3s ease-in-out infinite reverse;
+  animation-direction: reverse;
 }
 
 @keyframes float {
@@ -317,38 +361,40 @@ const onAppointmentCancel = () => {
 }
 
 .services-grid-section {
-  padding-top: 60px;
-  padding-bottom: 60px;
+  padding-top: 80px;
+  padding-bottom: 80px;
 }
 
 .service-card {
-  border-radius: 12px;
+  border-radius: var(--radius-xl);
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: all var(--transition-normal);
   height: 100%;
   display: flex;
   flex-direction: column;
   cursor: pointer;
-}
-
-.service-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--primary-orange);
+  }
 }
 
 .service-image-container {
   position: relative;
   overflow: hidden;
+  height: 200px;
 }
 
 .service-image {
-  height: 200px;
+  height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: transform var(--transition-normal);
 }
 
 .service-card:hover .service-image {
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 
 .service-overlay {
@@ -362,7 +408,7 @@ const onAppointmentCancel = () => {
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity var(--transition-normal);
 }
 
 .service-card:hover .service-overlay {
@@ -377,52 +423,54 @@ const onAppointmentCancel = () => {
 
 .category-chip {
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-md);
 }
 
 .service-content {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+  padding: var(--spacing-lg);
 }
 
 .service-title {
   font-size: 1.25rem;
   line-height: 1.3;
-  color: #1A1A1A;
+  color: var(--text-primary);
 }
 
 .service-description {
   font-size: 0.95rem;
   line-height: 1.5;
-  color: #6B7280;
+  color: var(--text-secondary);
   flex-grow: 1;
+  margin-bottom: var(--spacing-md);
 }
 
 .service-info {
   display: flex;
-  gap: 16px;
-  margin-top: 12px;
+  gap: var(--spacing-md);
+  margin-top: auto;
 }
 
 .info-item {
   display: flex;
   align-items: center;
-  color: #6B7280;
+  color: var(--text-secondary);
 }
 
 .service-actions {
-  padding: 16px;
-  border-top: 1px solid #E5E7EB;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-top: 1px solid var(--border-light);
 }
 
 .details-btn {
   font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.details-btn:hover {
-  transform: translateX(4px);
+  transition: all var(--transition-fast);
+  
+  &:hover {
+    transform: translateX(4px);
+  }
 }
 
 .cta-section {
@@ -431,60 +479,46 @@ const onAppointmentCancel = () => {
   padding-bottom: 80px;
 }
 
-/* Estilos para el modal de detalles */
+// Modal de detalles
 .service-detail-image {
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
 }
 
 .service-detail-content {
-  padding: 20px 0;
+  padding: var(--spacing-md) 0;
 }
 
 .service-detail-info {
-  background: #F9FAFB;
-  padding: 16px;
-  border-radius: 8px;
-  margin-bottom: 20px;
+  background: var(--bg-secondary);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-lg);
 }
 
 .detail-row {
   display: flex;
   align-items: center;
-  margin-bottom: 8px;
-}
-
-.detail-row:last-child {
-  margin-bottom: 0;
+  margin-bottom: var(--spacing-sm);
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 
 .feature-item {
-  padding: 8px 0;
+  padding: var(--spacing-sm) 0;
 }
 
 .service-detail-actions {
-  margin-top: 24px;
-  text-align: center;
+  margin-top: var(--spacing-xl);
 }
 
-/* Responsive */
+// Responsive
 @media (max-width: 768px) {
   .hero-services {
     min-height: auto;
-    padding-top: 40px;
-    padding-bottom: 40px;
-  }
-  
-  .hero-services .col-md-6 {
-    text-align: center;
-  }
-  
-  .hero-services .q-gutter-md {
-    justify-content: center;
-  }
-  
-  .hero-image-container {
-    margin-top: 30px;
+    padding: 40px 20px;
   }
   
   .services-grid-section {
@@ -493,7 +527,7 @@ const onAppointmentCancel = () => {
   
   .service-info {
     flex-direction: column;
-    gap: 8px;
+    gap: var(--spacing-xs);
   }
   
   .floating-elements {

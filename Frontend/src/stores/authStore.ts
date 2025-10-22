@@ -1,15 +1,27 @@
-// stores/authStore.js
+// stores/authStore.ts
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import type { RouteLocationNormalized } from 'vue-router'
 
-// Static mock data for development - Remove in production
+// Tipos de usuarios
+export type UserRole = 'PUBLIC' | 'ADMIN' | 'DENTIST' | 'CLIENT'
+
+export interface User {
+  id: number
+  email: string
+  name: string
+  role: UserRole
+  avatar: string
+}
+
+// Mock users para desarrollo
 const MOCK_USERS = {
   admin: {
     id: 1,
     email: 'admin@dentalsystem.com',
     password: 'admin123',
     name: 'Admin User',
-    role: 'ADMIN',
+    role: 'ADMIN' as UserRole,
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin'
   },
   dentist: {
@@ -17,7 +29,7 @@ const MOCK_USERS = {
     email: 'dentist@dentalsystem.com',
     password: 'dentist123',
     name: 'Dr. Juan García',
-    role: 'DENTIST',
+    role: 'DENTIST' as UserRole,
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=dentist'
   },
   client: {
@@ -25,47 +37,41 @@ const MOCK_USERS = {
     email: 'client@dentalsystem.com',
     password: 'client123',
     name: 'María López',
-    role: 'CLIENT',
+    role: 'CLIENT' as UserRole,
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=client'
   }
 }
 
-// Utility function to sanitize user data and prevent XSS
-const sanitizeUser = (user) => {
+// Sanitización de usuario
+const sanitizeUser = (user: any): User | null => {
   if (!user) return null
   
-  // Create a new object with sanitized properties
-  // Only include safe properties, never raw HTML
   return {
     id: user.id,
     email: String(user.email).trim(),
     name: String(user.name).trim(),
-    role: String(user.role).trim(),
+    role: String(user.role).trim() as UserRole,
     avatar: String(user.avatar).trim()
-    // Never include password in the returned user object
   }
 }
 
-// Generate a simple JWT-like token (for development only)
-const generateMockToken = (userId, role) => {
-  // This is NOT a real JWT. For production, get from backend
+// Generación de token mock
+const generateMockToken = (userId: number, role: UserRole): string => {
   const payload = {
     userId,
     role,
     iat: Date.now(),
-    exp: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
+    exp: Date.now() + (24 * 60 * 60 * 1000) // 24 horas
   }
-  // Simple base64 encoding (NOT secure - development only)
   return btoa(JSON.stringify(payload))
 }
 
-// Validate token format (development only)
-const validateMockToken = (token) => {
+// Validación de token
+const validateMockToken = (token: string) => {
   try {
     if (!token) return null
     const decoded = JSON.parse(atob(token))
     
-    // Check if token is expired
     if (decoded.exp < Date.now()) {
       return null
     }
@@ -77,41 +83,53 @@ const validateMockToken = (token) => {
 }
 
 export const useAuthStore = defineStore('auth', () => {
-  const user = ref(null)
-  const token = ref(null)
+  // Estado
+  const user = ref<User | null>(null)
+  const token = ref<string | null>(null)
   const isLoading = ref(false)
-  const error = ref(null)
+  const error = ref<string | null>(null)
+  const redirectPath = ref<string | null>(null) // Para recordar dónde quería ir el usuario
   
-  // Only expose non-sensitive data
+  // Computed
   const isAuthenticated = computed(() => !!token.value && !!user.value)
-  
-  const userRole = computed(() => user.value?.role || null)
-  
+  const userRole = computed(() => user.value?.role || 'PUBLIC')
   const userName = computed(() => user.value?.name || '')
-  
   const userEmail = computed(() => user.value?.email || '')
+  const userAvatar = computed(() => user.value?.avatar || '')
+  
+  // Verificar si el usuario es público
+  const isPublicUser = computed(() => userRole.value === 'PUBLIC' || !isAuthenticated.value)
+  
+  // Obtener la ruta inicial según el rol
+  const getDefaultRoute = (): string => {
+    if (!isAuthenticated.value) return '/'
+    
+    switch (userRole.value) {
+      case 'ADMIN':
+        return '/dashboard'
+      case 'DENTIST':
+        return '/dashboard'
+      case 'CLIENT':
+        return '/dashboard'
+      default:
+        return '/'
+    }
+  }
 
-  // Login with email and password
-  const login = async (email, password) => {
+  // Login
+  const login = async (email: string, password: string) => {
     try {
       isLoading.value = true
       error.value = null
 
-      // Validate inputs exist
       if (!email || !password) {
         throw new Error('Correo y contraseña son requeridos')
       }
 
-      // Sanitize input to prevent injection attacks
       const sanitizedEmail = String(email).trim().toLowerCase()
       const sanitizedPassword = String(password).trim()
 
-      // Validate input
-      if (!sanitizedEmail || !sanitizedPassword) {
-        throw new Error('Correo y contraseña son requeridos')
-      }
-
-      // Find user in mock data
+      // Buscar usuario en mock data
       const mockUser = Object.values(MOCK_USERS).find(
         u => u.email === sanitizedEmail && u.password === sanitizedPassword
       )
@@ -120,24 +138,26 @@ export const useAuthStore = defineStore('auth', () => {
         throw new Error('Correo o contraseña inválida')
       }
 
-      // Simulate API delay
+      // Simular delay de API
       await new Promise(resolve => setTimeout(resolve, 800))
 
-      // Generate token
+      // Generar token y sanitizar usuario
       const generatedToken = generateMockToken(mockUser.id, mockUser.role)
-      
-      // Sanitize user data before storing
       const sanitizedUser = sanitizeUser(mockUser)
 
-      // Store only in memory (not in localStorage for sensitive data)
       token.value = generatedToken
       user.value = sanitizedUser
 
+      // Guardar en sessionStorage para persistencia durante la sesión
+      sessionStorage.setItem('authToken', generatedToken)
+      sessionStorage.setItem('user', JSON.stringify(sanitizedUser))
+
       return {
         success: true,
-        user: sanitizedUser
+        user: sanitizedUser,
+        redirectTo: redirectPath.value || getDefaultRoute()
       }
-    } catch (err) {
+    } catch (err: any) {
       error.value = err.message || 'Error en la autenticación'
       user.value = null
       token.value = null
@@ -155,24 +175,33 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = null
     token.value = null
     error.value = null
+    redirectPath.value = null
+    
+    // Limpiar storage
+    sessionStorage.removeItem('authToken')
+    sessionStorage.removeItem('user')
   }
 
-  // Check if token is valid and restore session
-  const checkAuth = async () => {
+  // Restaurar sesión
+  const restoreSession = async (): Promise<boolean> => {
     try {
-      // In development, we keep token only in memory
-      if (!token.value) {
+      const savedToken = sessionStorage.getItem('authToken')
+      const savedUser = sessionStorage.getItem('user')
+
+      if (!savedToken || !savedUser) {
         return false
       }
 
-      const decoded = validateMockToken(token.value)
+      const decoded = validateMockToken(savedToken)
       
       if (!decoded) {
         logout()
         return false
       }
 
-      // Token is valid, user data is already in state
+      token.value = savedToken
+      user.value = JSON.parse(savedUser)
+      
       return true
     } catch (err) {
       logout()
@@ -180,26 +209,54 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  // Check if user has a specific role
-  const hasRole = (role) => {
+  // Verificar autenticación
+  const checkAuth = async (): Promise<boolean> => {
+    if (token.value && user.value) {
+      return true
+    }
+    
+    return await restoreSession()
+  }
+
+  // Verificar rol específico
+  const hasRole = (role: UserRole): boolean => {
     return user.value?.role === role
   }
 
-  // Check if user has any of the provided roles
-  const hasAnyRole = (roles) => {
+  // Verificar si tiene alguno de los roles
+  const hasAnyRole = (roles: UserRole[]): boolean => {
     if (!Array.isArray(roles)) return false
-    return roles.includes(user.value?.role)
+    return roles.includes(userRole.value)
   }
 
-  // Check if user has all of the provided roles
-  const hasAllRoles = (roles) => {
-    if (!Array.isArray(roles) || roles.length === 0) return false
-    return roles.every(role => role === user.value?.role)
+  // Verificar permisos para acceder a una ruta
+  const canAccessRoute = (route: RouteLocationNormalized): boolean => {
+    // Rutas públicas siempre son accesibles
+    if (!route.meta.requiresAuth) {
+      return true
+    }
+
+    // Si requiere autenticación pero no está autenticado
+    if (!isAuthenticated.value) {
+      return false
+    }
+
+    // Si no hay roles específicos requeridos, cualquier usuario autenticado puede acceder
+    if (!route.meta.roles || !Array.isArray(route.meta.roles)) {
+      return true
+    }
+
+    // Verificar si el usuario tiene uno de los roles requeridos
+    return hasAnyRole(route.meta.roles as UserRole[])
   }
 
-  // Get mock credentials for development (remove in production)
+  // Guardar ruta de redirección
+  const setRedirectPath = (path: string) => {
+    redirectPath.value = path
+  }
+
+  // Obtener credenciales mock (solo desarrollo)
   const getMockCredentials = () => {
-    // Only return this in development environment
     if (import.meta.env.MODE === 'production') {
       return null
     }
@@ -223,14 +280,19 @@ export const useAuthStore = defineStore('auth', () => {
     userRole,
     userName,
     userEmail,
+    userAvatar,
+    isPublicUser,
     
     // Methods
     login,
     logout,
     checkAuth,
+    restoreSession,
     hasRole,
     hasAnyRole,
-    hasAllRoles,
+    canAccessRoute,
+    getDefaultRoute,
+    setRedirectPath,
     getMockCredentials
   }
 })
