@@ -60,8 +60,4 @@ onMounted(() => {
 const pacienteSeleccionado = computed(() => store.pacienteSeleccionado)
 </script>
 
-<style lang="scss" scoped>
-.text-center {
-  color: $blue-10;
-}
-</style>
+<!-- Los estilos están en app.scss global -->

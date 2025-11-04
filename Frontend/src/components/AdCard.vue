@@ -110,30 +110,4 @@ const getSocialIcon = (social) => {
 }
 </script>
 
-<style scoped>
-.ad-card {
-  transition: all 0.3s ease;
-  height: 100%;
-  cursor: pointer;
-  border: 2px solid transparent;
-}
-
-.ad-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-  border-color: #1976d2;
-}
-
-.overlay {
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    transparent 60%,
-    rgba(0,0,0,0.7) 100%
-  );
-}
-
-.q-card-section {
-  padding: 16px;
-}
-</style>
+<!-- Los estilos están en app.scss global -->
