@@ -1,5 +1,5 @@
 <template>
-  <q-dialog v-model="isOpen" persistent>
+  <q-dialog v-model="estaAbierto" persistent>
     <q-card class="appointment-modal">
       <q-card-section class="appointment-header">
         <div class="text-h5 text-weight-bold text-center">Agenda tu cita fácilmente</div>
@@ -10,8 +10,8 @@
           <!-- Botón Nueva Cita -->
           <q-btn
             class="appointment-option-btn new-appointment-btn"
-            @click="openNewAppointment"
-            :loading="newAppointmentLoading"
+            @click="abrirNuevaReserva"
+            :loading="reservaStore.cargandoNuevaReserva"
           >
             <div class="option-content">
               <div class="option-icon">
@@ -24,8 +24,8 @@
           <!-- Botón Historial -->
           <q-btn
             class="appointment-option-btn history-btn"
-            @click="openHistory"
-            :loading="historyLoading"
+            @click="abrirHistorial"
+            :loading="reservaStore.cargandoHistorial"
           >
             <div class="option-content">
               <div class="option-icon">
@@ -40,7 +40,7 @@
         <div class="cancel-section">
           <q-btn
             class="cancel-btn"
-            @click="closeModal"
+            @click="cerrarModal"
             flat
           >
             Cancelar
@@ -52,8 +52,9 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useQuasar } from 'quasar'
+import { useReserveStore } from 'src/stores/reserva'
 
 const props = defineProps({
   modelValue: {
@@ -62,58 +63,41 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:modelValue', 'new-appointment', 'history', 'cancel'])
+const emit = defineEmits(['update:modelValue', 'new-appointment', 'history', 'cancelar'])
 
 const $q = useQuasar()
+const reservaStore = useReserveStore()
 
-// Controlar la visibilidad del modal
-const isOpen = computed({
+// Estado del modal controlado por el padre + store
+const estaAbierto = computed({
   get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
+  set: (valor) => emit('update:modelValue', valor)
 })
 
-// Datos reactivos
-const newAppointmentLoading = ref(false)
-const historyLoading = ref(false)
-
 // Métodos
-const openNewAppointment = async () => {
-  newAppointmentLoading.value = true
-  
+const abrirNuevaReserva = async () => {
+  reservaStore.cargandoNuevaReserva = true
   try {
-    // Simular carga
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    // Emitir evento para abrir nueva cita
+    await reservaStore.simularCarga()
     emit('new-appointment')
-    
-    // Cerrar modal
-    closeModal()
-    
+    cerrarModal()
   } catch {
     $q.notify({
       type: 'negative',
-      message: 'Error al abrir nueva cita',
+      message: 'Error al abrir nueva reserva',
       position: 'top'
     })
   } finally {
-    newAppointmentLoading.value = false
+    reservaStore.cargandoNuevaReserva = false
   }
 }
 
-const openHistory = async () => {
-  historyLoading.value = true
-  
+const abrirHistorial = async () => {
+  reservaStore.cargandoHistorial = true
   try {
-    // Simular carga
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    // Emitir evento para abrir historial
+    await reservaStore.simularCarga()
     emit('history')
-    
-    // Cerrar modal
-    closeModal()
-    
+    cerrarModal()
   } catch {
     $q.notify({
       type: 'negative',
@@ -121,14 +105,15 @@ const openHistory = async () => {
       position: 'top'
     })
   } finally {
-    historyLoading.value = false
+    reservaStore.cargandoHistorial = false
   }
 }
 
-const closeModal = () => {
-  emit('cancel')
-  isOpen.value = false
+const cerrarModal = () => {
+  emit('cancelar')
+  estaAbierto.value = false
+  reservaStore.cerrarModal()
 }
 </script>
 
-<!-- Los estilos están en app.scss global -->
+

@@ -34,16 +34,19 @@
             <div class="appointment-number">{{ index + 1 }}</div>
             <div class="appointment-details">
               <div class="detail-item">
-                <strong>Nombre:</strong> {{ appointment.patientName }}
+                <strong>Nombre:</strong> {{ appointment.nombrePaciente }}
               </div>
               <div class="detail-item">
-                <strong>Sucursal:</strong> {{ appointment.clinicName }}
+                <strong>Sucursal:</strong> {{ appointment.nombreSucursal }}
               </div>
               <div class="detail-item">
-                <strong>Fecha:</strong> {{ appointment.date }}
+                <strong>Fecha:</strong> {{ appointment.fecha }}
               </div>
               <div class="detail-item">
-                <strong>Hora:</strong> {{ appointment.time }}
+                <strong>Hora:</strong> {{ appointment.hora }}
+              </div>
+              <div class="detail-item">
+                <strong>Servicio:</strong> {{ appointment.servicio }}
               </div>
             </div>
             <q-btn 
@@ -64,15 +67,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useQuasar } from 'quasar'
+import { useReserveStore } from '../stores/reserva'
 
 // Props
 const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    default: false
-  }
+  modelValue: { type: Boolean, default: false }
 })
 
 // Emits
@@ -81,34 +82,20 @@ const emit = defineEmits(['update:modelValue'])
 // Quasar
 const $q = useQuasar()
 
+// Pinia
+const reservaStore = useReserveStore()
+
 // Estado del modal
 const isOpen = computed({
   get: () => props.modelValue,
   set: (value) => emit('update:modelValue', value)
 })
 
-// Datos del usuario (simulado)
-const userEmail = ref('Cliente@gmail.com')
+// Datos del usuario
+const userEmail = computed(() => reservaStore.correoUsuario)
 
-// Lista de citas (simulada)
-const appointments = ref([
-  {
-    id: 1,
-    patientName: 'Pablo Martinez Valle',
-    clinicName: 'Sucursal 1',
-    date: '17/9/2025',
-    time: '13:00',
-    service: 'Limpieza Dental'
-  },
-  {
-    id: 2,
-    patientName: 'Maria Garcia Lopez',
-    clinicName: 'Sucursal 2',
-    date: '20/9/2025',
-    time: '10:00',
-    service: 'Ortodoncia'
-  }
-])
+// Lista de citas desde Pinia
+const appointments = computed(() => reservaStore.citas)
 
 // Métodos
 const closeModal = () => {
@@ -122,29 +109,11 @@ const deleteAppointment = (appointmentId) => {
     cancel: true,
     persistent: true
   }).onOk(() => {
-    // Eliminar la cita de la lista
-    const index = appointments.value.findIndex(apt => apt.id === appointmentId)
-    if (index > -1) {
-      appointments.value.splice(index, 1)
-      
-      $q.notify({
-        type: 'positive',
-        message: 'Cita eliminada exitosamente'
-      })
-    }
+    reservaStore.eliminarCita(appointmentId)
+    $q.notify({
+      type: 'positive',
+      message: 'Cita eliminada exitosamente'
+    })
   })
 }
-
-// Cargar citas del usuario (simulado)
-const loadAppointments = () => {
-  // Aquí se cargarían las citas reales del usuario desde una API
-  console.log('Cargando citas del usuario:', userEmail.value)
-}
-
-// Cargar citas cuando el componente se monte
-onMounted(() => {
-  loadAppointments()
-})
 </script>
-
-<!-- Estilos movidos a app.scss para mejor mantenimiento -->
