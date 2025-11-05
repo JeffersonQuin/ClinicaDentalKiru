@@ -31,6 +31,17 @@
         />
       </q-btn-group>
     </div>
+
+    <!-- 👇 INFO DE RESERVAS CARGADAS -->
+    <div class="reservas-info">
+      <q-banner class="bg-primary text-white">
+        <template v-slot:avatar>
+          <q-icon name="fa-solid fa-calendar-check" />
+        </template>
+        Mostrando {{ reservasCompletas.length }} reservas en el calendario
+      </q-banner>
+    </div>
+
     <div class="calendar-grid">
       <div class="calendar-row calendar-days">
         <div v-for="day in weekDays" :key="day" class="calendar-cell day-label">{{ day }}</div>
@@ -57,6 +68,7 @@
             >
               <span class="event-time">{{ event.time }}</span>
               <span class="event-title">{{ event.title }}</span>
+              <span class="event-email" v-if="event.email">{{ event.email }}</span>
             </div>
           </div>
         </div>
@@ -102,6 +114,12 @@
             </div>
             <div v-else>
               <div><b>Nombre:</b> {{ detailEvent.title }}</div>
+              <div v-if="detailEvent.email"><b>Email:</b> {{ detailEvent.email }}</div>
+              <div v-if="detailEvent.servicio"><b>Servicio:</b> {{ detailEvent.servicio }}</div>
+              <div v-if="detailEvent.sucursal"><b>Sucursal:</b> {{ detailEvent.sucursal }}</div>
+              <div v-if="detailEvent.dependiente">
+                <b>Dependiente:</b> {{ detailEvent.dependiente.nombreCompleto }} ({{ detailEvent.dependiente.parentesco }})
+              </div>
             </div>
             <div><b>Tipo:</b> {{ detailEvent.type === 'cita' ? 'Cita' : 'Reserva' }}</div>
           </div>
@@ -115,16 +133,18 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useReserveStore } from 'src/stores/reserva' // 👈 Importar el store
 import citasData from 'src/data/citas.json'
-import reservasData from 'src/data/reservas.json'
 import pacientes from 'src/data/pacientes.json'
 
 export default {
   name: 'CalendarMonthPage',
   setup() {
     const router = useRouter()
+    const reserveStore = useReserveStore() // 👈 Usar el store
+    
     const today = new Date()
     const currentMonth = ref(today.getMonth())
     const currentYear = ref(today.getFullYear())
@@ -137,6 +157,9 @@ export default {
     const showDetailDialog = ref(false)
     const detailEvent = ref(null)
     const refreshKey = ref(0)
+
+    // 👇 TODAS LAS RESERVAS DESDE PINIA
+    const reservasCompletas = computed(() => reserveStore.reservasCompletas || [])
 
     const getPacienteName = (id) => {
       const paciente = pacientes.pacientes.find(p => Number(p.id) === Number(id))
@@ -166,6 +189,7 @@ export default {
         })
       }
 
+      // 👇 Citas (mantienes igual)
       citasData.citas.forEach(cita => {
         const cell = cells.find(c => c.date === cita.fecha)
         if (cell) {
@@ -180,7 +204,8 @@ export default {
         }
       })
 
-      reservasData.reservas.forEach(reserva => {
+      // 👇 RESERVAS DESDE PINIA (ACTUALIZADO)
+      reservasCompletas.value.forEach(reserva => {
         const cell = cells.find(c => c.date === reserva.fechaReserva)
         if (cell) {
           cell.events.push({
@@ -188,7 +213,11 @@ export default {
             type: 'reserva',
             time: reserva.horaReserva,
             title: reserva.nombreCompleto,
-            date: reserva.fechaReserva
+            date: reserva.fechaReserva,
+            email: reserva.gmail, // 👈 Agregar email
+            servicio: reserva.servicio,
+            sucursal: reserva.sucursal,
+            dependiente: reserva.dependiente
           })
         }
       })
@@ -213,6 +242,7 @@ export default {
         currentMonth.value--
       }
     }
+    
     const nextMonth = () => {
       if (currentMonth.value === 11) {
         currentMonth.value = 0
@@ -221,20 +251,25 @@ export default {
         currentMonth.value++
       }
     }
+    
     const setView = (v) => {
       view.value = v
     }
+    
     const goToDay = () => {
       router.push('/Calendar-Day')
     }
+    
     const goToWeek = () => {
       router.push('/Calendar-Week')
     }
+    
     const goToMonth = () => {
       router.push('/Calendar-Month')
     }
+    
     const salir = () => {
-      router.push({ name: 'home' }) // Cambia 'home' por tu ruta principal si es diferente
+      router.push({ name: 'home' })
     }
 
     // Drag & Drop para mover eventos
@@ -242,6 +277,7 @@ export default {
       draggedEvent.value = event
       draggedFromDate.value = fromDate
     }
+    
     const onDrop = (toDate) => {
       if (!draggedEvent.value) return
       if (draggedFromDate.value === toDate) return
@@ -249,9 +285,11 @@ export default {
       confirmToDate.value = toDate
       showConfirmDialog.value = true
     }
+    
     const confirmMoveEvent = () => {
       if (!confirmEvent.value) return
       let changed = false
+      
       if (confirmEvent.value.type === 'cita') {
         const cita = citasData.citas.find(c => `cita-${c.id}` === confirmEvent.value.id)
         if (cita && cita.fecha !== confirmToDate.value) {
@@ -259,12 +297,14 @@ export default {
           changed = true
         }
       } else if (confirmEvent.value.type === 'reserva') {
-        const reserva = reservasData.reservas.find(r => `reserva-${r.id}` === confirmEvent.value.id)
+        // 👇 RESERVAS DESDE PINIA (ACTUALIZADO)
+        const reserva = reserveStore.reservas.find(r => `reserva-${r.id}` === confirmEvent.value.id)
         if (reserva && reserva.fechaReserva !== confirmToDate.value) {
           reserva.fechaReserva = confirmToDate.value
           changed = true
         }
       }
+      
       draggedEvent.value = null
       draggedFromDate.value = null
       confirmEvent.value = null
@@ -292,6 +332,11 @@ export default {
       }
     }
 
+    // Cargar datos al montar el componente
+    onMounted(() => {
+      console.log('📅 Calendario Mensual cargado con TODAS las reservas:', reservasCompletas.value.length)
+    })
+
     return {
       weekDays,
       monthMatrix,
@@ -314,10 +359,24 @@ export default {
       detailEvent,
       showDetail,
       formatDate,
-      getPacienteName
+      getPacienteName,
+      reservasCompletas // 👈 Exportar para el template
     }
   }
 }
 </script>
 
-<!-- Los estilos están en app.scss global -->
+<style scoped>
+.reservas-info {
+  margin: 10px 0;
+}
+
+.event-email {
+  font-size: 0.7rem;
+  color: #666;
+  display: block;
+  margin-top: 2px;
+}
+
+/* Los estilos están en app.scss global */
+</style>

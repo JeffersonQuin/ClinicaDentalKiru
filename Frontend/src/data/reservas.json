@@ -6,77 +6,29 @@
       "horaReserva": "13:00",
       "nombreCompleto": "Pedro Martinez Valle",
       "gmail": "Pedro@gmail.com",
-      "dependiente": {
-        "nombreCompleto": "Mario Martinez Quispe",
-        "genero": "Masculino",
-        "parentesco": "Hijo",
-        "telefono": "67343276"
-      }
+      "dependienteId": 1,
+      "servicio": "Limpieza Dental",
+      "sucursal": "Sucursal 1"
     },
     {
       "id": 2,
       "fechaReserva": "2025-09-18",
-      "horaReserva": "09:30",
+      "horaReserva": "09:00", 
       "nombreCompleto": "Ana López Fernández",
       "gmail": "ana.lopez@gmail.com",
-      "dependiente": {
-        "nombreCompleto": "Lucía López Fernández",
-        "genero": "Femenino",
-        "parentesco": "Hija",
-        "telefono": "67891234"
-      }
+      "dependienteId": 2,
+      "servicio": "Ortodoncia",
+      "sucursal": "Sucursal 2"
     },
     {
       "id": 3,
       "fechaReserva": "2025-09-19",
       "horaReserva": "11:00",
-      "nombreCompleto": "Carlos Pérez Soto",
+      "nombreCompleto": "Carlos Pérez Soto", 
       "gmail": "carlos.perez@gmail.com",
-      "dependiente": {
-        "nombreCompleto": "Mateo Pérez Soto",
-        "genero": "Masculino",
-        "parentesco": "Hijo",
-        "telefono": "67983456"
-      }
-    },
-    {
-      "id": 4,
-      "fechaReserva": "2025-09-20",
-      "horaReserva": "15:00",
-      "nombreCompleto": "María Torres Ruiz",
-      "gmail": "maria.torres@gmail.com",
-      "dependiente": {
-        "nombreCompleto": "Sofía Torres Ruiz",
-        "genero": "Femenino",
-        "parentesco": "Hija",
-        "telefono": "67123456"
-      }
-    },
-    {
-      "id": 5,
-      "fechaReserva": "2025-09-21",
-      "horaReserva": "10:30",
-      "nombreCompleto": "Jorge Ramírez Díaz",
-      "gmail": "jorge.ramirez@gmail.com",
-      "dependiente": {
-        "nombreCompleto": "Diego Ramírez Díaz",
-        "genero": "Masculino",
-        "parentesco": "Hijo",
-        "telefono": "67098765"
-      }
-    },
-    {
-      "id": 6,
-      "fechaReserva": "2025-09-22",
-      "horaReserva": "14:30",
-      "nombreCompleto": "Laura Gutiérrez Salas",
-      "gmail": "laura.gutierrez@gmail.com",
-      "dependiente": {
-        "nombreCompleto": "Valentina Gutiérrez Salas",
-        "genero": "Femenino",
-        "parentesco": "Hija",
-        "telefono": "67987654"
-      }
+      "dependienteId": null,
+      "servicio": "Extracción",
+      "sucursal": "Sucursal 1"
     }
   ]
 }

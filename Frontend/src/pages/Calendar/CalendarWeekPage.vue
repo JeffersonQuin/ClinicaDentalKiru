@@ -16,6 +16,17 @@
         <q-btn flat label="Mes" @click="goToMonth" :color="view==='month' ? 'primary' : 'grey-8'" />
       </q-btn-group>
     </div>
+
+    <!-- 👇 INFO DE RESERVAS CARGADAS -->
+    <div class="reservas-info">
+      <q-banner class="bg-primary text-white">
+        <template v-slot:avatar>
+          <q-icon name="fa-solid fa-calendar-check" />
+        </template>
+        Mostrando {{ reservasCompletas.length }} reservas en el calendario
+      </q-banner>
+    </div>
+
     <div class="calendar-grid week-grid">
       <div class="calendar-row week-header">
         <div class="calendar-cell hour-label">Hor</div>
@@ -29,9 +40,13 @@
           v-for="(date, dIdx) in weekDates"
           :key="dIdx"
           class="calendar-cell"
-          :class="{ 'not-current': !isCurrentMonth(date) }"
+          :class="{ 
+            'not-current': !isCurrentMonth(date),
+            'bloqueado': estaHorarioBloqueado(date.toISOString().slice(0, 10), hour)
+          }"
           @dragover.prevent
           @drop="onDrop(date, hour)"
+          @click="handleCellClick(date, hour)"
         >
           <div class="cell-events">
             <template v-if="getEvents(date, hour).length">
@@ -41,15 +56,21 @@
                 class="event-card"
                 draggable="true"
                 @dragstart="onDragStart(event, date, hour)"
-                @click="showDetail(event)"
+                @click.stop="showDetail(event)"
                 :title="event.type === 'cita' ? 'Cita' : 'Reserva'"
               >
                 <span class="event-title">{{ event.title }}</span>
                 <span class="event-type">{{ event.type === 'cita' ? 'Cita' : 'Reserva' }}</span>
+                <span class="event-email" v-if="event.email">{{ event.email }}</span>
               </div>
             </template>
             <template v-else>
-              <span class="libre-label">libre</span>
+              <span 
+                class="libre-label"
+                :class="{ 'bloqueado-label': estaHorarioBloqueado(date.toISOString().slice(0, 10), hour) }"
+              >
+                {{ estaHorarioBloqueado(date.toISOString().slice(0, 10), hour) ? 'Bloqueado' : 'libre' }}
+              </span>
             </template>
           </div>
         </div>
@@ -95,6 +116,12 @@
             </div>
             <div v-else>
               <div><b>Nombre:</b> {{ detailEvent.title }}</div>
+              <div v-if="detailEvent.email"><b>Email:</b> {{ detailEvent.email }}</div>
+              <div v-if="detailEvent.servicio"><b>Servicio:</b> {{ detailEvent.servicio }}</div>
+              <div v-if="detailEvent.sucursal"><b>Sucursal:</b> {{ detailEvent.sucursal }}</div>
+              <div v-if="detailEvent.dependiente">
+                <b>Dependiente:</b> {{ detailEvent.dependiente.nombreCompleto }} ({{ detailEvent.dependiente.parentesco }})
+              </div>
             </div>
             <div><b>Tipo:</b> {{ detailEvent.type === 'cita' ? 'Cita' : 'Reserva' }}</div>
           </div>
@@ -108,16 +135,18 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useReserveStore } from 'src/stores/reserva' // 👈 Importar el store
 import citasData from 'src/data/citas.json'
-import reservasData from 'src/data/reservas.json'
 import pacientes from 'src/data/pacientes.json'
 
 export default {
   name: 'CalendarWeekPage',
   setup() {
     const router = useRouter()
+    const reserveStore = useReserveStore() // 👈 Usar el store
+    
     const today = new Date()
     const currentWeekStart = ref(getStartOfWeek(today))
     const view = ref('week')
@@ -130,6 +159,9 @@ export default {
     const confirmToHour = ref('')
     const showDetailDialog = ref(false)
     const detailEvent = ref(null)
+
+    // 👇 TODAS LAS RESERVAS DESDE PINIA
+    const reservasCompletas = computed(() => reserveStore.reservasCompletas || [])
 
     // Genera todas las horas del día en formato HH:00
     const hours = Array.from({ length: 24 }, (_, i) => `${i.toString().padStart(2, '0')}:00`)
@@ -173,6 +205,8 @@ export default {
     function getEvents(date, hour) {
       const dateStr = date.toISOString().slice(0, 10)
       const events = []
+      
+      // 👇 Citas (mantienes igual)
       citasData.citas.forEach(cita => {
         if (cita.fecha === dateStr && cita.hora === hour) {
           events.push({
@@ -185,17 +219,24 @@ export default {
           })
         }
       })
-      reservasData.reservas.forEach(reserva => {
+
+      // 👇 RESERVAS DESDE PINIA (ACTUALIZADO)
+      reservasCompletas.value.forEach(reserva => {
         if (reserva.fechaReserva === dateStr && reserva.horaReserva === hour) {
           events.push({
             id: `reserva-${reserva.id}`,
             type: 'reserva',
             title: reserva.nombreCompleto,
             date: reserva.fechaReserva,
-            hour: reserva.horaReserva
+            hour: reserva.horaReserva,
+            email: reserva.gmail, // 👈 Agregar email
+            servicio: reserva.servicio,
+            sucursal: reserva.sucursal,
+            dependiente: reserva.dependiente
           })
         }
       })
+      
       return events
     }
 
@@ -203,10 +244,12 @@ export default {
       currentWeekStart.value.setDate(currentWeekStart.value.getDate() - 7)
       currentWeekStart.value = new Date(currentWeekStart.value)
     }
+    
     const nextWeek = () => {
       currentWeekStart.value.setDate(currentWeekStart.value.getDate() + 7)
       currentWeekStart.value = new Date(currentWeekStart.value)
     }
+    
     const setView = (v) => {
       view.value = v
       if (v === 'day') {
@@ -217,6 +260,7 @@ export default {
         router.push('/Calendar-Month')
       }
     }
+    
     const salir = () => {
       // Implementa la navegación según tu router
     }
@@ -227,6 +271,7 @@ export default {
       draggedFromDate.value = fromDate
       draggedFromHour.value = fromHour
     }
+    
     const onDrop = (toDate, toHour) => {
       if (!draggedEvent.value) return
       if (
@@ -238,8 +283,10 @@ export default {
       confirmToHour.value = toHour
       showConfirmDialog.value = true
     }
+    
     const confirmMoveEvent = () => {
       if (!confirmEvent.value) return
+      
       if (confirmEvent.value.type === 'cita') {
         const cita = citasData.citas.find(c => `cita-${c.id}` === confirmEvent.value.id)
         if (cita) {
@@ -247,12 +294,14 @@ export default {
           cita.hora = confirmToHour.value
         }
       } else if (confirmEvent.value.type === 'reserva') {
-        const reserva = reservasData.reservas.find(r => `reserva-${r.id}` === confirmEvent.value.id)
+        // 👇 RESERVAS DESDE PINIA (ACTUALIZADO)
+        const reserva = reserveStore.reservas.find(r => `reserva-${r.id}` === confirmEvent.value.id)
         if (reserva) {
           reserva.fechaReserva = confirmToDate.value
           reserva.horaReserva = confirmToHour.value
         }
       }
+      
       draggedEvent.value = null
       draggedFromDate.value = null
       draggedFromHour.value = null
@@ -265,6 +314,31 @@ export default {
     const showDetail = (event) => {
       detailEvent.value = event
       showDetailDialog.value = true
+    }
+
+    // 👇 NUEVO: Manejar click en celda libre para bloquear/desbloquear
+    const handleCellClick = (date, hour) => {
+      // Solo permitir bloquear/desbloquear si no hay eventos (reservas o citas)
+      const events = getEvents(date, hour)
+      if (events.length > 0) {
+        return // No hacer nada si hay eventos
+      }
+
+      const dateStr = date.toISOString().slice(0, 10)
+      const estaBloqueado = reserveStore.estaHorarioBloqueado(dateStr, hour)
+
+      if (estaBloqueado) {
+        // Desbloquear
+        reserveStore.desbloquearHorario(dateStr, hour)
+      } else {
+        // Bloquear
+        reserveStore.bloquearHorario(dateStr, hour)
+      }
+    }
+
+    // 👇 NUEVO: Verificar si un horario está bloqueado
+    const estaHorarioBloqueado = (fecha, hora) => {
+      return reserveStore.estaHorarioBloqueado(fecha, hora)
     }
 
     const formatDate = (dateString) => {
@@ -284,12 +358,19 @@ export default {
     const goToDay = () => {
       router.push('/Calendar-Day')
     }
+    
     const goToWeek = () => {
       router.push('/Calendar-Week')
     }
+    
     const goToMonth = () => {
       router.push('/Calendar-Month')
     }
+
+    // Cargar datos al montar el componente
+    onMounted(() => {
+      console.log('📅 Calendario Semanal cargado con TODAS las reservas:', reservasCompletas.value.length)
+    })
 
     return {
       weekDays,
@@ -317,10 +398,40 @@ export default {
       getPacienteName,
       goToDay,
       goToWeek,
-      goToMonth
+      goToMonth,
+      reservasCompletas, // 👈 Exportar para el template
+      handleCellClick, // 👈 Funciones para bloquear/desbloquear
+      estaHorarioBloqueado
     }
   }
 }
 </script>
 
-<!-- Los estilos están en app.scss global -->
+<style scoped>
+.reservas-info {
+  margin: 10px 0;
+}
+
+.event-email {
+  font-size: 0.7rem;
+  color: #666;
+  display: block;
+  margin-top: 2px;
+}
+
+.calendar-cell.bloqueado {
+  background-color: #ffebee !important;
+  cursor: pointer;
+}
+
+.calendar-cell.bloqueado:hover {
+  background-color: #ffcdd2 !important;
+}
+
+.bloqueado-label {
+  color: #c62828;
+  font-weight: bold;
+}
+
+/* Los estilos están en app.scss global */
+</style>

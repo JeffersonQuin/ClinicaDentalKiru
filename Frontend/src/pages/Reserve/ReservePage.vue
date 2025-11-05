@@ -10,7 +10,6 @@
             <p class="page-subtitle">Administra las reservas de pacientes y sus dependientes</p>
           </div>
         </div>
-        <!-- Eliminar el botón de agregar reserva -->
       </div>
     </div>
 
@@ -25,6 +24,15 @@
           <div class="stat-label">Total de Reservas</div>
         </div>
       </div>
+      <div class="stat-card">
+        <div class="stat-icon-container dependientes">
+          <i class="fa-solid fa-users"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ reservasConDependientes }}</div>
+          <div class="stat-label">Con Dependientes</div>
+        </div>
+      </div>
     </div>
 
     <!-- Search Section -->
@@ -34,7 +42,7 @@
         class="search-input"
         outlined
         type="search"
-        placeholder="Buscar por nombre, email o fecha..."
+        placeholder="Buscar por nombre, email, dependiente o fecha..."
         @input="filterRows"
         clearable
         dense
@@ -54,7 +62,7 @@
         :columns="columns"
         row-key="id"
         :rows-per-page-options="[5, 10, 15, 20, 0]"
-        :pagination="{ rowsPerPage: 5 }"
+        :pagination="{ rowsPerPage: 10 }"
         separator="cell"
       >
         <template v-slot:no-data>
@@ -70,21 +78,43 @@
             <span>{{ formatDate(props.row.fechaReserva) }}</span>
           </q-td>
         </template>
+
         <template v-slot:body-cell-horaReserva="props">
           <q-td :props="props">
             <span>{{ props.row.horaReserva }}</span>
           </q-td>
         </template>
+
         <template v-slot:body-cell-nombreCompleto="props">
           <q-td :props="props">
-            <span>{{ props.row.nombreCompleto }}</span>
+            <div>
+              <div>{{ props.row.nombreCompleto }}</div>
+              <div v-if="props.row.dependiente" class="dependiente-badge">
+                <i class="fa-solid fa-user-friends"></i>
+                {{ props.row.dependiente.nombreCompleto }} ({{ props.row.dependiente.parentesco }})
+              </div>
+            </div>
           </q-td>
         </template>
+
         <template v-slot:body-cell-gmail="props">
           <q-td :props="props">
             <span>{{ props.row.gmail }}</span>
           </q-td>
         </template>
+
+        <template v-slot:body-cell-servicio="props">
+          <q-td :props="props">
+            <span>{{ props.row.servicio }}</span>
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-sucursal="props">
+          <q-td :props="props">
+            <span>{{ props.row.sucursal }}</span>
+          </q-td>
+        </template>
+
         <template v-slot:body-cell-actions="props">
           <q-td :props="props">
             <div class="action-buttons">
@@ -124,14 +154,6 @@
       :reserveData="selectedReserve"
     />
 
-    <!-- Eliminar el dialog de nueva reserva -->
-    <!--
-    <NewReserveDialog
-      v-model="showNewDialog"
-      @reserve-created="handleReserveCreate"
-    />
-    -->
-
     <!-- Reject Confirmation Dialog -->
     <q-dialog v-model="showRejectDialog" persistent>
       <q-card class="confirm-dialog">
@@ -145,6 +167,9 @@
         <q-card-section class="q-pt-none">
           <p class="dialog-text">
             ¿Está seguro que desea rechazar la reserva de <strong>{{ selectedReserve?.nombreCompleto }}</strong>?
+          </p>
+          <p class="dialog-subtext" v-if="selectedReserve?.dependiente">
+            También se rechazará la reserva del dependiente: <strong>{{ selectedReserve.dependiente.nombreCompleto }}</strong>
           </p>
           <p class="dialog-subtext">
             Esta acción no se puede deshacer.
@@ -176,11 +201,11 @@
 </template>
 
 <script>
-import { ref, onMounted, watch } from 'vue'
-import reservas from 'src/data/reservas.json'
+import { ref, onMounted, watch, computed } from 'vue'
+import { useQuasar } from 'quasar'
+import { useReserveStore } from 'src/stores/reserva' // 👈 Importar el store
 import Fuse from 'fuse.js'
 import DetailReserveDialog from './DetailReserveDialog.vue'
-//import NewReserveDialog from './NewReserveDialog.vue'
 
 const columns = [
   {
@@ -201,16 +226,30 @@ const columns = [
   },
   {
     name: 'nombreCompleto',
-    label: 'Nombre Completo',
+    label: 'Paciente',
     align: 'left',
     field: 'nombreCompleto',
     sortable: true
   },
   {
     name: 'gmail',
-    label: 'Gmail',
+    label: 'Email',
     align: 'left',
     field: 'gmail',
+    sortable: true
+  },
+  {
+    name: 'servicio',
+    label: 'Servicio',
+    align: 'left',
+    field: 'servicio',
+    sortable: true
+  },
+  {
+    name: 'sucursal',
+    label: 'Sucursal',
+    align: 'left',
+    field: 'sucursal',
     sortable: true
   },
   {
@@ -224,7 +263,16 @@ const columns = [
 ]
 
 const FUSE_OPTIONS = {
-  keys: ['nombreCompleto', 'gmail', 'fechaReserva', 'horaReserva'],
+  keys: [
+    'nombreCompleto', 
+    'gmail', 
+    'fechaReserva', 
+    'horaReserva',
+    'servicio',
+    'sucursal',
+    'dependiente.nombreCompleto',
+    'dependiente.parentesco'
+  ],
   threshold: 0.3,
   includeScore: true,
   minMatchCharLength: 1
@@ -234,74 +282,61 @@ export default {
   name: 'ReserveTable',
   components: {
     DetailReserveDialog,
-    //NewReserveDialog
   },
   setup() {
+    const $q = useQuasar()
+    const reservaStore = useReserveStore() // 👈 Usar el store
+
     const search = ref('')
-    const rows = ref([])
-    const filteredRows = ref([])
     const selectedReserve = ref(null)
     const showDetailDialog = ref(false)
-    const showNewDialog = ref(false)
     const showRejectDialog = ref(false)
     let fuse = null
 
+    // 👇 DATOS DESDE PINIA (MUCHO MÁS SIMPLE)
+    const allReservas = computed(() => reservaStore.reservasCompletas || [])
+    const filteredRows = ref([])
+
+    // 👇 Estadísticas
+    const reservasConDependientes = computed(() => {
+      return allReservas.value.filter(row => row.dependiente).length
+    })
+
     const loadReservas = () => {
-      rows.value = reservas.reservas.map(r => ({
-        ...r,
-        id: Number(r.id)
-      }))
-      filteredRows.value = rows.value.filter(r => r.state !== 'rejected')
-      fuse = new Fuse(filteredRows.value, FUSE_OPTIONS)
+      // Los datos ya vienen del store, solo inicializar Fuse
+      filteredRows.value = allReservas.value
+      initializeFuse()
     }
 
-    const rebuildFuse = () => {
-      const collection = rows.value.filter(r => r.state !== 'rejected')
-      if (fuse && typeof fuse.setCollection === 'function') {
-        fuse.setCollection(collection)
-      } else {
-        fuse = new Fuse(collection, FUSE_OPTIONS)
-      }
+    const initializeFuse = () => {
+      fuse = new Fuse(allReservas.value, FUSE_OPTIONS)
     }
 
     const filterRows = () => {
       if (!search.value?.trim()) {
-        filteredRows.value = rows.value.filter(r => r.state !== 'rejected')
+        filteredRows.value = allReservas.value
         return
       }
       const results = fuse.search(search.value.trim())
       filteredRows.value = results.map(result => result.item)
     }
 
-    const handleReserveCreate = (newReserve) => {
-      const reserveToAdd = {
-        ...newReserve,
-        id: null
-      }
-      const numericIds = rows.value.map(r => Number(r.id)).filter(n => !Number.isNaN(n))
-      const maxId = numericIds.length ? Math.max(...numericIds) : 0
-      reserveToAdd.id = maxId + 1
-      rows.value.push(reserveToAdd)
-      rebuildFuse()
-      filterRows()
-    }
-
     const rejectReserve = () => {
-      const index = rows.value.findIndex(r => Number(r.id) === Number(selectedReserve.value.id))
-      if (index > -1) {
-        rows.value[index].state = 'rejected'
-        rebuildFuse()
-        filterRows()
-      }
+      if (!selectedReserve.value) return
+      
+      // 👇 Usar el método del store
+      reservaStore.eliminarReserva(selectedReserve.value.id)
+      
+      $q.notify({
+        type: 'positive',
+        message: 'Reserva eliminada exitosamente',
+        position: 'top'
+      })
     }
 
     const viewReserve = (reserve) => {
       selectedReserve.value = { ...reserve }
       showDetailDialog.value = true
-    }
-
-    const openNewReserveDialog = () => {
-      showNewDialog.value = true
     }
 
     const confirmRejectReserve = (reserve) => {
@@ -312,12 +347,13 @@ export default {
     const formatDate = (dateString) => {
       if (!dateString) return 'No disponible'
       try {
-        const date = new Date(dateString)
-        return date.toLocaleDateString('es-ES', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit'
-        })
+        // Manejar formato YYYY-MM-DD
+        if (dateString.includes('-')) {
+          const [year, month, day] = dateString.split('-')
+          return `${day}/${month}/${year}`
+        }
+        // Si ya está en formato DD/MM/YYYY
+        return dateString
       } catch {
         return 'Fecha inválida'
       }
@@ -326,24 +362,27 @@ export default {
     onMounted(() => {
       loadReservas()
     })
+
     watch(search, () => {
       filterRows()
+    })
+
+    // 👇 Recargar cuando cambien los datos del store
+    watch(allReservas, () => {
+      loadReservas()
     })
 
     return {
       search,
       columns,
-      rows,
       filteredRows,
       selectedReserve,
       showDetailDialog,
-      showNewDialog,
       showRejectDialog,
+      reservasConDependientes,
       filterRows,
-      handleReserveCreate,
       rejectReserve,
       viewReserve,
-      openNewReserveDialog,
       confirmRejectReserve,
       formatDate
     }
