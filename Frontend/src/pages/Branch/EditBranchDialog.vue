@@ -243,16 +243,10 @@ import { ref, computed, watch } from 'vue'
 export default {
   name: 'EditBranchDialog',
   props: {
-    modelValue: {
-      type: Boolean,
-      default: false
-    },
-    branchData: {
-      type: Object,
-      default: () => null
-    }
+    modelValue: Boolean,
+    branchData: Object
   },
-  emits: ['update:modelValue', 'branch-updated'],
+  emits: ['update:modelValue', 'branch-updated', 'close'],
   setup(props, { emit }) {
     const loading = ref(false)
     const newImageFile = ref(null)
@@ -277,39 +271,12 @@ export default {
 
     const initializeForm = () => {
       if (props.branchData) {
-        form.value = {
-          id: props.branchData.id,
-          nombre: props.branchData.nombre || '',
-          ubicacion: props.branchData.ubicacion || '',
-          direccion: props.branchData.direccion || '',
-          descripcion: props.branchData.descripcion || '',
-          imagen: props.branchData.imagen || '',
-          latitud: props.branchData.latitud || 0,
-          longitud: props.branchData.longitud || 0,
-          activo: props.branchData.activo !== undefined ? props.branchData.activo : true
-        }
+        form.value = { ...props.branchData }
       }
-    }
-
-    const resetForm = () => {
-      form.value = {
-        id: null,
-        nombre: '',
-        ubicacion: '',
-        direccion: '',
-        descripcion: '',
-        imagen: '',
-        latitud: 0,
-        longitud: 0,
-        activo: true
-      }
-      newImageFile.value = null
-      imagePreview.value = null
     }
 
     const closeDialog = () => {
-      showDialog.value = false
-      resetForm()
+      emit('close')
     }
 
     const handleImageSelect = (file) => {
@@ -332,51 +299,36 @@ export default {
       loading.value = true
 
       try {
-        // Simular procesamiento
-        await new Promise(resolve => setTimeout(resolve, 1000))
-
-        let imagePath = form.value.imagen
-
-        if (newImageFile.value) {
-          const timestamp = Date.now()
-          const fileName = `sucursal_${form.value.id}_${timestamp}.${newImageFile.value.name.split('.').pop()}`
-          imagePath = `/icons/${fileName}`
-
-          console.log('Imagen a guardar:', fileName, 'en /public/icons/')
-        }
-
-        const updatedBranch = {
-          id: form.value.id,
-          nombre: form.value.nombre,
-          ubicacion: form.value.ubicacion,
-          direccion: form.value.direccion,
-          descripcion: form.value.descripcion,
-          imagen: imagePath,
-          latitud: parseFloat(form.value.latitud) || 0,
-          longitud: parseFloat(form.value.longitud) || 0,
-          activo: form.value.activo
-        }
-
-        emit('branch-updated', updatedBranch)
-        closeDialog()
+        // Simular procesamiento (puedes quitar esto si no es necesario)
+        await new Promise(resolve => setTimeout(resolve, 500))
+        
+        // Emitir el evento de actualización
+        emit('branch-updated', form.value)
+        
+        // IMPORTANTE: Reiniciar el estado de loading
+        loading.value = false
+        
+        // También limpiar el archivo de imagen seleccionado
+        newImageFile.value = null
+        imagePreview.value = null
+        
       } catch (error) {
-        console.error('Error updating branch:', error)
-      } finally {
+        console.error('Error guardando sucursal:', error)
         loading.value = false
       }
     }
 
-    watch(() => props.branchData, (newData) => {
-      if (newData) {
-        initializeForm()
-      }
-    }, { immediate: true })
-
-    watch(() => props.modelValue, (newValue) => {
-      if (newValue) {
-        initializeForm()
+    // Watcher para cuando se cierra el diálogo, reiniciar estados
+    watch(showDialog, (newValue) => {
+      if (!newValue) {
+        // Cuando se cierra el diálogo, reiniciar todo
+        loading.value = false
+        newImageFile.value = null
+        imagePreview.value = null
       }
     })
+
+    watch(() => props.branchData, initializeForm, { immediate: true })
 
     return {
       showDialog,

@@ -61,73 +61,69 @@
           <p class="text-h6 text-grey-7">Selecciona la sucursal que mejor se adapte a tus necesidades</p>
         </div>
         
-        <div class="row q-col-gutter-lg">
+        <!-- Loading State -->
+        <div v-if="publicarStore.loading" class="text-center q-pa-xl">
+          <q-spinner-gears color="primary" size="50px" />
+          <div class="text-h6 q-mt-md">Cargando sucursales...</div>
+        </div>
+
+        <!-- Empty State -->
+        <div v-else-if="filteredBranches.length === 0" class="text-center q-pa-xl">
+          <q-icon name="location_off" color="grey-5" size="80px" />
+          <div class="text-h5 q-mt-md text-grey-7">No hay sucursales disponibles</div>
+          <p class="text-grey-6">Próximamente abriremos nuevas sucursales en tu zona.</p>
+        </div>
+        
+        <!-- Sucursales Grid -->
+        <div v-else class="row q-col-gutter-lg">
           <div 
-            v-for="(branch, index) in branches" 
+            v-for="(branch, index) in filteredBranches" 
             :key="branch.id" 
             class="col-12 col-sm-6 col-lg-4 animated fadeInUp"
             :style="{ animationDelay: `${index * 0.1}s` }"
           >
             <q-card class="branch-card" flat bordered @click="openBranchDetail(branch)">
               <div class="branch-image-container">
-                <q-img :src="branch.image" :alt="branch.name" class="branch-image" />
+                <q-img 
+                  :src="branch.imagen || '/default-branch.jpg'" 
+                  :alt="branch.nombre" 
+                  class="branch-image"
+                  @error="handleImageError"
+                />
                 <div class="branch-overlay">
                   <q-icon name="visibility" color="white" size="2em" />
                 </div>
                 <div class="branch-status">
                   <q-chip 
-                    color="green" 
+                    :color="branch.activo ? 'green' : 'red'" 
                     text-color="white" 
                     size="sm"
                     class="status-chip"
                   >
-                    Abierto
+                    {{ branch.activo ? 'Abierto' : 'Cerrado' }}
                   </q-chip>
                 </div>
               </div>
               
               <q-card-section class="branch-content">
                 <div class="text-h6 text-weight-bold q-mb-sm branch-title">
-                  {{ branch.name }}
+                  {{ branch.nombre }}
                 </div>
                 <div class="branch-location q-mb-md">
                   <q-icon name="location_on" color="primary" size="16px" class="q-mr-xs" />
-                  <span class="text-grey-7">{{ branch.location }}</span>
+                  <span class="text-grey-7">{{ branch.direccion }}</span>
                 </div>
                 
                 <div class="branch-info q-mb-md">
                   <div class="info-item">
-                    <q-icon name="phone" color="primary" size="16px" class="q-mr-xs" />
-                    <span class="text-caption">{{ branch.phone }}</span>
-                  </div>
-                  <div class="info-item">
-                    <q-icon name="email" color="primary" size="16px" class="q-mr-xs" />
-                    <span class="text-caption">{{ branch.email }}</span>
+                    <q-icon name="place" color="primary" size="16px" class="q-mr-xs" />
+                    <span class="text-caption">{{ branch.ubicacion }}</span>
                   </div>
                 </div>
                 
-                <div class="branch-services q-mb-md">
-                  <div class="text-caption text-weight-bold q-mb-xs">Servicios disponibles:</div>
-                  <div class="services-tags">
-                    <q-chip 
-                      v-for="service in branch.services.slice(0, 3)" 
-                      :key="service"
-                      color="blue" 
-                      text-color="white" 
-                      size="xs"
-                      class="q-mr-xs q-mb-xs"
-                    >
-                      {{ service }}
-                    </q-chip>
-                    <q-chip 
-                      v-if="branch.services.length > 3"
-                      color="grey" 
-                      text-color="white" 
-                      size="xs"
-                      class="q-mr-xs q-mb-xs"
-                    >
-                      +{{ branch.services.length - 3 }} más
-                    </q-chip>
+                <div class="branch-description q-mb-md">
+                  <div class="text-caption text-grey-7">
+                    {{ truncateDescription(branch.descripcion) }}
                   </div>
                 </div>
               </q-card-section>
@@ -183,10 +179,11 @@
     <!-- Dialog de detalle de la sucursal -->
     <q-dialog v-model="branchDialog" maximized transition-show="slide-up" transition-hide="slide-down">
       <q-card v-if="selectedBranch">
-        <q-card-section class="dialog-header">
+        <q-card-section class="dialog-header bg-primary text-white">
           <div class="row items-center">
             <div class="col">
-              <div class="text-h6">{{ selectedBranch.name }}</div>
+              <div class="text-h6">{{ selectedBranch.nombre }}</div>
+              <div class="text-caption">{{ selectedBranch.ubicacion }}</div>
             </div>
             <div class="col-auto">
               <q-btn icon="close" flat round dense v-close-popup color="white" />
@@ -194,13 +191,14 @@
           </div>
         </q-card-section>
         
-        <q-card-section class="dialog-content">
+        <q-card-section class="dialog-content q-pt-lg">
           <div class="row q-col-gutter-xl">
             <div class="col-12 col-md-6">
               <q-img
-                :src="selectedBranch.image"
-                :alt="selectedBranch.name"
+                :src="selectedBranch.imagen || '/default-branch.jpg'"
+                :alt="selectedBranch.nombre"
                 class="branch-detail-image"
+                @error="handleImageError"
               />
               
               <!-- Mapa embebido -->
@@ -208,7 +206,7 @@
                 <h5 class="text-h6 text-weight-bold q-mb-sm">Ubicación</h5>
                 <div class="map-container">
                   <iframe
-                    :src="selectedBranch.mapUrl"
+                    :src="generateMapUrl(selectedBranch)"
                     width="100%"
                     height="300"
                     style="border:0;"
@@ -224,79 +222,39 @@
             <div class="col-12 col-md-6">
               <div class="branch-detail-content">
                 <div class="text-h5 text-weight-bold q-mb-md">
-                  {{ selectedBranch.name }}
+                  {{ selectedBranch.nombre }}
                 </div>
                 
                 <div class="branch-detail-info q-mb-md">
-                  <div class="detail-row">
+                  <div class="detail-row q-mb-sm">
                     <q-icon name="location_on" color="primary" size="20px" class="q-mr-sm" />
                     <span class="text-weight-bold">Dirección:</span>
-                    <span class="q-ml-sm">{{ selectedBranch.address }}</span>
+                    <span class="q-ml-sm">{{ selectedBranch.direccion }}</span>
                   </div>
                   
-                  <div class="detail-row">
-                    <q-icon name="phone" color="primary" size="20px" class="q-mr-sm" />
-                    <span class="text-weight-bold">Teléfono:</span>
-                    <span class="q-ml-sm">{{ selectedBranch.phone }}</span>
+                  <div class="detail-row q-mb-sm">
+                    <q-icon name="place" color="primary" size="20px" class="q-mr-sm" />
+                    <span class="text-weight-bold">Ubicación:</span>
+                    <span class="q-ml-sm">{{ selectedBranch.ubicacion }}</span>
                   </div>
                   
-                  <div class="detail-row">
-                    <q-icon name="email" color="primary" size="20px" class="q-mr-sm" />
-                    <span class="text-weight-bold">Email:</span>
-                    <span class="q-ml-sm">{{ selectedBranch.email }}</span>
-                  </div>
-                </div>
-                
-                <div class="q-mb-md">
-                  <h5 class="text-h6 text-weight-bold q-mb-sm">Horarios de Atención</h5>
-                  <q-list dense bordered separator class="rounded-borders">
-                    <q-item 
-                      v-for="(time, day) in selectedBranch.schedule" 
-                      :key="day"
-                      class="schedule-item"
-                    >
-                      <q-item-section>
-                        <q-item-label class="text-weight-bold">{{ getDayName(day) }}</q-item-label>
-                      </q-item-section>
-                      <q-item-section side>
-                        <q-item-label>{{ time }}</q-item-label>
-                      </q-item-section>
-                    </q-item>
-                  </q-list>
-                </div>
-                
-                <div class="q-mb-md">
-                  <h5 class="text-h6 text-weight-bold q-mb-sm">Servicios Disponibles</h5>
-                  <div class="services-grid">
+                  <div class="detail-row q-mb-sm">
+                    <q-icon name="info" color="primary" size="20px" class="q-mr-sm" />
+                    <span class="text-weight-bold">Estado:</span>
                     <q-chip 
-                      v-for="service in selectedBranch.services" 
-                      :key="service"
-                      color="blue" 
+                      :color="selectedBranch.activo ? 'green' : 'red'" 
                       text-color="white" 
-                      size="md"
-                      class="q-mr-sm q-mb-sm"
+                      size="sm"
+                      class="q-ml-sm"
                     >
-                      {{ service }}
+                      {{ selectedBranch.activo ? 'Abierto' : 'Cerrado' }}
                     </q-chip>
                   </div>
                 </div>
                 
-                <div class="q-mb-md" v-if="selectedBranch.features">
-                  <h5 class="text-h6 text-weight-bold q-mb-sm">Características</h5>
-                  <q-list dense bordered class="rounded-borders">
-                    <q-item 
-                      v-for="feature in selectedBranch.features" 
-                      :key="feature"
-                      class="feature-item"
-                    >
-                      <q-item-section avatar>
-                        <q-icon name="check_circle" color="green" size="20px" />
-                      </q-item-section>
-                      <q-item-section>
-                        <q-item-label>{{ feature }}</q-item-label>
-                      </q-item-section>
-                    </q-item>
-                  </q-list>
+                <div class="q-mb-md">
+                  <h5 class="text-h6 text-weight-bold q-mb-sm">Descripción</h5>
+                  <p class="text-body1">{{ selectedBranch.descripcion }}</p>
                 </div>
                 
                 <div class="branch-detail-actions">
@@ -309,13 +267,15 @@
                     push
                     no-caps
                     class="q-mr-sm"
+                    :disable="!selectedBranch.activo"
                   />
                   <q-btn 
                     color="secondary" 
-                    label="Llamar" 
+                    label="Cómo Llegar" 
                     size="lg"
-                    icon="phone"
-                    :href="`tel:${selectedBranch.phone}`"
+                    icon="directions"
+                    :href="generateDirectionsUrl(selectedBranch)"
+                    target="_blank"
                     push
                     no-caps
                   />
@@ -356,23 +316,29 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useNotifications } from 'src/composables/useNotifications'
+import { usePublicarSucursal } from 'src/stores/publicarSucursal'
 import AppointmentModal from 'components/AppointmentModal.vue'
-import sucursalesData from 'src/data/sucursales.json'
 
 const { notifyInfo } = useNotifications()
+const publicarStore = usePublicarSucursal()
 
 // Datos reactivos
 const appointmentDialog = ref(false)
 const branchDialog = ref(false)
 const mapDialog = ref(false)
 const selectedBranch = ref(null)
-const branches = ref([])
+
+// Computed properties
+const filteredBranches = computed(() => {
+  // Filtrar solo sucursales activas
+  return publicarStore.sucursalesActivas
+})
 
 // Cargar datos de sucursales al montar el componente
 onMounted(() => {
-  branches.value = sucursalesData.sucursales
+  publicarStore.cargarSucursales()
 })
 
 // Métodos
@@ -389,17 +355,30 @@ const openMapDialog = () => {
   mapDialog.value = true
 }
 
-const getDayName = (day) => {
-  const days = {
-    monday: 'Lunes',
-    tuesday: 'Martes',
-    wednesday: 'Miércoles',
-    thursday: 'Jueves',
-    friday: 'Viernes',
-    saturday: 'Sábado',
-    sunday: 'Domingo'
+const truncateDescription = (description) => {
+  if (!description) return ''
+  return description.length > 120 
+    ? description.substring(0, 120) + '...' 
+    : description
+}
+
+const generateMapUrl = (branch) => {
+  if (branch.latitud && branch.longitud) {
+    return `https://maps.google.com/maps?q=${branch.latitud},${branch.longitud}&z=15&output=embed`
   }
-  return days[day] || day
+  // Fallback a una ubicación general de Oruro
+  return 'https://maps.google.com/maps?q=Oruro,Bolivia&z=13&output=embed'
+}
+
+const generateDirectionsUrl = (branch) => {
+  if (branch.latitud && branch.longitud) {
+    return `https://www.google.com/maps/dir/?api=1&destination=${branch.latitud},${branch.longitud}`
+  }
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(branch.direccion)}`
+}
+
+const handleImageError = (event) => {
+  event.target.src = '/default-branch.jpg'
 }
 
 // Funciones para manejar eventos del modal de citas
@@ -416,4 +395,3 @@ const onAppointmentCancel = () => {
 }
 </script>
 
-<!-- Los estilos están en app.scss global -->

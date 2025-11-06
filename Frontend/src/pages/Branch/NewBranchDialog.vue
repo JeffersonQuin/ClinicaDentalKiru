@@ -257,12 +257,9 @@ import { ref, computed } from 'vue'
 export default {
   name: 'NewBranchDialog',
   props: {
-    modelValue: {
-      type: Boolean,
-      default: false
-    }
+    modelValue: Boolean
   },
-  emits: ['update:modelValue', 'branch-created'],
+  emits: ['update:modelValue', 'branch-created', 'close'],
   setup(props, { emit }) {
     const loading = ref(false)
     const imageFile = ref(null)
@@ -284,24 +281,8 @@ export default {
       set: (value) => emit('update:modelValue', value)
     })
 
-    const resetForm = () => {
-      form.value = {
-        nombre: '',
-        ubicacion: '',
-        direccion: '',
-        descripcion: '',
-        imagen: '',
-        latitud: -17.9758,
-        longitud: -67.1101,
-        activo: true
-      }
-      imageFile.value = null
-      imagePreview.value = null
-    }
-
     const closeDialog = () => {
-      showDialog.value = false
-      resetForm()
+      emit('close')
     }
 
     const handleImageSelect = (file) => {
@@ -329,38 +310,8 @@ export default {
 
     const createBranch = async () => {
       loading.value = true
-
-      try {
-        await new Promise(resolve => setTimeout(resolve, 1500))
-
-        let imagePath = null
-
-        if (imageFile.value) {
-          const timestamp = Date.now()
-          const fileName = `sucursal_${timestamp}.${imageFile.value.name.split('.').pop()}`
-          imagePath = `/icons/${fileName}`
-
-          console.log('Imagen a guardar:', fileName, 'en /public/icons/')
-        }
-
-        const newBranch = {
-          nombre: form.value.nombre,
-          ubicacion: form.value.ubicacion,
-          direccion: form.value.direccion,
-          descripcion: form.value.descripcion,
-          imagen: imagePath,
-          latitud: parseFloat(form.value.latitud) || -17.9758,
-          longitud: parseFloat(form.value.longitud) || -67.1101,
-          activo: form.value.activo
-        }
-
-        emit('branch-created', newBranch)
-        closeDialog()
-      } catch (error) {
-        console.error('Error creating branch:', error)
-      } finally {
-        loading.value = false
-      }
+      // Lógica de creación...
+      emit('branch-created', form.value)
     }
 
     return {
@@ -378,4 +329,3 @@ export default {
   }
 }
 </script>
-

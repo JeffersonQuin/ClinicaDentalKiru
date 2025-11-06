@@ -187,16 +187,10 @@ import { computed } from 'vue'
 export default {
   name: 'DetailBranchDialog',
   props: {
-    modelValue: {
-      type: Boolean,
-      default: false
-    },
-    branchData: {
-      type: Object,
-      default: () => null
-    }
+    modelValue: Boolean,
+    branchData: Object
   },
-  emits: ['update:modelValue', 'edit-branch'],
+  emits: ['update:modelValue', 'edit-branch', 'close'],
   setup(props, { emit }) {
     const showDialog = computed({
       get: () => props.modelValue,
@@ -209,13 +203,17 @@ export default {
 
     const editBranch = () => {
       emit('edit-branch', props.branchData)
-      showDialog.value = false
+    }
+
+    const closeDialog = () => {
+      emit('close')
     }
 
     return {
       showDialog,
       handleImageError,
-      editBranch
+      editBranch,
+      closeDialog
     }
   }
 }
