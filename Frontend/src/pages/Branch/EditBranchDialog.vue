@@ -34,7 +34,7 @@
                   <span class="required">*</span>
                 </label>
                 <q-input
-                  v-model="form.name"
+                  v-model="form.nombre"
                   filled
                   dense
                   :rules="[val => !!val || 'El nombre es requerido']"
@@ -46,14 +46,14 @@
               <div class="field-group">
                 <label class="field-label">
                   <i class="fa-solid fa-location-dot"></i>
-                  <span>Ciudad</span>
+                  <span>Ubicación (Ciudad)</span>
                   <span class="required">*</span>
                 </label>
                 <q-input
-                  v-model="form.location"
+                  v-model="form.ubicacion"
                   filled
                   dense
-                  :rules="[val => !!val || 'La ciudad es requerida']"
+                  :rules="[val => !!val || 'La ubicación es requerida']"
                   class="form-input"
                   placeholder="Ej: Oruro"
                 />
@@ -66,51 +66,31 @@
                   <span class="required">*</span>
                 </label>
                 <q-input
-                  v-model="form.address"
+                  v-model="form.direccion"
                   filled
                   dense
                   :rules="[val => !!val || 'La dirección es requerida']"
                   class="form-input"
-                  placeholder="Ej: Av. 6 de Agosto #123"
+                  placeholder="Ej: Av. 6 de Agosto #123, Centro, Oruro"
                 />
               </div>
 
-              <div class="field-row">
-                <div class="field-group">
-                  <label class="field-label">
-                    <i class="fa-solid fa-phone"></i>
-                    <span>Teléfono</span>
-                    <span class="required">*</span>
-                  </label>
-                  <q-input
-                    v-model="form.phone"
-                    filled
-                    dense
-                    :rules="[val => !!val || 'El teléfono es requerido']"
-                    class="form-input"
-                    placeholder="78900785"
-                  />
-                </div>
-
-                <div class="field-group">
-                  <label class="field-label">
-                    <i class="fa-solid fa-envelope"></i>
-                    <span>Email</span>
-                    <span class="required">*</span>
-                  </label>
-                  <q-input
-                    v-model="form.email"
-                    filled
-                    dense
-                    type="email"
-                    :rules="[
-                      val => !!val || 'El email es requerido',
-                      val => /.+@.+\..+/.test(val) || 'Email inválido'
-                    ]"
-                    class="form-input"
-                    placeholder="info@clinica.com"
-                  />
-                </div>
+              <div class="field-group">
+                <label class="field-label">
+                  <i class="fa-solid fa-circle-info"></i>
+                  <span>Descripción</span>
+                  <span class="required">*</span>
+                </label>
+                <q-input
+                  v-model="form.descripcion"
+                  filled
+                  dense
+                  type="textarea"
+                  rows="3"
+                  :rules="[val => !!val || 'La descripción es requerida']"
+                  class="form-input"
+                  placeholder="Descripción de la sucursal..."
+                />
               </div>
 
               <div class="field-group">
@@ -119,9 +99,9 @@
                   <span>Imagen de la Sucursal</span>
                 </label>
 
-                <div v-if="form.image && !newImageFile" style="margin-bottom: 10px;">
+                <div v-if="form.imagen && !newImageFile" style="margin-bottom: 10px;">
                   <div style="display: flex; align-items: center; gap: 10px;">
-                    <img :src="form.image" alt="Preview" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;" />
+                    <img :src="form.imagen" alt="Preview" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;" />
                     <q-btn
                       flat
                       dense
@@ -156,6 +136,19 @@
                 </div>
               </div>
 
+              <div class="field-group">
+                <q-toggle
+                  v-model="form.activo"
+                  label="Sucursal Activa"
+                  color="positive"
+                  checked-icon="fa-solid fa-check"
+                  unchecked-icon="fa-solid fa-xmark"
+                />
+              </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="form-column">
               <h4 class="section-header">Coordenadas GPS</h4>
 
               <div class="field-row">
@@ -165,11 +158,11 @@
                     <span>Latitud</span>
                   </label>
                   <q-input
-                    v-model.number="form.coordinates.lat"
+                    v-model.number="form.latitud"
                     filled
                     dense
                     type="number"
-                    step="0.0001"
+                    step="0.000001"
                     class="form-input"
                     placeholder="-17.9758"
                   />
@@ -181,11 +174,11 @@
                     <span>Longitud</span>
                   </label>
                   <q-input
-                    v-model.number="form.coordinates.lng"
+                    v-model.number="form.longitud"
                     filled
                     dense
                     type="number"
-                    step="0.0001"
+                    step="0.000001"
                     class="form-input"
                     placeholder="-67.1101"
                   />
@@ -195,117 +188,24 @@
               <div class="field-group">
                 <label class="field-label">
                   <i class="fa-solid fa-map"></i>
-                  <span>URL del Mapa (Google Maps Embed)</span>
+                  <span>Vista Previa del Mapa</span>
                 </label>
-                <q-input
-                  v-model="form.mapUrl"
-                  filled
-                  dense
-                  type="textarea"
-                  rows="3"
-                  class="form-input"
-                  placeholder="https://www.google.com/maps/embed?pb=..."
-                />
-              </div>
-            </div>
-
-            <!-- Right Column -->
-            <div class="form-column">
-              <h4 class="section-header">Horario de Atención</h4>
-
-              <div v-for="(day, key) in dayTranslations" :key="key" class="field-group">
-                <label class="field-label">
-                  <i class="fa-solid fa-clock"></i>
-                  <span>{{ day }}</span>
-                </label>
-                <q-input
-                  v-model="form.schedule[key]"
-                  filled
-                  dense
-                  class="form-input"
-                  placeholder="8:00 AM - 6:00 PM o Cerrado"
-                />
-              </div>
-
-              <h4 class="section-header">Servicios Ofrecidos</h4>
-
-              <div class="field-group">
-                <label class="field-label">
-                  <i class="fa-solid fa-hand-holding-medical"></i>
-                  <span>Lista de Servicios</span>
-                </label>
-                <div class="services-editor">
-                  <div
-                    v-for="(service, index) in form.services"
-                    :key="index"
-                    class="service-input-row"
-                  >
-                    <q-input
-                      v-model="form.services[index]"
-                      filled
-                      dense
-                      class="form-input"
-                      placeholder="Nombre del servicio"
-                    />
-                    <q-btn
-                      round
-                      dense
-                      icon="fa-solid fa-trash"
-                      color="negative"
-                      size="sm"
-                      @click="removeService(index)"
-                    />
+                <div class="map-preview">
+                  <div v-if="form.latitud && form.longitud" class="map-container-small">
+                    <iframe
+                      :src="`https://www.google.com/maps?q=${form.latitud},${form.longitud}&hl=es&z=15&output=embed`"
+                      width="100%"
+                      height="150"
+                      style="border:0; border-radius: 8px;"
+                      allowfullscreen=""
+                      loading="lazy"
+                      referrerpolicy="no-referrer-when-downgrade"
+                    ></iframe>
                   </div>
-                  <q-btn
-                    flat
-                    icon="fa-solid fa-plus"
-                    label="Agregar Servicio"
-                    color="primary"
-                    @click="addService"
-                    no-caps
-                    size="sm"
-                  />
-                </div>
-              </div>
-
-              <h4 class="section-header">Características</h4>
-
-              <div class="field-group">
-                <label class="field-label">
-                  <i class="fa-solid fa-star"></i>
-                  <span>Lista de Características</span>
-                </label>
-                <div class="features-editor">
-                  <div
-                    v-for="(feature, index) in form.features"
-                    :key="index"
-                    class="feature-input-row"
-                  >
-                    <q-input
-                      v-model="form.features[index]"
-                      filled
-                      dense
-                      class="form-input"
-                      placeholder="Característica"
-                    />
-                    <q-btn
-                      round
-                      dense
-                      icon="fa-solid fa-trash"
-                      color="negative"
-                      size="sm"
-                      @click="removeFeature(index)"
-                    />
+                  <div v-else class="map-placeholder-small">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                    <p>Ingresa las coordenadas para ver el mapa</p>
                   </div>
-                  <q-btn
-                    flat
-                    icon="fa-solid fa-plus"
-                    label="Agregar Característica"
-                    color="primary"
-                    @click="addFeature"
-                    no-caps
-                    size="sm"
-                  />
                 </div>
               </div>
             </div>
@@ -320,6 +220,7 @@
             label="Cancelar"
             @click="closeDialog"
             class="secondary-btn"
+            no-caps
           />
           <q-btn
             type="submit"
@@ -327,6 +228,8 @@
             icon="fa-solid fa-save"
             :loading="loading"
             class="primary-btn"
+            unelevated
+            no-caps
           />
         </q-card-actions>
       </q-form>
@@ -357,39 +260,15 @@ export default {
 
     const form = ref({
       id: null,
-      name: '',
-      location: '',
-      address: '',
-      phone: '',
-      email: '',
-      image: '',
-      schedule: {
-        monday: '',
-        tuesday: '',
-        wednesday: '',
-        thursday: '',
-        friday: '',
-        saturday: '',
-        sunday: ''
-      },
-      services: [],
-      coordinates: {
-        lat: 0,
-        lng: 0
-      },
-      mapUrl: '',
-      features: []
+      nombre: '',
+      ubicacion: '',
+      direccion: '',
+      descripcion: '',
+      imagen: '',
+      latitud: 0,
+      longitud: 0,
+      activo: true
     })
-
-    const dayTranslations = {
-      monday: 'Lunes',
-      tuesday: 'Martes',
-      wednesday: 'Miércoles',
-      thursday: 'Jueves',
-      friday: 'Viernes',
-      saturday: 'Sábado',
-      sunday: 'Domingo'
-    }
 
     const showDialog = computed({
       get: () => props.modelValue,
@@ -400,17 +279,14 @@ export default {
       if (props.branchData) {
         form.value = {
           id: props.branchData.id,
-          name: props.branchData.name || '',
-          location: props.branchData.location || '',
-          address: props.branchData.address || '',
-          phone: props.branchData.phone || '',
-          email: props.branchData.email || '',
-          image: props.branchData.image || '',
-          schedule: { ...props.branchData.schedule },
-          services: [...(props.branchData.services || [])],
-          coordinates: { ...(props.branchData.coordinates || { lat: 0, lng: 0 }) },
-          mapUrl: props.branchData.mapUrl || '',
-          features: [...(props.branchData.features || [])]
+          nombre: props.branchData.nombre || '',
+          ubicacion: props.branchData.ubicacion || '',
+          direccion: props.branchData.direccion || '',
+          descripcion: props.branchData.descripcion || '',
+          imagen: props.branchData.imagen || '',
+          latitud: props.branchData.latitud || 0,
+          longitud: props.branchData.longitud || 0,
+          activo: props.branchData.activo !== undefined ? props.branchData.activo : true
         }
       }
     }
@@ -418,28 +294,14 @@ export default {
     const resetForm = () => {
       form.value = {
         id: null,
-        name: '',
-        location: '',
-        address: '',
-        phone: '',
-        email: '',
-        image: '',
-        schedule: {
-          monday: '',
-          tuesday: '',
-          wednesday: '',
-          thursday: '',
-          friday: '',
-          saturday: '',
-          sunday: ''
-        },
-        services: [],
-        coordinates: {
-          lat: 0,
-          lng: 0
-        },
-        mapUrl: '',
-        features: []
+        nombre: '',
+        ubicacion: '',
+        direccion: '',
+        descripcion: '',
+        imagen: '',
+        latitud: 0,
+        longitud: 0,
+        activo: true
       }
       newImageFile.value = null
       imagePreview.value = null
@@ -463,32 +325,17 @@ export default {
     }
 
     const removeCurrentImage = () => {
-      form.value.image = ''
-    }
-
-    const addService = () => {
-      form.value.services.push('')
-    }
-
-    const removeService = (index) => {
-      form.value.services.splice(index, 1)
-    }
-
-    const addFeature = () => {
-      form.value.features.push('')
-    }
-
-    const removeFeature = (index) => {
-      form.value.features.splice(index, 1)
+      form.value.imagen = ''
     }
 
     const saveBranch = async () => {
       loading.value = true
 
       try {
+        // Simular procesamiento
         await new Promise(resolve => setTimeout(resolve, 1000))
 
-        let imagePath = form.value.image
+        let imagePath = form.value.imagen
 
         if (newImageFile.value) {
           const timestamp = Date.now()
@@ -498,23 +345,16 @@ export default {
           console.log('Imagen a guardar:', fileName, 'en /public/icons/')
         }
 
-        // Filtrar servicios y características vacíos
-        const cleanedServices = form.value.services.filter(s => s.trim() !== '')
-        const cleanedFeatures = form.value.features.filter(f => f.trim() !== '')
-
         const updatedBranch = {
-          ...props.branchData,
-          name: form.value.name,
-          location: form.value.location,
-          address: form.value.address,
-          phone: form.value.phone,
-          email: form.value.email,
-          image: imagePath,
-          schedule: form.value.schedule,
-          services: cleanedServices,
-          coordinates: form.value.coordinates,
-          mapUrl: form.value.mapUrl,
-          features: cleanedFeatures
+          id: form.value.id,
+          nombre: form.value.nombre,
+          ubicacion: form.value.ubicacion,
+          direccion: form.value.direccion,
+          descripcion: form.value.descripcion,
+          imagen: imagePath,
+          latitud: parseFloat(form.value.latitud) || 0,
+          longitud: parseFloat(form.value.longitud) || 0,
+          activo: form.value.activo
         }
 
         emit('branch-updated', updatedBranch)
@@ -541,21 +381,14 @@ export default {
     return {
       showDialog,
       form,
-      dayTranslations,
       loading,
       newImageFile,
       imagePreview,
       closeDialog,
       saveBranch,
       handleImageSelect,
-      removeCurrentImage,
-      addService,
-      removeService,
-      addFeature,
-      removeFeature
+      removeCurrentImage
     }
   }
 }
 </script>
-
-<!-- Los estilos están en app.scss global -->

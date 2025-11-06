@@ -1,12 +1,15 @@
 <template>
   <q-dialog v-model="showDialog" persistent maximized>
     <q-card class="branch-detail-card">
+
+      <!-- 🟦 ENCABEZADO -->
       <q-card-section class="dialog-header">
         <div class="header-content">
           <div class="header-title">
             <i class="fa-solid fa-building"></i>
             <span>Detalles de la Sucursal</span>
           </div>
+
           <q-btn
             flat
             round
@@ -20,16 +23,19 @@
 
       <q-separator />
 
+      <!-- 🟩 CONTENIDO PRINCIPAL -->
       <q-card-section class="detail-content-scroll">
         <div class="branch-detail-container">
-          <!-- Left Column: Image and Basic Info -->
+
+          <!-- 🧩 COLUMNA IZQUIERDA -->
           <div class="detail-left-column">
-            <!-- Branch Image -->
+
+            <!-- 📷 Imagen de la Sucursal -->
             <div class="detail-image-container">
               <img
-                v-if="branchData?.image"
-                :src="branchData.image"
-                :alt="branchData.name"
+                v-if="branchData?.imagen"
+                :src="branchData.imagen"
+                :alt="branchData.nombre"
                 class="detail-image"
                 @error="handleImageError"
               />
@@ -38,121 +44,99 @@
               </div>
             </div>
 
-            <!-- Basic Info Card -->
+            <!-- 🏢 Información General -->
             <div class="info-card">
-              <h2 class="branch-detail-name">{{ branchData?.name || 'Sin nombre' }}</h2>
-              
+              <h2 class="branch-detail-name">
+                {{ branchData?.nombre || 'Sin nombre' }}
+              </h2>
+
+              <!-- Ubicación -->
               <div class="detail-info-item">
                 <i class="fa-solid fa-location-dot"></i>
                 <div>
                   <div class="info-label">Ubicación</div>
-                  <div class="info-value">{{ branchData?.location || 'N/A' }}</div>
+                  <div class="info-value">
+                    {{ branchData?.ubicacion || 'N/A' }}
+                  </div>
                 </div>
               </div>
 
+              <!-- Dirección -->
               <div class="detail-info-item">
                 <i class="fa-solid fa-map-marker-alt"></i>
                 <div>
                   <div class="info-label">Dirección</div>
-                  <div class="info-value">{{ branchData?.address || 'N/A' }}</div>
+                  <div class="info-value">
+                    {{ branchData?.direccion || 'N/A' }}
+                  </div>
                 </div>
               </div>
 
-              <div class="detail-info-row">
-                <div class="detail-info-item">
-                  <i class="fa-solid fa-phone"></i>
-                  <div>
-                    <div class="info-label">Teléfono</div>
-                    <div class="info-value">{{ branchData?.phone || 'N/A' }}</div>
+              <!-- Descripción -->
+              <div class="detail-info-item">
+                <i class="fa-solid fa-circle-info"></i>
+                <div>
+                  <div class="info-label">Descripción</div>
+                  <div class="info-value text-justify">
+                    {{ branchData?.descripcion || 'Sin descripción' }}
                   </div>
                 </div>
+              </div>
 
-                <div class="detail-info-item">
-                  <i class="fa-solid fa-envelope"></i>
-                  <div>
-                    <div class="info-label">Email</div>
-                    <div class="info-value">{{ branchData?.email || 'N/A' }}</div>
+              <!-- Estado -->
+              <div class="detail-info-item">
+                <i class="fa-solid fa-toggle-on"></i>
+                <div>
+                  <div class="info-label">Estado</div>
+                  <div class="info-value">
+                    <q-chip
+                      :color="branchData?.activo ? 'green' : 'red'"
+                      text-color="white"
+                      dense
+                    >
+                      {{ branchData?.activo ? 'Activo' : 'Inactivo' }}
+                    </q-chip>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Features Card -->
+            <!-- 📍 Coordenadas -->
             <div class="info-card">
               <div class="card-title">
-                <i class="fa-solid fa-star"></i>
-                <span>Características</span>
+                <i class="fa-solid fa-location-crosshairs"></i>
+                <span>Coordenadas</span>
               </div>
-              <div class="features-list">
-                <div
-                  v-for="(feature, index) in (branchData?.features || [])"
-                  :key="index"
-                  class="feature-item"
-                >
-                  <i class="fa-solid fa-check-circle"></i>
-                  <span>{{ feature }}</span>
+
+              <div class="detail-info-item">
+                <div class="info-label">Latitud</div>
+                <div class="info-value">
+                  {{ branchData?.latitud || 'N/A' }}
                 </div>
-                <div v-if="!branchData?.features || branchData.features.length === 0" class="no-data">
-                  No hay características registradas
+              </div>
+
+              <div class="detail-info-item">
+                <div class="info-label">Longitud</div>
+                <div class="info-value">
+                  {{ branchData?.longitud || 'N/A' }}
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Right Column: Schedule, Services and Map -->
+          <!-- 🧭 COLUMNA DERECHA -->
           <div class="detail-right-column">
-            <!-- Schedule Card -->
-            <div class="info-card">
-              <div class="card-title">
-                <i class="fa-solid fa-clock"></i>
-                <span>Horario de Atención</span>
-              </div>
-              <div class="schedule-grid">
-                <div
-                  v-for="(day, key) in dayTranslations"
-                  :key="key"
-                  class="schedule-item"
-                  :class="{ 'schedule-closed': branchData?.schedule?.[key] === 'Cerrado' }"
-                >
-                  <div class="schedule-day">{{ day }}</div>
-                  <div class="schedule-time">{{ branchData?.schedule?.[key] || 'N/A' }}</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Services Card -->
-            <div class="info-card">
-              <div class="card-title">
-                <i class="fa-solid fa-hand-holding-medical"></i>
-                <span>Servicios Ofrecidos</span>
-              </div>
-              <div class="services-grid">
-                <q-chip
-                  v-for="(service, index) in (branchData?.services || [])"
-                  :key="index"
-                  color="primary"
-                  text-color="white"
-                  icon="fa-solid fa-tooth"
-                  class="service-chip-large"
-                >
-                  {{ service }}
-                </q-chip>
-                <div v-if="!branchData?.services || branchData.services.length === 0" class="no-data">
-                  No hay servicios registrados
-                </div>
-              </div>
-            </div>
-
-            <!-- Map Card -->
+            <!-- 🗺️ Mapa -->
             <div class="info-card map-card">
               <div class="card-title">
                 <i class="fa-solid fa-map"></i>
                 <span>Ubicación en el Mapa</span>
               </div>
+
               <div class="map-container">
                 <iframe
-                  v-if="branchData?.mapUrl"
-                  :src="branchData.mapUrl"
+                  v-if="branchData?.latitud && branchData?.longitud"
+                  :src="`https://www.google.com/maps?q=${branchData.latitud},${branchData.longitud}&hl=es&z=15&output=embed`"
                   width="100%"
                   height="100%"
                   style="border:0;"
@@ -160,14 +144,11 @@
                   loading="lazy"
                   referrerpolicy="no-referrer-when-downgrade"
                 ></iframe>
+
                 <div v-else class="map-placeholder">
                   <i class="fa-solid fa-map-location-dot"></i>
                   <p>Mapa no disponible</p>
                 </div>
-              </div>
-              <div v-if="branchData?.coordinates" class="coordinates-info">
-                <i class="fa-solid fa-location-crosshairs"></i>
-                <span>Lat: {{ branchData.coordinates.lat }}, Lng: {{ branchData.coordinates.lng }}</span>
               </div>
             </div>
           </div>
@@ -176,6 +157,7 @@
 
       <q-separator />
 
+      <!-- 🟨 ACCIONES -->
       <q-card-actions class="dialog-actions">
         <q-btn
           flat
@@ -200,7 +182,7 @@
 </template>
 
 <script>
-import { computed} from 'vue'
+import { computed } from 'vue'
 
 export default {
   name: 'DetailBranchDialog',
@@ -221,16 +203,6 @@ export default {
       set: (value) => emit('update:modelValue', value)
     })
 
-    const dayTranslations = {
-      monday: 'Lunes',
-      tuesday: 'Martes',
-      wednesday: 'Miércoles',
-      thursday: 'Jueves',
-      friday: 'Viernes',
-      saturday: 'Sábado',
-      sunday: 'Domingo'
-    }
-
     const handleImageError = (event) => {
       event.target.style.display = 'none'
     }
@@ -242,12 +214,9 @@ export default {
 
     return {
       showDialog,
-      dayTranslations,
       handleImageError,
       editBranch
     }
   }
 }
 </script>
-
-<!-- Los estilos están en app.scss global -->
