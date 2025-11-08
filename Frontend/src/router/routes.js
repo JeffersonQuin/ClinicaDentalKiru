@@ -9,7 +9,7 @@ import DashboardLayout from 'layouts/DashboardLayout.vue'
 export const rolePermissions = {
   DENTIST: ['dashboard', 'patients', 'reserves', 'calendar', 'odontogram', 'quotes', 'historyQuotes'],
   CLIENT: ['dashboard', 'reserves', 'quotes', 'historyQuotes'],
-  ADMIN: ['dashboard', 'users', 'dentist', 'specialties', 'publications', 'branches', 'patients', 'reserves', 'quotes', 'historyQuotes', 'calendar', 'odontogram']
+  ADMIN: ['dashboard', 'users', 'dentist', 'specialties', 'announcements', 'branches', 'patients', 'reserves', 'quotes', 'historyQuotes', 'calendar', 'odontogram']
 }
 
 /**
@@ -31,7 +31,7 @@ export const dashboardMenuConfig = {
         { title: 'Usuarios', icon: 'people', to: '/users', permission: 'users' },
         { title: 'Dentistas', icon: 'medical_services', to: '/dentist', permission: 'dentist' },
         { title: 'Especialidades', icon: 'school', to: '/specialties', permission: 'specialties' },
-        { title: 'Publicaciones', icon: 'article', to: '/publications', permission: 'publications' },
+        { title: 'Anuncios', icon: 'article', to: '/announcement', permission: 'announcements' },
         { title: 'Sucursales', icon: 'business', to: '/branches', permission: 'branches' }
       ]
     },
@@ -243,13 +243,13 @@ const routes = [
         }
       },
       {
-        path: '/publications',
-        name: 'Publications',
-        component: () => import('pages/Publication/PublicationsPage.vue'),
+        path: '/Announcement',
+        name: 'Announcements',
+        component: () => import('pages/Announcement/AnnouncementPage.vue'),
         meta: { 
           requiresAuth: true,
           roles: ['ADMIN'],
-          title: 'Publicaciones'
+          title: 'Anuncios'
         }
       },
       {

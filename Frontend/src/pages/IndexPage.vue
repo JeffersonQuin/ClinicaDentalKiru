@@ -57,21 +57,81 @@
     <section class="anuncios-section q-pa-xl">
       <q-container>
         <div class="text-center q-mb-xl animated fadeIn">
-          <h2 class="text-h3 text-weight-bold">Anuncios</h2>
-          <p class="text-h6 text-grey-7">Descubre nuestras promociones especiales</p>
+          <h2 class="text-h3 text-weight-bold">Anuncios y Promociones</h2>
+          <p class="text-h6 text-grey-7">Descubre nuestras ofertas especiales y eventos</p>
         </div>
         
-        <div class="row q-col-gutter-lg">
+        <!-- Loading State -->
+        <div v-if="anuncioStore.filteredRows.length === 0" class="text-center q-pa-xl">
+          <q-icon name="campaign" color="grey-5" size="80px" />
+          <div class="text-h5 q-mt-md text-grey-7">No hay anuncios disponibles</div>
+          <p class="text-grey-6">Próximamente tendremos nuevas promociones para ti.</p>
+        </div>
+        
+        <!-- Anuncios Grid -->
+        <div v-else class="row q-col-gutter-lg">
           <div 
-            v-for="(ad, index) in ads" 
-            :key="ad.id"
+            v-for="(anuncio, index) in anunciosActivos" 
+            :key="anuncio.id"
             class="col-12 col-md-4 animated fadeInUp"
             :style="{ animationDelay: `${index * 0.1}s` }"
           >
-            <AdCard 
-              :ad="ad"
-              @click="openAdDetail(ad)"
-            />
+            <q-card class="anuncio-card" flat bordered @click="openAnuncioDetail(anuncio)">
+              <div class="anuncio-image-container">
+                <q-img 
+                  :src="anuncio.imagen || '/default-ad.jpg'" 
+                  :alt="anuncio.titulo" 
+                  class="anuncio-image"
+                  @error="anuncioStore.handleImageError"
+                  ratio="1"
+                />
+                <div class="anuncio-overlay">
+                  <q-icon name="visibility" color="white" size="2em" />
+                </div>
+                <div class="anuncio-categoria">
+                  <q-chip 
+                    color="primary" 
+                    text-color="white" 
+                    size="sm"
+                    class="categoria-chip"
+                  >
+                    {{ anuncio.categoria }}
+                  </q-chip>
+                </div>
+              </div>
+              
+              <q-card-section class="anuncio-content">
+                <div class="text-h6 text-weight-bold q-mb-sm anuncio-title">
+                  {{ anuncio.titulo }}
+                </div>
+                
+                <div class="anuncio-descripcion q-mb-md">
+                  <p class="text-caption text-grey-7">
+                    {{ truncateDescription(anuncio.descripcion) }}
+                  </p>
+                </div>
+                
+                <div class="anuncio-fechas q-mb-sm">
+                  <div class="fecha-info">
+                    <q-icon name="event" color="primary" size="14px" class="q-mr-xs" />
+                    <span class="text-caption">Válido hasta: {{ anuncioStore.formatDate(anuncio.fecha_expiracion) }}</span>
+                  </div>
+                </div>
+              </q-card-section>
+              
+              <q-separator />
+              
+              <q-card-actions align="right" class="anuncio-actions">
+                <q-btn 
+                  flat 
+                  label="Ver Detalles" 
+                  color="primary" 
+                  icon-right="arrow_forward"
+                  no-caps
+                  class="details-btn"
+                />
+              </q-card-actions>
+            </q-card>
           </div>
         </div>
       </q-container>
@@ -120,12 +180,13 @@
     />
 
     <!-- Dialog de detalle del anuncio -->
-    <q-dialog v-model="adDialog" maximized transition-show="slide-up" transition-hide="slide-down">
-      <q-card v-if="selectedAd" class="dialog-container">
-        <q-card-section class="dialog-header">
+    <q-dialog v-model="anuncioDialog" maximized transition-show="slide-up" transition-hide="slide-down">
+      <q-card v-if="selectedAnuncio" class="dialog-container">
+        <q-card-section class="dialog-header bg-primary text-white">
           <div class="row items-center">
             <div class="col">
-              <div class="text-h6">{{ selectedAd.title }}</div>
+              <div class="text-h6">{{ selectedAnuncio.titulo }}</div>
+              <div class="text-caption">{{ selectedAnuncio.categoria }}</div>
             </div>
             <div class="col-auto">
               <q-btn icon="close" flat round dense v-close-popup color="white" />
@@ -133,33 +194,80 @@
           </div>
         </q-card-section>
         
-        <q-card-section class="dialog-content">
+        <q-card-section class="dialog-content q-pt-lg">
           <div class="row q-col-gutter-xl">
             <div class="col-12 col-md-6">
               <q-img
-                :src="selectedAd.image"
-                :alt="selectedAd.title"
-                class="rounded-borders"
+                :src="selectedAnuncio.imagen || '/default-ad.jpg'"
+                :alt="selectedAnuncio.titulo"
+                class="rounded-borders anuncio-detail-image"
+                @error="anuncioStore.handleImageError"
               />
+              
+              <!-- Información adicional -->
+              <div class="anuncio-meta q-mt-md">
+                <q-list bordered class="rounded-borders">
+                  <q-item>
+                    <q-item-section avatar>
+                      <q-icon name="event_available" color="green" />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label caption>Publicado</q-item-label>
+                      <q-item-label>{{ anuncioStore.formatDate(selectedAnuncio.fecha_publicacion) }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                  
+                  <q-item>
+                    <q-item-section avatar>
+                      <q-icon name="event_busy" color="red" />
+                    </q-item-section>
+                    <q-item-section>
+                      <q-item-label caption>Válido hasta</q-item-label>
+                      <q-item-label>{{ anuncioStore.formatDate(selectedAnuncio.fecha_expiracion) }}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </div>
             </div>
             
             <div class="col-12 col-md-6">
-              <div class="text-h5 text-weight-bold q-mb-md">
-                {{ selectedAd.title }}
+              <div class="anuncio-detail-content">
+                <div class="text-h4 text-weight-bold q-mb-md">
+                  {{ selectedAnuncio.titulo }}
+                </div>
+                
+                <div class="categoria-badge q-mb-md">
+                  <q-chip color="primary" text-color="white" icon="local_offer">
+                    {{ selectedAnuncio.categoria }}
+                  </q-chip>
+                </div>
+                
+                <div class="descripcion-completa q-mb-lg">
+                  <h5 class="text-h6 text-weight-bold q-mb-sm">Descripción</h5>
+                  <p class="text-body1">{{ selectedAnuncio.descripcion }}</p>
+                </div>
+                
+                <div class="anuncio-detail-actions">
+                  <q-btn 
+                    color="primary" 
+                    label="Agendar Cita" 
+                    size="lg"
+                    icon="calendar_today"
+                    @click="openAppointmentDialogFromDetail"
+                    push
+                    no-caps
+                    class="q-mr-sm"
+                  />
+                  <q-btn 
+                    color="secondary" 
+                    label="Compartir" 
+                    size="lg"
+                    icon="share"
+                    outline
+                    no-caps
+                  />
+                </div>
               </div>
-              <p class="text-body1 q-mb-md">
-                {{ selectedAd.description }}
-              </p>
-              <q-btn 
-                color="primary" 
-                label="Agendar Cita" 
-                size="lg"
-                icon="calendar_today"
-                @click="openAppointmentDialog"
-                push
-                no-caps
-                class="primary-btn"
-              />
             </div>
           </div>
         </q-card-section>
@@ -169,23 +277,39 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useQuasar } from 'quasar'
-import AdCard from 'components/AdCard.vue'
+import { usePublicarAnuncio } from 'src/stores/publicarAnuncio'
 import AppointmentModal from 'components/AppointmentModal.vue'
-import anunciosData from 'src/data/anuncios.json'
 
 const $q = useQuasar()
+const anuncioStore = usePublicarAnuncio()
 
 // Datos reactivos
 const appointmentDialog = ref(false)
-const adDialog = ref(false)
-const selectedAd = ref(null)
-const ads = ref([])
+const anuncioDialog = ref(false)
+const selectedAnuncio = ref(null)
 
-// Cargar datos del JSON al montar el componente
+// Computed properties
+const anunciosActivos = computed(() => {
+  // Filtrar solo anuncios activos y que no hayan expirado
+  return anuncioStore.filteredRows.filter(anuncio => {
+    if (anuncio.estado !== 'activo') return false
+    
+    // Verificar si la fecha de expiración ha pasado
+    if (anuncio.fecha_expiracion) {
+      const hoy = new Date()
+      const expiracion = new Date(anuncio.fecha_expiracion)
+      return expiracion >= hoy
+    }
+    
+    return true
+  })
+})
+
+// Cargar datos del store al montar el componente
 onMounted(() => {
-  ads.value = anunciosData.anuncios
+  anuncioStore.initialize()
 })
 
 // Métodos
@@ -193,9 +317,21 @@ const openAppointmentDialog = () => {
   appointmentDialog.value = true
 }
 
-const openAdDetail = (ad) => {
-  selectedAd.value = ad
-  adDialog.value = true
+const openAnuncioDetail = (anuncio) => {
+  selectedAnuncio.value = anuncio
+  anuncioDialog.value = true
+}
+
+const openAppointmentDialogFromDetail = () => {
+  anuncioDialog.value = false
+  appointmentDialog.value = true
+}
+
+const truncateDescription = (description) => {
+  if (!description) return ''
+  return description.length > 100 
+    ? description.substring(0, 100) + '...' 
+    : description
 }
 
 // Funciones para manejar eventos del modal de citas
@@ -220,4 +356,3 @@ const onAppointmentCancel = () => {
 }
 </script>
 
-<!-- Los estilos están en app.scss global -->
