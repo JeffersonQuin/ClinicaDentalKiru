@@ -21,44 +21,108 @@
         />
       </div>
     </div>
+
+    <!-- Estadísticas -->
     <div class="stats-section">
       <div class="stat-card">
         <div class="stat-icon-container total">
           <i class="fa-solid fa-users"></i>
         </div>
         <div class="stat-content">
-          <div class="stat-value">{{ filteredRows.length }}</div>
+          <div class="stat-value">{{ store.totalPacientes }}</div>
           <div class="stat-label">Total de Pacientes</div>
         </div>
       </div>
+      <div class="stat-card">
+        <div class="stat-icon-container alert">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ store.pacientesConAlertas }}</div>
+          <div class="stat-label">Con Alertas Clínicas</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon-container city">
+          <i class="fa-solid fa-map-marker-alt"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ store.ciudadesUnicas }}</div>
+          <div class="stat-label">Ciudades Diferentes</div>
+        </div>
+      </div>
     </div>
+
+    <!-- Búsqueda y Filtros -->
     <div class="search-section">
-      <q-input
-        v-model="search"
-        class="search-input"
-        outlined
-        type="search"
-        placeholder="Buscar por nombre, CI o Gmail..."
-        @input="filterRows"
-        clearable
-        dense
-      >
-        <template v-slot:prepend>
-          <i class="fa-solid fa-search"></i>
-        </template>
-      </q-input>
+      <div class="search-filters">
+        <q-input
+          v-model="store.searchQuery"
+          class="search-input"
+          outlined
+          type="search"
+          placeholder="Buscar por nombre, CI, email, ciudad, profesión..."
+          @update:model-value="store.establecerBusqueda"
+          clearable
+          dense
+        >
+          <template v-slot:prepend>
+            <i class="fa-solid fa-search"></i>
+          </template>
+        </q-input>
+        
+        <q-select
+          v-model="store.cityFilter"
+          :options="store.opcionesCiudad"
+          label="Filtrar por ciudad"
+          outlined
+          dense
+          clearable
+          class="filter-select"
+          @update:model-value="store.establecerFiltroCiudad"
+        />
+        
+        <q-select
+          v-model="store.alertFilter"
+          :options="store.opcionesAlerta"
+          label="Filtrar por alertas"
+          outlined
+          dense
+          clearable
+          class="filter-select"
+          @update:model-value="store.establecerFiltroAlerta"
+        />
+      </div>
     </div>
+
+    <!-- Tabla de Pacientes -->
     <div class="table-container">
       <q-table
         class="data-table"
         flat
-        :rows="filteredRows"
+        :rows="store.pacientesFiltrados"
         :columns="columns"
         row-key="id"
-        :rows-per-page-options="[5, 10, 15, 20, 0]"
-        :pagination="{ rowsPerPage: 5 }"
+        :rows-per-page-options="[5, 10, 15, 20]"
+        :pagination="{ rowsPerPage: 10 }"
         separator="cell"
       >
+        <template v-slot:top>
+          <div class="table-header">
+            <span class="table-title">Lista de Pacientes</span>
+            <div class="table-actions">
+              <q-btn
+                flat
+                icon="fa-solid fa-download"
+                label="Exportar"
+                color="primary"
+                no-caps
+                size="sm"
+              />
+            </div>
+          </div>
+        </template>
+
         <template v-slot:no-data>
           <div class="no-data-container">
             <i class="fa-solid fa-users-slash no-data-icon"></i>
@@ -66,32 +130,82 @@
             <p class="no-data-subtext">Intenta ajustar los filtros de búsqueda</p>
           </div>
         </template>
-        <template v-slot:body-cell-nombre="props">
+        
+        <!-- Columna: Paciente -->
+        <template v-slot:body-cell-paciente="props">
           <q-td :props="props">
-            <span>{{ props.row.nombre }}</span>
+            <div class="patient-info">
+              <div class="patient-name">
+                <strong>{{ props.row.nombre }} {{ props.row.apellidoPaterno }} {{ props.row.apellidoMaterno }}</strong>
+              </div>
+              <div class="patient-details">
+                <span class="patient-age">{{ store.calcularEdad(props.row.fechaNacimiento) }} años</span>
+                <span class="patient-profession">• {{ props.row.profesion }}</span>
+              </div>
+            </div>
           </q-td>
         </template>
-        <template v-slot:body-cell-apellidoPaterno="props">
+        
+        <!-- Columna: Contacto -->
+        <template v-slot:body-cell-contacto="props">
           <q-td :props="props">
-            <span>{{ props.row.apellidoPaterno }}</span>
+            <div class="contact-info">
+              <div class="contact-email">
+                <i class="fa-solid fa-envelope"></i>
+                {{ props.row.gmail }}
+              </div>
+              <div class="contact-phone">
+                <i class="fa-solid fa-phone"></i>
+                {{ props.row.telefono }}
+              </div>
+            </div>
           </q-td>
         </template>
-        <template v-slot:body-cell-apellidoMaterno="props">
+        
+        <!-- Columna: Ubicación -->
+        <template v-slot:body-cell-ubicacion="props">
           <q-td :props="props">
-            <span>{{ props.row.apellidoMaterno }}</span>
+            <div class="location-info">
+              <div class="city-badge">
+                <i class="fa-solid fa-map-marker-alt"></i>
+                {{ props.row.ciudad }}
+              </div>
+              <div class="patient-address">
+                {{ props.row.domicilio }}
+              </div>
+            </div>
           </q-td>
         </template>
-        <template v-slot:body-cell-ci="props">
+        
+        <!-- Columna: Consulta -->
+        <template v-slot:body-cell-consulta="props">
           <q-td :props="props">
-            <span>{{ props.row.ci }}</span>
+            <div class="consultation-info">
+              <div class="consultation-reason">
+                <strong>{{ props.row.motivoConsulta }}</strong>
+              </div>
+              <div class="consultation-date">
+                Última visita: {{ store.formatearFecha(props.row.ultimaVisitaOdontologo) }}
+              </div>
+            </div>
           </q-td>
         </template>
-        <template v-slot:body-cell-gmail="props">
+        
+        <!-- Columna: Alertas -->
+        <template v-slot:body-cell-alertas="props">
           <q-td :props="props">
-            <span>{{ props.row.gmail }}</span>
+            <div v-if="props.row.alertasClinicas" class="alert-indicator">
+              <q-icon name="fa-solid fa-triangle-exclamation" color="negative" />
+              <div class="alert-tooltip">
+                {{ props.row.alertasClinicas }}
+              </div>
+            </div>
+            <span v-else class="no-alert">-</span>
           </q-td>
         </template>
-        <template v-slot:body-cell-actions="props">
+
+        <!-- Columna: Acciones -->
+        <template v-slot:body-cell-acciones="props">
           <q-td :props="props">
             <div class="action-buttons">
               <q-btn
@@ -104,7 +218,7 @@
                 @click="viewPatient(props.row)"
                 color="grey-8"
               >
-                <q-tooltip>Ver detalles</q-tooltip>
+                <q-tooltip>Ver detalles completos</q-tooltip>
               </q-btn>
               <q-btn
                 class="action-btn recipe-btn"
@@ -116,7 +230,7 @@
                 @click="openRecipeDialog(props.row)"
                 color="secondary"
               >
-                <q-tooltip>Recetar</q-tooltip>
+                <q-tooltip>Recetar medicamentos</q-tooltip>
               </q-btn>
               <q-btn
                 class="action-btn edit-btn"
@@ -128,7 +242,7 @@
                 @click="editPatient(props.row)"
                 color="primary"
               >
-                <q-tooltip>Editar paciente</q-tooltip>
+                <q-tooltip>Editar información</q-tooltip>
               </q-btn>
               <q-btn
                 class="action-btn delete-btn"
@@ -147,23 +261,27 @@
         </template>
       </q-table>
     </div>
+
+    <!-- Diálogos -->
     <NewPatientDialog
       v-model="showNewPatientDialog"
       @patient-created="handlePatientCreate"
     />
     <EditPatientDialog
       v-model="showEditPatientDialog"
-      :patientData="selectedPatient"
+      :patientData="store.selectedPatient"
       @patient-updated="handlePatientUpdate"
     />
     <DetailPatientDialog
       v-model="showDetailPatientDialog"
-      :patientData="selectedPatient"
+      :patientData="store.selectedPatient"
     />
     <RecipePatientDialog
       v-model="showRecipeDialog"
-      :patientData="selectedPatient"
+      :patientData="store.selectedPatient"
     />
+
+    <!-- Diálogo de Confirmación de Eliminación -->
     <q-dialog v-model="showDeleteDialog" persistent>
       <q-card class="confirm-dialog">
         <q-card-section class="dialog-header">
@@ -174,10 +292,11 @@
         </q-card-section>
         <q-card-section class="q-pt-none">
           <p class="dialog-text">
-            ¿Está seguro que desea eliminar al paciente <strong>{{ selectedPatient?.nombre }}</strong>?
+            ¿Está seguro que desea eliminar al paciente 
+            <strong>{{ store.selectedPatient?.nombre }} {{ store.selectedPatient?.apellidoPaterno }}</strong>?
           </p>
           <p class="dialog-subtext">
-            Esta acción no se puede deshacer y el paciente perderá acceso al sistema.
+            Esta acción no se puede deshacer y se perderá toda la información del paciente.
           </p>
         </q-card-section>
         <q-card-actions class="dialog-actions">
@@ -205,9 +324,8 @@
 </template>
 
 <script>
-import { ref, onMounted, watch } from 'vue'
-import pacientes from 'src/data/pacientes.json'
-import Fuse from 'fuse.js'
+import { ref } from 'vue'
+import { usePacienteStore } from 'stores/pacienteStore'
 import NewPatientDialog from './NewPatientDialog.vue'
 import EditPatientDialog from './EditPatientDialog.vue'
 import DetailPatientDialog from './DetailPatientDialog.vue'
@@ -215,25 +333,11 @@ import RecipePatientDialog from './RecipePatientDialog.vue'
 
 const columns = [
   {
-    name: 'nombre',
+    name: 'paciente',
     required: true,
-    label: 'Nombre',
+    label: 'Paciente',
     align: 'left',
-    field: 'nombre',
-    sortable: true
-  },
-  {
-    name: 'apellidoPaterno',
-    label: 'Apellido Paterno',
-    align: 'left',
-    field: 'apellidoPaterno',
-    sortable: true
-  },
-  {
-    name: 'apellidoMaterno',
-    label: 'Apellido Materno',
-    align: 'left',
-    field: 'apellidoMaterno',
+    field: row => `${row.nombre} ${row.apellidoPaterno} ${row.apellidoMaterno}`,
     sortable: true
   },
   {
@@ -245,28 +349,43 @@ const columns = [
     style: 'width: 120px'
   },
   {
-    name: 'gmail',
-    label: 'Gmail',
+    name: 'contacto',
+    label: 'Contacto',
     align: 'left',
     field: 'gmail',
     sortable: true
   },
   {
-    name: 'actions',
+    name: 'ubicacion',
+    label: 'Ubicación',
+    align: 'left',
+    field: 'ciudad',
+    sortable: true
+  },
+  {
+    name: 'consulta',
+    label: 'Consulta',
+    align: 'left',
+    field: 'motivoConsulta',
+    sortable: true
+  },
+  {
+    name: 'alertas',
+    label: 'Alertas',
+    align: 'center',
+    field: 'alertasClinicas',
+    sortable: false,
+    style: 'width: 80px'
+  },
+  {
+    name: 'acciones',
     label: 'Acciones',
-    field: 'actions',
+    field: 'acciones',
     align: 'center',
     sortable: false,
-    style: 'width: 180px'
+    style: 'width: 200px'
   }
 ]
-
-const FUSE_OPTIONS = {
-  keys: ['nombre', 'apellidoPaterno', 'apellidoMaterno', 'ci', 'gmail'],
-  threshold: 0.3,
-  includeScore: true,
-  minMatchCharLength: 1
-}
 
 export default {
   name: 'PatientTable',
@@ -277,121 +396,72 @@ export default {
     RecipePatientDialog
   },
   setup() {
-    const search = ref('')
-    const rows = ref([])
-    const filteredRows = ref([])
-    const selectedPatient = ref(null)
+    const store = usePacienteStore()
+    
     const showNewPatientDialog = ref(false)
     const showDeleteDialog = ref(false)
     const showEditPatientDialog = ref(false)
     const showDetailPatientDialog = ref(false)
     const showRecipeDialog = ref(false)
-    let fuse = null
-
-    const loadPacientes = () => {
-      rows.value = pacientes.pacientes.map(p => ({
-        ...p,
-        id: Number(p.id)
-      }))
-      filteredRows.value = rows.value.filter(p => p.state !== 'deleted')
-      fuse = new Fuse(filteredRows.value, FUSE_OPTIONS)
-    }
-
-    const rebuildFuse = () => {
-      const collection = rows.value.filter(p => p.state !== 'deleted')
-      if (fuse && typeof fuse.setCollection === 'function') {
-        fuse.setCollection(collection)
-      } else {
-        fuse = new Fuse(collection, FUSE_OPTIONS)
-      }
-    }
-
-    const filterRows = () => {
-      if (!search.value?.trim()) {
-        filteredRows.value = rows.value.filter(p => p.state !== 'deleted')
-        return
-      }
-      const results = fuse.search(search.value.trim())
-      filteredRows.value = results.map(result => result.item)
-    }
-
-    const handlePatientCreate = (newPaciente) => {
-      const pacienteToAdd = {
-        ...newPaciente,
-        id: null
-      }
-      const numericIds = rows.value.map(u => Number(u.id)).filter(n => !Number.isNaN(n))
-      const maxId = numericIds.length ? Math.max(...numericIds) : 0
-      pacienteToAdd.id = maxId + 1
-      rows.value.push(pacienteToAdd)
-      rebuildFuse()
-      filterRows()
-    }
-
-    const deletePatient = () => {
-      const index = rows.value.findIndex(u => Number(u.id) === Number(selectedPatient.value.id))
-      if (index > -1) {
-        rows.value[index].state = 'deleted'
-        rebuildFuse()
-        filterRows()
-      }
-    }
 
     const viewPatient = (patient) => {
-      selectedPatient.value = { ...patient }
+      store.seleccionarPaciente(patient)
       showDetailPatientDialog.value = true
     }
+
     const editPatient = (patient) => {
-      selectedPatient.value = { ...patient }
+      store.seleccionarPaciente(patient)
       showEditPatientDialog.value = true
     }
+
     const openRecipeDialog = (patient) => {
-      selectedPatient.value = { ...patient }
+      store.seleccionarPaciente(patient)
       showRecipeDialog.value = true
     }
-    const handlePatientUpdate = (updatedPatient) => {
-      const index = rows.value.findIndex(u => Number(u.id) === Number(updatedPatient.id))
-      if (index > -1) {
-        rows.value[index] = { ...updatedPatient }
-        rebuildFuse()
-        filterRows()
-      }
-    }
+
     const openNewPatientDialog = () => {
       showNewPatientDialog.value = true
     }
+
     const confirmDeletePatient = (patient) => {
-      selectedPatient.value = { ...patient }
+      store.seleccionarPaciente(patient)
       showDeleteDialog.value = true
     }
 
-    onMounted(() => {
-      loadPacientes()
-    })
-    watch(search, () => {
-      filterRows()
-    })
+    const handlePatientCreate = async (newPatient) => {
+      await store.agregarPaciente(newPatient)
+      showNewPatientDialog.value = false
+    }
+
+    const handlePatientUpdate = async (updatedPatient) => {
+      await store.actualizarPaciente(updatedPatient)
+      showEditPatientDialog.value = false
+    }
+
+    const deletePatient = () => {
+      if (store.selectedPatient) {
+        store.eliminarPaciente(store.selectedPatient.id)
+        showDeleteDialog.value = false
+        store.limpiarPacienteSeleccionado()
+      }
+    }
 
     return {
-      search,
+      store,
       columns,
-      rows,
-      filteredRows,
-      selectedPatient,
       showNewPatientDialog,
       showDeleteDialog,
       showEditPatientDialog,
       showDetailPatientDialog,
       showRecipeDialog,
-      filterRows,
-      handlePatientCreate,
-      deletePatient,
       viewPatient,
       editPatient,
       openRecipeDialog,
-      handlePatientUpdate,
       openNewPatientDialog,
-      confirmDeletePatient
+      confirmDeletePatient,
+      handlePatientCreate,
+      handlePatientUpdate,
+      deletePatient
     }
   }
 }

@@ -107,7 +107,7 @@
             >
               <div class="card-image-container">
                 <q-img 
-                  :src="speciality.image || 'https://cdn.quasar.dev/img/parallax2.jpg'"
+                  :src="speciality.image || 'https://i.pinimg.com/originals/ea/d5/5a/ead55a380087931b94a3968f54d8fbda.jpg'"
                   :ratio="4/3"
                   spinner-color="primary"
                   @error="handleImageError"
@@ -263,9 +263,8 @@
 </template>
 
 <script>
-import { ref, onMounted, watch, computed } from 'vue'
-import especialidades from 'src/data/especialidades.json'
-import Fuse from 'fuse.js'
+import { ref, onMounted, computed } from 'vue'
+import { useSpecialityStore } from 'src/stores/especialidadStore'
 import DetailSpecialityDialog from './DetailSpecialityDialog.vue'
 import EditSpecialityDialog from './EditSpecialityDialog.vue'
 import NewSpecialityDialog from './NewSpecialityDialog.vue'
@@ -278,103 +277,33 @@ export default {
     NewSpecialityDialog
   },
   setup() {
+    const store = useSpecialityStore()
+
     const search = ref('')
-    const specialities = ref([])
-    const filteredSpecialities = ref([])
-    const selectedSpeciality = ref(null)
     const showDetailDialog = ref(false)
     const showEditDialog = ref(false)
     const showNewDialog = ref(false)
     const showDeleteDialog = ref(false)
-    const currentPage = ref(0)
-    const itemsPerPage = 4
-    let fuse = null
+    const selectedSpeciality = ref(null)
 
-    const fuseOptions = {
-      keys: ['name', 'description'],
-      threshold: 0.3,
-      includeScore: true,
-      minMatchCharLength: 1
-    }
+    // Computed properties from store
+    const totalPages = computed(() => store.totalPages)
+    const currentPageSpecialities = computed(() => store.currentPageSpecialities)
+    const filteredSpecialities = computed(() => store.filteredSpecialities)
+    const visiblePages = computed(() => store.visiblePages)
+    const currentPage = computed(() => store.currentPage)
+    
+    // Store actions
+    const loadSpecialities = () => store.loadSpecialities()
+    const filterSpecialities = () => store.filterSpecialities(search.value)
+    const nextPage = () => store.nextPage()
+    const previousPage = () => store.previousPage()
+    const goToPage = (page) => store.goToPage(page)
 
-    const totalPages = computed(() => {
-      return Math.ceil(filteredSpecialities.value.length / itemsPerPage)
-    })
-
-    const currentPageSpecialities = computed(() => {
-      const start = currentPage.value * itemsPerPage
-      const end = start + itemsPerPage
-      return filteredSpecialities.value.slice(start, end)
-    })
-
-    const visiblePages = computed(() => {
-      const total = totalPages.value
-      const current = currentPage.value
-      const pages = []
-      
-      if (total <= 7) {
-        for (let i = 0; i < total; i++) {
-          pages.push(i)
-        }
-      } else {
-        if (current <= 3) {
-          for (let i = 0; i < 5; i++) pages.push(i)
-          pages.push('...')
-          pages.push(total - 1)
-        } else if (current >= total - 4) {
-          pages.push(0)
-          pages.push('...')
-          for (let i = total - 5; i < total; i++) pages.push(i)
-        } else {
-          pages.push(0)
-          pages.push('...')
-          for (let i = current - 1; i <= current + 1; i++) pages.push(i)
-          pages.push('...')
-          pages.push(total - 1)
-        }
-      }
-      
-      return pages
-    })
-
-    const loadSpecialities = () => {
-      specialities.value = especialidades.especialidades || []
-      filteredSpecialities.value = specialities.value.filter(s => s.state !== 'deleted')
-      fuse = new Fuse(filteredSpecialities.value, fuseOptions)
-    }
-
-    const filterSpecialities = () => {
-      currentPage.value = 0
-      if (!search.value || search.value.trim() === '') {
-        filteredSpecialities.value = specialities.value.filter(s => s.state !== 'deleted')
-      } else {
-        const results = fuse.search(search.value.trim())
-        filteredSpecialities.value = results.map(result => result.item)
-      }
-    }
-
-    const nextPage = () => {
-      if (currentPage.value < totalPages.value - 1) {
-        currentPage.value++
-      }
-    }
-
-    const previousPage = () => {
-      if (currentPage.value > 0) {
-        currentPage.value--
-      }
-    }
-
-    const goToPage = (page) => {
-      if (page !== '...' && page >= 0 && page < totalPages.value) {
-        currentPage.value = page
-      }
-    }
-
+    // UI functions
     const truncateText = (text, maxLength) => {
       if (!text) return ''
-      if (text.length <= maxLength) return text
-      return text.substring(0, maxLength) + '...'
+      return text.length <= maxLength ? text : text.substring(0, maxLength) + '...'
     }
 
     const handleImageError = (event) => {
@@ -402,52 +331,35 @@ export default {
     }
 
     const deleteSpeciality = () => {
-      const index = specialities.value.findIndex(s => s.id === selectedSpeciality.value.id)
-      if (index > -1) {
-        specialities.value[index].state = 'deleted'
-        filterSpecialities()
+      if (selectedSpeciality.value) {
+        store.deleteSpeciality(selectedSpeciality.value.id)
       }
     }
 
     const handleSpecialityUpdate = (updatedSpeciality) => {
-      const index = specialities.value.findIndex(s => s.id === updatedSpeciality.id)
-      if (index > -1) {
-        specialities.value[index] = { ...updatedSpeciality }
-        filterSpecialities()
-      }
+      store.updateSpeciality(updatedSpeciality)
     }
 
     const handleSpecialityCreate = (newSpeciality) => {
-      const maxId = specialities.value.length > 0 
-        ? Math.max(...specialities.value.map(s => s.id)) 
-        : 0
-      newSpeciality.id = maxId + 1
-      newSpeciality.state = 'active'
-      specialities.value.push(newSpeciality)
-      filterSpecialities()
+      store.createSpeciality(newSpeciality)
     }
 
     onMounted(() => {
       loadSpecialities()
     })
 
-    watch(search, () => {
-      filterSpecialities()
-    })
-
     return {
       search,
-      specialities,
-      filteredSpecialities,
       selectedSpeciality,
       showDetailDialog,
       showEditDialog,
       showNewDialog,
       showDeleteDialog,
-      currentPage,
       totalPages,
       currentPageSpecialities,
+      filteredSpecialities,
       visiblePages,
+      currentPage,
       filterSpecialities,
       nextPage,
       previousPage,
@@ -466,6 +378,6 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-
+<style scoped>
+/* Agrega tus estilos aquí */
 </style>

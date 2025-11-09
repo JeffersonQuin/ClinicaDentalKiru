@@ -1,5 +1,5 @@
 <template>
-  <q-dialog  v-model="showDialog" persistent>
+  <q-dialog v-model="showDialog" persistent>
     <q-card class="detail-dialog">
       <q-card-section class="dialog-header">
         <div class="header-content">
@@ -21,19 +21,13 @@
       <q-separator />
 
       <q-card-section class="dialog-content">
-        <div class="speciality-image-section">
-          <div class="image-container">
-            <q-img
-              :src="specialityData?.image || 'https://cdn.quasar.dev/img/parallax2.jpg'"
-              :ratio="16/9"
-              spinner-color="primary"
-              class="speciality-image"
-              @error="handleImageError"
-            >
-              <div class="absolute-bottom image-overlay">
-                <div class="text-h5">{{ specialityData?.name }}</div>
-              </div>
-            </q-img>
+        <div class="speciality-header">
+          <div class="header-icon">
+            <i class="fa-solid fa-tooth"></i>
+          </div>
+          <div class="header-info">
+            <h3 class="speciality-name">{{ specialityData?.name }}</h3>
+            <p class="speciality-id">ID: {{ specialityData?.id ?? 'No disponible' }}</p>
           </div>
         </div>
         
@@ -64,20 +58,19 @@
             </div>
           </div>
 
-          <div class="detail-row" v-if="specialityData?.createdAt">
+          <div class="detail-row">
             <div class="detail-label">
-              <i class="fa-solid fa-calendar-plus"></i>
-              <span>Fecha de Creación</span>
+              <i class="fa-solid fa-circle-check"></i>
+              <span>Estado</span>
             </div>
-            <div class="detail-value">{{ formatDate(specialityData?.createdAt) }}</div>
-          </div>
-
-          <div class="detail-row" v-if="specialityData?.updatedAt">
-            <div class="detail-label">
-              <i class="fa-solid fa-clock"></i>
-              <span>Última Actualización</span>
+            <div class="detail-value">
+              <q-badge 
+                :color="specialityData?.state === 'active' ? 'positive' : 'negative'"
+                class="status-badge"
+              >
+                {{ specialityData?.state === 'active' ? 'Activa' : 'Inactiva' }}
+              </q-badge>
             </div>
-            <div class="detail-value">{{ formatDate(specialityData?.updatedAt) }}</div>
           </div>
         </div>
       </q-card-section>
@@ -104,7 +97,7 @@
 </template>
 
 <script>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 
 export default {
   name: 'DetailSpecialityDialog',
@@ -125,69 +118,16 @@ export default {
       set: (value) => emit('update:modelValue', value)
     })
 
-    const imageErrored = ref(false)
-
-    const handleImageError = (event) => {
-      imageErrored.value = true
-      event.target.src = 'https://cdn.quasar.dev/img/parallax2.jpg'
-    }
-
-    const formatDate = (dateString) => {
-      if (!dateString) return 'No disponible'
-      try {
-        const date = new Date(dateString)
-        return date.toLocaleDateString('es-ES', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        })
-      } catch (error) {
-        console.error(error)
-        return 'Fecha inválida'
-      }
-    }
-
     const editSpeciality = () => {
       emit('edit-speciality', props.specialityData)
       showDialog.value = false
-      imageErrored.value = false
     }
 
     return {
       showDialog,
-      imageErrored,
-      handleImageError,
-      formatDate,
       editSpeciality
     }
   }
 }
 </script>
 
-<style lang="scss" scoped>
-.speciality-image-section {
-  margin-bottom: 24px;
-}
-
-.image-container {
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.speciality-image {
-  width: 100%;
-}
-
-.image-overlay {
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
-  padding: 16px;
-}
-
-.description-text {
-  line-height: 1.6;
-  text-align: justify;
-}
-</style>
