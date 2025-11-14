@@ -54,9 +54,12 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { computed } from 'vue'
+<script setup>
+import { computed, watch } from 'vue'
 import { usePacientesStore } from 'src/stores/pacientes'
+
+// Definir el emit para el evento paciente-seleccionado
+const emit = defineEmits(['paciente-seleccionado'])
 
 const store = usePacientesStore()
 
@@ -64,6 +67,14 @@ const store = usePacientesStore()
 const searchTerm = computed(() => store.searchTerm)
 const sugerenciasPacientes = computed(() => store.sugerenciasPacientes)
 const pacienteSeleccionado = computed(() => store.pacienteSeleccionado)
+
+// Watch para emitir evento cuando se selecciona un paciente
+watch(pacienteSeleccionado, (nuevoPaciente) => {
+  if (nuevoPaciente) {
+    console.log('Paciente seleccionado en SearchPatien:', nuevoPaciente)
+    emit('paciente-seleccionado', nuevoPaciente)
+  }
+})
 
 // Métodos
 const actualizarBusqueda = (valor) => {
