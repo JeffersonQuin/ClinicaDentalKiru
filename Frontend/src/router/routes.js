@@ -9,7 +9,7 @@ import DashboardLayout from 'layouts/DashboardLayout.vue'
 export const rolePermissions = {
   DENTIST: ['dashboard', 'patients', 'reserves', 'calendar', 'odontogram', 'quotes', 'historyQuotes'],
   CLIENT: ['dashboard', 'reserves', 'quotes', 'historyQuotes'],
-  ADMIN: ['dashboard', 'users', 'dentist', 'specialties', 'announcements', 'branches', 'patients', 'reserves', 'quotes', 'historyQuotes', 'calendar', 'odontogram']
+  ADMIN: ['dashboard', 'users', 'dentist', 'specialties', 'announcements', 'branches', 'patients', 'reserves', 'quotes', 'historyQuotes', 'calendar', 'odontogram', 'statistics', 'purchase']
 }
 
 /**
@@ -64,6 +64,18 @@ export const dashboardMenuConfig = {
         { title: 'Historial', icon: 'history', to: '/HistoryQuotes', permission: 'historyQuotes' },
         { title: 'Odontograma', icon: 'emoji_emotions', to: '/Odontogram', permission: 'odontogram' }
       ]
+    },
+    {
+      title: 'Estadísticas',
+      icon: 'bar_chart',
+      to: '/Statistics',
+      permission: 'statistics'
+    },
+    {
+      title: 'Pagos',
+      icon: 'payment',
+      to: '/purchase',
+      permission: 'purchase'
     }
   ],
   DENTIST: [
@@ -351,7 +363,31 @@ const routes = [
           roles: ['DENTIST', 'ADMIN'],
           title: 'Odontograma'
         }
-      }
+      },
+
+      // PAGOS - CLIENT y ADMIN
+      {
+        path: '/purchase',
+        name: 'Purchase',
+        component: () => import('pages/Purchase/PurchasePage.vue'),
+        meta: { 
+          requiresAuth: true,
+          roles: ['CLIENT', 'ADMIN'],
+          title: 'Pagos'
+        }
+      },
+
+      // ESTADÍSTICAS - Solo ADMIN
+            {
+        path: '/Statistics',
+        name: 'Statistics',
+        component: () => import('pages/Stadistic/StadisticsPage.vue'),
+        meta: { 
+          requiresAuth: true,
+          roles: ['ADMIN'],
+          title: 'Estadísticas'
+        }
+      },
     ]
   },
 

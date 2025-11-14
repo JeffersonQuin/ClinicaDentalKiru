@@ -1,104 +1,214 @@
 <template>
-  <div class="calendar-page-container">
-    <div class="calendar-header">
-      <h1>Calendario de Cita:</h1>
-      <q-btn flat icon="fa-solid fa-arrow-right" label="Salir" class="exit-btn" @click="salir" />
-    </div>
-    <div class="calendar-controls">
-      <q-btn-group>
-        <q-btn flat label="&lt;&lt;" @click="prevDay" />
-        <q-btn flat label="&gt;&gt;" @click="nextDay" />
-      </q-btn-group>
-      <span class="calendar-title">{{ dayTitle }}</span>
-      <q-btn-group>
-        <q-btn flat label="Día" @click="goToDay" :color="view==='day' ? 'primary' : 'grey-8'" />
-        <q-btn flat label="Semana" @click="goToWeek" :color="view==='week' ? 'primary' : 'grey-8'" />
-        <q-btn flat label="Mes" @click="goToMonth" :color="view==='month' ? 'primary' : 'grey-8'" />
-      </q-btn-group>
-    </div>
-
-    <!-- 👇 INFO DE RESERVAS CARGADAS -->
-    <div class="reservas-info">
-      <q-banner class="bg-primary text-white">
-        <template v-slot:avatar>
-          <q-icon name="fa-solid fa-calendar-check" />
-        </template>
-        Mostrando {{ reservasCompletas.length }} reservas en el calendario
-      </q-banner>
-    </div>
-
-    <div class="calendar-grid day-grid">
-      <div class="calendar-row day-header">
-        <div class="calendar-cell hour-label">Hor</div>
-        <div class="calendar-cell day-label">{{ dayName }}</div>
+  <div class="page-container">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="header-content">
+        <div class="title-section">
+          <i class="fa-solid fa-calendar-day header-icon"></i>
+          <div>
+            <h1 class="page-title">Calendario Diario</h1>
+            <p class="page-subtitle">{{ dayTitle }}</p>
+          </div>
+        </div>
+        <q-btn
+          flat
+          icon="fa-solid fa-arrow-left"
+          label="Volver"
+          color="grey-8"
+          @click="salir"
+          no-caps
+          size="md"
+        />
       </div>
-      <div v-for="hour in hours" :key="hour" class="calendar-row">
-        <div class="calendar-cell hour-label">{{ hour }}</div>
-        <div
-          class="calendar-cell"
-          :class="{ 'bloqueado': estaHorarioBloqueado(currentDateStr, hour) }"
-          @dragover.prevent
-          @drop="onDrop(hour)"
-          @click="handleCellClick(hour)"
-        >
-          <div class="cell-events">
-            <template v-if="getEvents(hour).length">
-              <div
-                v-for="event in getEvents(hour)"
-                :key="event.id"
-                class="event-card"
-                draggable="true"
-                @dragstart="onDragStart(event, hour)"
-                @click.stop="showDetail(event)"
-                :title="event.type === 'cita' ? 'Cita' : 'Reserva'"
-              >
-                <span class="event-title">{{ event.title }}</span>
-                <span class="event-type">{{ event.type === 'cita' ? 'Cita' : 'Reserva' }}</span>
-                <span class="event-email" v-if="event.email">{{ event.email }}</span>
-              </div>
-            </template>
-            <template v-else>
-              <span 
-                class="libre-label"
-                :class="{ 'bloqueado-label': estaHorarioBloqueado(currentDateStr, hour) }"
-              >
-                {{ estaHorarioBloqueado(currentDateStr, hour) ? 'Bloqueado' : 'Libre' }}
-              </span>
-            </template>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="stats-section">
+      <div class="stat-card">
+        <div class="stat-icon-container total">
+          <i class="fa-solid fa-calendar-check"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ reservasCompletas.length }}</div>
+          <div class="stat-label">Reservas Totales</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon-container alert">
+          <i class="fa-solid fa-clock"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ getTodayEventsCount() }}</div>
+          <div class="stat-label">Eventos del Día</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon-container city">
+          <i class="fa-solid fa-calendar-alt"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ dayName }}</div>
+          <div class="stat-label">Día de la Semana</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navegación -->
+    <div class="search-section">
+      <div class="search-filters">
+        <q-btn-group outline>
+          <q-btn
+            outline
+            icon="fa-solid fa-chevron-left"
+            label="Anterior"
+            @click="prevDay"
+            color="primary"
+            no-caps
+          />
+          <q-btn
+            outline
+            icon="fa-solid fa-chevron-right"
+            label="Siguiente"
+            @click="nextDay"
+            color="primary"
+            no-caps
+          />
+        </q-btn-group>
+        
+        <q-btn-group outline>
+          <q-btn
+            outline
+            label="Día"
+            @click="goToDay"
+            :color="view==='day' ? 'primary' : 'grey-8'"
+            no-caps
+          />
+          <q-btn
+            outline
+            label="Semana"
+            @click="goToWeek"
+            :color="view==='week' ? 'primary' : 'grey-8'"
+            no-caps
+          />
+          <q-btn
+            outline
+            label="Mes"
+            @click="goToMonth"
+            :color="view==='month' ? 'primary' : 'grey-8'"
+            no-caps
+          />
+        </q-btn-group>
+      </div>
+    </div>
+
+    <!-- Calendario -->
+    <div class="table-container">
+      <div class="table-header">
+        <span class="table-title">Horario del Día</span>
+        <div class="table-actions">
+          <q-btn
+            flat
+            icon="fa-solid fa-info-circle"
+            color="primary"
+            no-caps
+            size="sm"
+          >
+            <q-tooltip>Click en celdas vacías para bloquear/desbloquear</q-tooltip>
+          </q-btn>
+        </div>
+      </div>
+      
+      <div class="calendar-grid day-grid">
+        <div class="calendar-row day-header">
+          <div class="calendar-cell hour-label"><strong>Hora</strong></div>
+          <div class="calendar-cell day-label"><strong>{{ dayName }}</strong></div>
+        </div>
+        
+        <div v-for="hour in hours" :key="hour" class="calendar-row">
+          <div class="calendar-cell hour-label">
+            {{ hour }}
+          </div>
+          <div
+            class="calendar-cell"
+            :class="{ 'bloqueado': estaHorarioBloqueado(currentDateStr, hour) }"
+            @dragover.prevent
+            @drop="onDrop(hour)"
+            @click="handleCellClick(hour)"
+          >
+            <div class="cell-events">
+              <template v-if="getEvents(hour).length">
+                <div
+                  v-for="event in getEvents(hour)"
+                  :key="event.id"
+                  class="event-card"
+                  draggable="true"
+                  @dragstart="onDragStart(event, hour)"
+                  @click.stop="showDetail(event)"
+                  :title="event.type === 'cita' ? 'Cita' : 'Reserva'"
+                >
+                  <span class="event-title">{{ event.title }}</span>
+                  <span class="event-type">{{ event.type === 'cita' ? 'Cita' : 'Reserva' }}</span>
+                  <span class="event-email" v-if="event.email">{{ event.email }}</span>
+                </div>
+              </template>
+              <template v-else>
+                <span 
+                  class="libre-label"
+                  :class="{ 'bloqueado-label': estaHorarioBloqueado(currentDateStr, hour) }"
+                >
+                  {{ estaHorarioBloqueado(currentDateStr, hour) ? 'Bloqueado' : 'Libre' }}
+                </span>
+              </template>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Modal de confirmación para mover evento -->
-    <q-dialog v-model="showConfirmDialog">
-      <q-card>
-        <q-card-section>
-          <div class="row items-center">
-            <i class="fa-solid fa-exclamation-triangle q-mr-sm" style="color:#e53935;font-size:2rem"></i>
-            <span class="text-h6">¿Seguro que quieres modificar la hora?</span>
+    <!-- Modal de confirmación -->
+    <q-dialog v-model="showConfirmDialog" persistent>
+      <q-card class="confirm-dialog">
+        <q-card-section class="dialog-header">
+          <div class="dialog-icon-container">
+            <i class="fa-solid fa-exclamation-triangle dialog-icon"></i>
           </div>
+          <h3 class="dialog-title">¿Seguro que quieres modificar la hora?</h3>
         </q-card-section>
-        <q-card-section>
-          <div>
+        <q-card-section class="q-pt-none">
+          <p class="dialog-text">
             <b>{{ confirmEvent?.title }}</b> será movido a las <b>{{ confirmToHour }}</b>.
-          </div>
+          </p>
         </q-card-section>
-        <q-card-actions align="right">
-          <q-btn flat label="Cancelar" v-close-popup />
-          <q-btn color="primary" label="Confirmar" @click="confirmMoveEvent" v-close-popup />
+        <q-card-actions class="dialog-actions">
+          <q-btn 
+            flat 
+            label="Cancelar" 
+            color="grey-7" 
+            v-close-popup 
+            no-caps
+            class="dialog-btn"
+          />
+          <q-btn 
+            unelevated
+            label="Confirmar" 
+            color="primary" 
+            @click="confirmMoveEvent"
+            v-close-popup 
+            no-caps
+            class="dialog-btn"
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>
 
-    <!-- Modal de detalle de evento -->
+    <!-- Modal de detalle -->
     <q-dialog v-model="showDetailDialog">
-      <q-card>
-        <q-card-section>
-          <div class="row items-center">
-            <i class="fa-solid fa-info-circle q-mr-sm" style="color:#1976d2;font-size:2rem"></i>
-            <span class="text-h6">Detalle {{ detailEvent?.type === 'cita' ? 'Cita' : 'Reserva' }}</span>
+      <q-card class="confirm-dialog">
+        <q-card-section class="dialog-header">
+          <div class="dialog-icon-container" :class="detailEvent?.type === 'cita' ? 'total' : 'alert'">
+            <i :class="detailEvent?.type === 'cita' ? 'fa-solid fa-user-doctor' : 'fa-solid fa-calendar-check'"></i>
           </div>
+          <h3 class="dialog-title">Detalle {{ detailEvent?.type === 'cita' ? 'Cita' : 'Reserva' }}</h3>
         </q-card-section>
         <q-card-section>
           <div v-if="detailEvent">
@@ -119,8 +229,15 @@
             <div><b>Tipo:</b> {{ detailEvent.type === 'cita' ? 'Cita' : 'Reserva' }}</div>
           </div>
         </q-card-section>
-        <q-card-actions align="right">
-          <q-btn flat label="Cerrar" v-close-popup />
+        <q-card-actions class="dialog-actions">
+          <q-btn 
+            flat 
+            label="Cerrar" 
+            color="primary" 
+            v-close-popup 
+            no-caps
+            class="dialog-btn"
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -151,16 +268,12 @@ export default {
     const showDetailDialog = ref(false)
     const detailEvent = ref(null)
 
-    // 👇 TODAS LAS RESERVAS - SIN FILTRAR POR USUARIO
     const reservasCompletas = computed(() => reserveStore.reservasCompletas || [])
-
-    // Genera todas las horas del día en formato HH:00
     const hours = Array.from({ length: 24 }, (_, i) => `${i.toString().padStart(2, '0')}:00`)
-
     const currentDateStr = computed(() => currentDate.value.toISOString().slice(0, 10))
 
     const dayName = computed(() => {
-      const days = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado']
+      const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
       return days[currentDate.value.getDay()]
     })
 
@@ -177,7 +290,6 @@ export default {
       const dateStr = currentDateStr.value
       const events = []
       
-      // 👇 Citas (mantienes igual)
       citasData.citas.forEach(cita => {
         if (cita.fecha === dateStr && cita.hora === hour) {
           events.push({
@@ -190,16 +302,14 @@ export default {
         }
       })
       
-      // 👇 TODAS LAS RESERVAS - SIN FILTRAR
       reservasCompletas.value.forEach(reserva => {
-        // 👇 IMPORTANTE: Verificar que la fecha coincida
         if (reserva.fechaReserva === dateStr && reserva.horaReserva === hour) {
           events.push({
             id: `reserva-${reserva.id}`,
             type: 'reserva',
             title: reserva.nombreCompleto,
             hour: reserva.horaReserva,
-            email: reserva.gmail, // 👈 Agregar email para identificar
+            email: reserva.gmail,
             servicio: reserva.servicio,
             sucursal: reserva.sucursal,
             dependiente: reserva.dependiente
@@ -220,27 +330,14 @@ export default {
       currentDate.value = new Date(currentDate.value)
     }
     
-    const setView = (v) => {
-      view.value = v
-    }
-    
     const salir = () => {
-      // Implementa la navegación según tu router
+      router.push({ name: 'home' })
     }
 
-    const goToDay = () => {
-      router.push('/Calendar-Day')
-    }
-    
-    const goToWeek = () => {
-      router.push('/Calendar-Week')
-    }
-    
-    const goToMonth = () => {
-      router.push('/Calendar-Month')
-    }
+    const goToDay = () => router.push('/Calendar-Day')
+    const goToWeek = () => router.push('/Calendar-Week')
+    const goToMonth = () => router.push('/Calendar-Month')
 
-    // Drag & Drop para mover eventos
     const onDragStart = (event, fromHour) => {
       draggedEvent.value = event
       draggedFromHour.value = fromHour
@@ -278,35 +375,35 @@ export default {
       confirmToHour.value = ''
     }
 
-    // Modal de detalle
     const showDetail = (event) => {
       detailEvent.value = event
       showDetailDialog.value = true
     }
 
-    // 👇 NUEVO: Manejar click en celda libre para bloquear/desbloquear
     const handleCellClick = (hour) => {
-      // Solo permitir bloquear/desbloquear si no hay eventos (reservas o citas)
       const events = getEvents(hour)
-      if (events.length > 0) {
-        return // No hacer nada si hay eventos
-      }
+      if (events.length > 0) return
 
       const dateStr = currentDateStr.value
       const estaBloqueado = reserveStore.estaHorarioBloqueado(dateStr, hour)
 
       if (estaBloqueado) {
-        // Desbloquear
         reserveStore.desbloquearHorario(dateStr, hour)
       } else {
-        // Bloquear
         reserveStore.bloquearHorario(dateStr, hour)
       }
     }
 
-    // 👇 NUEVO: Verificar si un horario está bloqueado
     const estaHorarioBloqueado = (fecha, hora) => {
       return reserveStore.estaHorarioBloqueado(fecha, hora)
+    }
+
+    const getTodayEventsCount = () => {
+      let count = 0
+      hours.forEach(hour => {
+        count += getEvents(hour).length
+      })
+      return count
     }
 
     const formatDate = (dateString) => {
@@ -315,24 +412,16 @@ export default {
         const date = new Date(dateString)
         return date.toLocaleDateString('es-ES', {
           year: 'numeric',
-          month: '2-digit',
-          day: '2-digit'
+          month: 'long',
+          day: 'numeric'
         })
       } catch {
         return 'Fecha inválida'
       }
     }
 
-    // Cargar datos al montar el componente
     onMounted(() => {
       console.log('📅 Calendario cargado con TODAS las reservas:', reservasCompletas.value.length)
-      console.log('📅 Fecha actual:', currentDateStr.value)
-      console.log('👥 Reservas disponibles:', reservasCompletas.value.map(r => ({
-        id: r.id,
-        fecha: r.fechaReserva,
-        hora: r.horaReserva,
-        nombre: r.nombreCompleto
-      })))
     })
 
     return {
@@ -341,10 +430,10 @@ export default {
       dayTitle,
       prevDay,
       nextDay,
-      setView,
       view,
       salir,
       getEvents,
+      getTodayEventsCount,
       onDragStart,
       onDrop,
       showConfirmDialog,
@@ -360,8 +449,8 @@ export default {
       goToDay,
       goToWeek,
       goToMonth,
-      reservasCompletas, // 👈 Exportar para debugging
-      handleCellClick, // 👈 Funciones para bloquear/desbloquear
+      reservasCompletas,
+      handleCellClick,
       estaHorarioBloqueado
     }
   }
@@ -369,30 +458,11 @@ export default {
 </script>
 
 <style scoped>
-.reservas-info {
-  margin: 10px 0;
-}
-
+/* Los estilos están en app.scss global */
 .event-email {
   font-size: 0.7rem;
   color: #666;
   display: block;
   margin-top: 2px;
 }
-
-.calendar-cell.bloqueado {
-  background-color: #ffebee !important;
-  cursor: pointer;
-}
-
-.calendar-cell.bloqueado:hover {
-  background-color: #ffcdd2 !important;
-}
-
-.bloqueado-label {
-  color: #c62828;
-  font-weight: bold;
-}
-
-/* Los estilos están en app.scss global */
 </style>

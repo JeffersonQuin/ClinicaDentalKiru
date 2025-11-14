@@ -2,7 +2,7 @@
   "reservas": [
     {
       "id": 1,
-      "fechaReserva": "2025-09-17",
+      "fechaReserva": "2025-11-17",
       "horaReserva": "13:00",
       "nombreCompleto": "Pedro Martinez Valle",
       "gmail": "Pedro@gmail.com",
@@ -12,7 +12,7 @@
     },
     {
       "id": 2,
-      "fechaReserva": "2025-09-18",
+      "fechaReserva": "2025-11-18",
       "horaReserva": "09:00", 
       "nombreCompleto": "Ana López Fernández",
       "gmail": "ana.lopez@gmail.com",
@@ -22,7 +22,7 @@
     },
     {
       "id": 3,
-      "fechaReserva": "2025-09-19",
+      "fechaReserva": "2025-11-19",
       "horaReserva": "11:00",
       "nombreCompleto": "Carlos Pérez Soto", 
       "gmail": "carlos.perez@gmail.com",
