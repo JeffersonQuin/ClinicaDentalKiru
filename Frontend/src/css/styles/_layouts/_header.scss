@@ -1,0 +1,323 @@
+/* ========================================
+   HEADER LAYOUT
+   ========================================
+   Estilos para el header (HeaderLayout)
+   ======================================== */
+
+/* Header Layout */
+.header-layout {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Banner de Promociones */
+.promo-banner {
+  background: linear-gradient(135deg, #FF6B35 0%, #FF5722 100%) !important;
+  color: white !important;
+  padding: 8px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.promo-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+  animation: shimmer 3s infinite;
+}
+
+.promo-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.promo-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.promo-icon {
+  animation: pulse 2s infinite;
+}
+
+.promo-text {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.promo-right {
+  display: flex;
+  align-items: center;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.language-selector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 4px 12px;
+  backdrop-filter: blur(10px);
+}
+
+.language-icon {
+  opacity: 0.9;
+}
+
+.language-select {
+  min-width: 45px;
+}
+
+.language-select .q-field__control {
+  color: white;
+  font-weight: 500;
+}
+
+.language-label {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 4px 8px;
+  backdrop-filter: blur(10px);
+}
+
+/* Navbar Principal */
+.main-navbar {
+  background: #FFFFFF !important;
+  border-bottom: 1px solid #E5E7EB !important;
+  backdrop-filter: blur(20px);
+}
+
+.navbar-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Logo */
+.logo-section {
+  flex-shrink: 0;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.logo-container:hover {
+  transform: scale(1.02);
+}
+
+.tooth-icon {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #FF6B35, #FF5722);
+  border-radius: 50%;
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+}
+
+.tooth-icon svg {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+.logo-text {
+  line-height: 1.2;
+}
+
+.brand-name {
+  font-size: 24px;
+  font-weight: 800;
+  color: #FF6B35 !important;
+  letter-spacing: -0.5px;
+}
+
+.brand-tagline {
+  font-size: 12px;
+  font-weight: 500;
+  color: #6B7280 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Navegación Desktop */
+.desktop-nav {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  margin: 0 40px;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.nav-link {
+  color: #1A1A1A !important;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 15px;
+  padding: 8px 0;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary-orange), var(--primary-orange-dark));
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #FF6B35 !important;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  width: 100%;
+}
+
+.nav-link.active {
+  color: #FF6B35 !important;
+  font-weight: 600;
+}
+
+/* Botones de Acción del Header */
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.login-btn {
+  color: #1A1A1A !important;
+  font-weight: 500;
+  padding: 10px 20px;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+}
+
+.login-btn:hover {
+  background: #F9FAFB !important;
+}
+
+.appointment-btn {
+  background: linear-gradient(135deg, #FF6B35, #FF5722) !important;
+  color: white !important;
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: 25px;
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+  transition: all 0.3s ease;
+}
+
+.appointment-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+}
+
+/* Menú Mobile */
+.mobile-menu-btn {
+  display: none;
+  color: var(--text-primary);
+}
+
+.mobile-menu {
+  background: #FFFFFF !important;
+  border-bottom: 1px solid #E5E7EB !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-menu-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.mobile-nav-list {
+  padding: 0;
+}
+
+.mobile-nav-item {
+  border-radius: 12px;
+  margin-bottom: 8px;
+  transition: all 0.3s ease;
+}
+
+.mobile-nav-item:hover {
+  background: #F9FAFB !important;
+}
+
+.mobile-nav-label {
+  font-weight: 500;
+  color: #1A1A1A !important;
+}
+
+.mobile-actions {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  gap: 12px;
+}
+
+.mobile-login-btn {
+  flex: 1;
+  color: #1A1A1A !important;
+  font-weight: 500;
+  padding: 12px;
+  border: 1px solid #E5E7EB !important;
+  border-radius: 12px;
+}
+
+.mobile-appointment-btn {
+  flex: 2;
+  background: linear-gradient(135deg, #FF6B35, #FF5722) !important;
+  color: white !important;
+  font-weight: 600;
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+}
+

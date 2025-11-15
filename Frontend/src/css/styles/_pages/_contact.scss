@@ -1,0 +1,74 @@
+/* ========================================
+   PÁGINA CONTACT - CONTACTO
+   ========================================
+   Estilos para la página de contacto con 
+   formulario, tarjetas de información y redes sociales
+   ======================================== */
+
+.contact-page {
+  padding-bottom: 0;
+}
+
+.hero-section {
+  background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+  min-height: 50vh;
+  display: flex;
+  align-items: center;
+}
+
+.body--dark .hero-section {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+
+.hero-image-container {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.quick-contact {
+  padding-top: 80px;
+  padding-bottom: 80px;
+}
+
+.contact-card {
+  transition: all var(--transition-normal);
+  height: 100%;
+  border-radius: var(--radius-xl);
+  
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--primary-color);
+  }
+}
+
+.contact-form-section {
+  padding-top: 80px;
+  padding-bottom: 80px;
+}
+
+.contact-form-card {
+  border-radius: var(--radius-xl);
+  min-height: 600px;
+}
+
+.form-fields {
+  .form-input {
+    :deep(.q-field__control) {
+      border-radius: var(--radius-md);
+      transition: all var(--transition-fast);
+      
+      &:hover {
+        border-color: var(--primary-color);
+      }
+    }
+  }
+}
+
+.social-section {
+  padding-top: 80px;
+  padding-bottom: 80px;
+}
+
