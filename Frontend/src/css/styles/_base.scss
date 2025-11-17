@@ -3,7 +3,10 @@
    ========================================
    Estilos base para páginas y contenedores principales
    ======================================== */
-
+.main-content {
+  min-height: calc(100vh - 200px); 
+  padding-bottom: 20px;
+}
 .page-container {
   padding: var(--spacing-xl);
   max-width: 1400px;

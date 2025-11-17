@@ -1,225 +1,278 @@
 <template>
   <div class="header-layout">
-    <!-- Banner de Promociones -->
-    <div class="promo-banner">
-      <div class="promo-content">
-        <div class="promo-left">
-          <q-icon name="local_offer" size="18px" class="promo-icon" />
-          <span class="promo-text">¡Descubre nuestras promociones especiales!</span>
+    <!-- Banner Superior Elegante -->
+    <div class="header-premium-banner">
+      <div class="header-premium-content">
+        <div class="header-premium-left">
+          <div class="header-sparkle-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5L12 2Z" fill="currentColor"/>
+            </svg>
+          </div>
+          <span class="header-premium-text">Descubre nuestra experiencia dental premium</span>
+          <div class="header-premium-divider"></div>
+          <span class="header-premium-subtext">Primera consulta gratuita</span>
         </div>
         
-        <div class="promo-right">
-          <div class="header-controls">
-            <!-- Selector de idioma -->
-            <div class="language-selector">
-              <q-icon name="language" size="16px" class="language-icon" />
+        <div class="header-premium-right">
+          <div class="header-premium-controls">
+            <!-- Selector de idioma premium -->
+            <div class="header-premium-language">
+              <q-icon name="translate" size="16px" class="header-premium-globe" />
               <q-select
                 v-model="selectedLanguage"
                 :options="languages"
                 dense
                 borderless
-                class="language-select"
+                class="header-premium-select"
                 emit-value
                 map-options
-                dropdown-icon="expand_more"
+                dropdown-icon="keyboard_arrow_down"
               >
                 <template v-slot:selected>
-                  <span class="language-label">{{ getLanguageLabel(selectedLanguage) }}</span>
+                  <span class="header-premium-lang-label">{{ getLanguageLabel(selectedLanguage) }}</span>
                 </template>
               </q-select>
             </div>
             
-            <!-- Dark mode toggle -->
-            <div class="theme-toggle">
-              <q-icon :name="darkMode ? 'light_mode' : 'dark_mode'" size="16px" />
-              <q-toggle
-                v-model="darkMode"
-                color="white"
-                size="sm"
-                @update:model-value="toggleDarkMode"
-              />
+            <!-- Dark mode toggle premium -->
+            <div class="header-premium-theme">
+              <div class="header-theme-container">
+                <q-icon name="light_mode" size="16px" class="header-theme-icon" />
+                <q-toggle
+                  v-model="darkMode"
+                  color="white"
+                  size="sm"
+                  class="header-premium-toggle"
+                  @update:model-value="toggleDarkMode"
+                />
+                <q-icon name="dark_mode" size="16px" class="header-theme-icon" />
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Barra de Navegación Principal -->
-    <div class="main-navbar">
-      <div class="navbar-content">
-        <!-- Logo KIRU -->
-        <div class="logo-section">
-          <div class="logo-container">
-            <div class="tooth-icon">
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                <path d="M16 4C12 4 8 6 8 12C8 18 10 24 12 26C13 27 15 28 16 28C17 28 19 27 20 26C22 24 24 18 24 12C24 6 20 4 16 4Z" fill="#FF6B35" stroke="#FF5722" stroke-width="1"/>
-                <circle cx="13" cy="14" r="1.5" fill="white"/>
-                <circle cx="19" cy="14" r="1.5" fill="white"/>
-              </svg>
-            </div>
-            
-            <div class="logo-text">
-              <div class="brand-name">KIRU</div>
-              <div class="brand-tagline">Odontología Integral</div>
+    <!-- Barra de Navegación Principal Premium -->
+    <div class="header-premium-navbar">
+      <div class="header-premium-nav-content">
+         <!-- Logo KIRU con Imagen -->
+        <div class="header-premium-logo">
+          <div class="header-premium-logo-container" @click="$router.push('/')">
+            <div class="header-logo-image">
+              <!-- Reemplaza 'logo-kiru.png' con la ruta de tu imagen -->
+              <img 
+                src="/KiruIMG/LogoKiru.png" 
+                alt="KIRU Odontología Integral"
+                style="width: 150px; height: 80px; "
+                @error="handleImageError"
+              />
             </div>
           </div>
         </div>
-
-        <!-- Navegación Desktop -->
-        <nav class="desktop-nav">
-          <div class="nav-links">
+        <!-- Navegación Desktop Premium -->
+        <nav class="header-premium-navigation">
+          <div class="header-premium-links">
             <router-link 
               to="/" 
-              class="nav-link"
-              :class="{ 'active': $route.path === '/' }"
+              class="header-premium-link"
+              :class="{ 'header-premium-active': $route.path === '/' }"
             >
-              Inicio
+              <q-icon name="home" size="18px" class="header-link-icon" />
+              <span>Inicio</span>
             </router-link>
             <router-link 
               to="/about" 
-              class="nav-link"
-              :class="{ 'active': $route.path === '/about' }"
+              class="header-premium-link"
+              :class="{ 'header-premium-active': $route.path === '/about' }"
             >
-              Conócenos
+              <q-icon name="business" size="18px" class="header-link-icon" />
+              <span>Conócenos</span>
             </router-link>
             <router-link 
               to="/services" 
-              class="nav-link"
-              :class="{ 'active': $route.path === '/services' }"
+              class="header-premium-link"
+              :class="{ 'header-premium-active': $route.path === '/services' }"
             >
-              Servicios
+              <q-icon name="medical_services" size="18px" class="header-link-icon" />
+              <span>Servicios</span>
             </router-link>
             <router-link 
               to="/branch" 
-              class="nav-link"
-              :class="{ 'active': $route.path === '/branch' }"
+              class="header-premium-link"
+              :class="{ 'header-premium-active': $route.path === '/branch' }"
             >
-              Sucursales
+              <q-icon name="location_on" size="18px" class="header-link-icon" />
+              <span>Sucursales</span>
             </router-link>
             <router-link 
               to="/faq" 
-              class="nav-link"
-              :class="{ 'active': $route.path === '/faq' }"
+              class="header-premium-link"
+              :class="{ 'header-premium-active': $route.path === '/faq' }"
             >
-              FAQ
+              <q-icon name="help" size="18px" class="header-link-icon" />
+              <span>FAQ</span>
             </router-link>
             <router-link 
               to="/contact" 
-              class="nav-link"
-              :class="{ 'active': $route.path === '/contact' }"
+              class="header-premium-link"
+              :class="{ 'header-premium-active': $route.path === '/contact' }"
             >
-              Contacto
+              <q-icon name="contact_page" size="18px" class="header-link-icon" />
+              <span>Contacto</span>
             </router-link>
           </div>
         </nav>
 
-        <!-- Botones de Acción -->
-        <div class="action-buttons">
+        <!-- Botones de Acción Premium -->
+        <div class="header-premium-actions">
           <router-link 
             to="/login" 
-            class="login-btn"
-            :class="{ 'active': $route.path === '/login' }"
+            class="header-premium-login"
+            :class="{ 'header-premium-active': $route.path === '/login' }"
           >
-          Iniciar Sesión
+            <q-icon name="account_circle" size="20px" />
+            <span>Mi Cuenta</span>
           </router-link>
           <q-btn 
             unelevated
-            label="Agendar Cita" 
-            class="appointment-btn"
+            class="header-premium-appointment"
             @click="openAppointmentDialog"
           >
-            <q-icon name="event" size="18px" class="q-ml-xs" />
+            <div class="header-appointment-content">
+              <q-icon name="calendar_today" size="20px" />
+              <span>Agendar Cita</span>
+            </div>
           </q-btn>
         </div>
 
-        <!-- Botón Menú Mobile -->
+        <!-- Botón Menú Mobile Premium -->
         <q-btn
           flat
           dense
           round
           icon="menu"
-          class="mobile-menu-btn"
+          class="header-premium-mobile-btn"
           @click="toggleMobileMenu"
         />
       </div>
     </div>
 
-    <!-- Menú Mobile -->
+    <!-- Menú Mobile Premium -->
     <q-slide-transition>
-      <div v-show="mobileMenuOpen" class="mobile-menu">
-        <div class="mobile-menu-content">
-          <q-list class="mobile-nav-list">
+      <div v-show="mobileMenuOpen" class="header-premium-mobile-menu">
+        <div class="header-premium-mobile-content">
+          <div class="header-mobile-header">
+            <div class="header-mobile-logo">
+              <div class="header-premium-tooth">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                  <path 
+                    d="M16 4C12 4 8 6 8 12C8 18 10 24 12 26C13 27 15 28 16 28C17 28 19 27 20 26C22 24 24 18 24 12C24 6 20 4 16 4Z" 
+                    fill="url(#toothGradient)" 
+                    stroke="url(#toothGradient)" 
+                    stroke-width="1.5"
+                  />
+                </svg>
+              </div>
+              <span class="header-mobile-brand">KIRU</span>
+            </div>
+            <q-btn
+              flat
+              dense
+              round
+              icon="close"
+              class="header-mobile-close"
+              @click="mobileMenuOpen = false"
+            />
+          </div>
+          
+          <q-list class="header-premium-mobile-list">
             <q-item 
               clickable 
               v-ripple 
-              class="mobile-nav-item"
+              class="header-premium-mobile-item"
               @click="navigateAndClose('/')"
             >
               <q-item-section avatar>
-                <q-icon name="home" size="20px" />
+                <q-icon name="home" size="22px" class="header-mobile-icon" />
               </q-item-section>
               <q-item-section>
-                <q-item-label class="mobile-nav-label">Inicio</q-item-label>
+                <q-item-label class="header-premium-mobile-label">Inicio</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-icon name="chevron_right" size="16px" />
               </q-item-section>
             </q-item>
             
             <q-item 
               clickable 
               v-ripple 
-              class="mobile-nav-item"
+              class="header-premium-mobile-item"
               @click="navigateAndClose('/about')"
             >
               <q-item-section avatar>
-                <q-icon name="info" size="20px" />
+                <q-icon name="business" size="22px" class="header-mobile-icon" />
               </q-item-section>
               <q-item-section>
-                <q-item-label class="mobile-nav-label">Conócenos</q-item-label>
+                <q-item-label class="header-premium-mobile-label">Conócenos</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-icon name="chevron_right" size="16px" />
               </q-item-section>
             </q-item>
             
             <q-item 
               clickable 
               v-ripple 
-              class="mobile-nav-item"
+              class="header-premium-mobile-item"
               @click="navigateAndClose('/services')"
             >
               <q-item-section avatar>
-                <q-icon name="medical_services" size="20px" />
+                <q-icon name="medical_services" size="22px" class="header-mobile-icon" />
               </q-item-section>
               <q-item-section>
-                <q-item-label class="mobile-nav-label">Servicios</q-item-label>
+                <q-item-label class="header-premium-mobile-label">Servicios</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-icon name="chevron_right" size="16px" />
               </q-item-section>
             </q-item>
             
             <q-item 
               clickable 
               v-ripple 
-              class="mobile-nav-item"
+              class="header-premium-mobile-item"
               @click="navigateAndClose('/contact')"
             >
               <q-item-section avatar>
-                <q-icon name="contact_mail" size="20px" />
+                <q-icon name="contact_page" size="22px" class="header-mobile-icon" />
               </q-item-section>
               <q-item-section>
-                <q-item-label class="mobile-nav-label">Contacto</q-item-label>
+                <q-item-label class="header-premium-mobile-label">Contacto</q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-icon name="chevron_right" size="16px" />
               </q-item-section>
             </q-item>
           </q-list>
           
-          <div class="mobile-actions">
+          <div class="header-premium-mobile-actions">
             <q-btn 
               flat
-              label="Iniciar Sesión" 
-              class="mobile-login-btn"
+              class="header-mobile-login"
               @click="openLoginDialog"
-            />
+            >
+              <q-icon name="account_circle" size="20px" class="q-mr-sm" />
+              Iniciar Sesión
+            </q-btn>
             <q-btn 
               unelevated
-              label="Agendar Cita" 
-              class="mobile-appointment-btn"
+              class="header-mobile-appointment"
               @click="openAppointmentDialog"
             >
-              <q-icon name="event" size="16px" class="q-ml-xs" />
+              <q-icon name="calendar_today" size="18px" class="q-mr-sm" />
+              Agendar Cita
             </q-btn>
           </div>
         </div>
@@ -362,4 +415,3 @@ const loadPreferences = () => {
 loadPreferences()
 </script>
 
-<!-- Los estilos están en app.scss global -->
