@@ -27,6 +27,7 @@
 @import './styles/_layouts/_page-container.scss';
 
 // 4. Páginas
+//4.1. Paginas públicas
 @import './styles/_pages/_home.scss';
 @import './styles/_pages/_about.scss';
 @import './styles/_pages/_services.scss';
@@ -34,8 +35,24 @@
 @import './styles/_pages/_contact.scss';
 @import './styles/_pages/_login.scss';
 @import './styles/_pages/_admin.scss';
-@import './styles/_pages/_calendar.scss';
 @import './styles/_pages/_faq.scss';
+//4.2. Paginas de administración
+@import './styles/_pages/administration/_specialty.scss';
+@import './styles/_pages/administration/_dentist.scss';
+@import './styles/_pages/administration/_calendar_month.scss';
+@import './styles/_pages/administration/_calendar_week.scss';
+@import './styles/_pages/administration/_calendar_day.scss';
+@import './styles/_pages/administration/_branch.scss';
+@import './styles/_pages/administration/_announcement.scss';
+@import './styles/_pages/administration/_user.scss';
+@import './styles/_pages/administration/_patient.scss';
+@import './styles/_pages/administration/_purchase.scss';
+@import './styles/_pages/administration/_reserve.scss';
+@import './styles/_pages/administration/_stadistics.scss';
+@import './styles/_pages/administration/_odontogram.scss';
+@import './styles/_pages/administration/_quotes.scss';
+@import './styles/_pages/administration/_historyquotes.scss';
+
 
 // 5. Responsive
 @import './styles/_responsive.scss';

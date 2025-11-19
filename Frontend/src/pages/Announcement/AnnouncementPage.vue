@@ -1,17 +1,23 @@
 <template>
-  <div class="page-container">
+  <div class="announcement-page-container">
     <!-- Header Section -->
-    <div class="page-header">
-      <div class="header-content">
-        <div class="title-section">
-          <i class="fa-solid fa-bullhorn header-icon"></i>
+    <div class="announcement-page-header">
+      <div class="announcement-header-background">
+        <div class="announcement-header-shape announcement-header-shape-1"></div>
+        <div class="announcement-header-shape announcement-header-shape-2"></div>
+      </div>
+      <div class="announcement-header-content">
+        <div class="announcement-title-section">
+          <div class="announcement-icon-wrapper">
+            <i class="fa-solid fa-bullhorn announcement-header-icon"></i>
+          </div>
           <div>
-            <h1 class="page-title">Gestión de Anuncios</h1>
-            <p class="page-subtitle">Administra las promociones y eventos de tu clínica</p>
+            <h1 class="announcement-page-title">Gestión de Anuncios</h1>
+            <p class="announcement-page-subtitle">Administra las promociones y eventos de tu clínica</p>
           </div>
         </div>
         <q-btn
-          class="primary-btn"
+          class="announcement-primary-btn"
           color="primary"
           icon="fa-solid fa-plus"
           label="Nuevo Anuncio"
@@ -24,70 +30,95 @@
     </div>
 
     <!-- Stats Section -->
-    <div class="stats-section">
-      <div class="stat-card">
-        <div class="stat-icon-container active">
+    <div class="announcement-stats-section">
+      <div class="announcement-stat-card">
+        <div class="announcement-stat-icon-container active">
           <i class="fa-solid fa-circle-check"></i>
         </div>
-        <div class="stat-content">
-          <div class="stat-value">{{ anuncioStore.activeAnunciosCount }}</div>
-          <div class="stat-label">Anuncios Activos</div>
+        <div class="announcement-stat-content">
+          <div class="announcement-stat-value">{{ anuncioStore.activeAnunciosCount }}</div>
+          <div class="announcement-stat-label">Anuncios Activos</div>
         </div>
+        <div class="announcement-stat-glow active"></div>
       </div>
       
-      <div class="stat-card">
-        <div class="stat-icon-container inactive">
+      <div class="announcement-stat-card">
+        <div class="announcement-stat-icon-container inactive">
           <i class="fa-solid fa-circle-xmark"></i>
         </div>
-        <div class="stat-content">
-          <div class="stat-value">{{ anuncioStore.inactiveAnunciosCount }}</div>
-          <div class="stat-label">Anuncios Inactivos</div>
+        <div class="announcement-stat-content">
+          <div class="announcement-stat-value">{{ anuncioStore.inactiveAnunciosCount }}</div>
+          <div class="announcement-stat-label">Anuncios Inactivos</div>
         </div>
+        <div class="announcement-stat-glow inactive"></div>
       </div>
       
-      <div class="stat-card">
-        <div class="stat-icon-container admin">
+      <div class="announcement-stat-card">
+        <div class="announcement-stat-icon-container admin">
           <i class="fa-solid fa-tags"></i>
         </div>
-        <div class="stat-content">
-          <div class="stat-value">{{ anuncioStore.uniqueCategories.length }}</div>
-          <div class="stat-label">Categorías</div>
+        <div class="announcement-stat-content">
+          <div class="announcement-stat-value">{{ anuncioStore.uniqueCategories.length }}</div>
+          <div class="announcement-stat-label">Categorías</div>
         </div>
+        <div class="announcement-stat-glow admin"></div>
       </div>
       
-      <div class="stat-card">
-        <div class="stat-icon-container total">
+      <div class="announcement-stat-card">
+        <div class="announcement-stat-icon-container total">
           <i class="fa-solid fa-bullhorn"></i>
         </div>
-        <div class="stat-content">
-          <div class="stat-value">{{ anuncioStore.totalAnuncios }}</div>
-          <div class="stat-label">Total de Anuncios</div>
+        <div class="announcement-stat-content">
+          <div class="announcement-stat-value">{{ anuncioStore.totalAnuncios }}</div>
+          <div class="announcement-stat-label">Total de Anuncios</div>
         </div>
+        <div class="announcement-stat-glow total"></div>
       </div>
     </div>
 
     <!-- Search Section -->
-    <div class="search-section">
-      <q-input
-        v-model="anuncioStore.search"
-        class="search-input"
-        outlined
-        type="search"
-        placeholder="Buscar por título, descripción o categoría..."
-        @update:model-value="anuncioStore.rebuildFuse" 
-        clearable
-        dense
-      >
-        <template v-slot:prepend>
-          <i class="fa-solid fa-search"></i>
-        </template>
-      </q-input>
+    <div class="announcement-search-section">
+      <div class="announcement-search-container">
+        <q-input
+          v-model="anuncioStore.search"
+          class="announcement-search-input"
+          outlined
+          type="search"
+          placeholder="Buscar por título, descripción o categoría..."
+          @update:model-value="anuncioStore.rebuildFuse" 
+          clearable
+        >
+          <template v-slot:prepend>
+            <i class="fa-solid fa-search announcement-search-icon"></i>
+          </template>
+          <template v-slot:append>
+            <q-icon 
+              v-if="anuncioStore.search" 
+              name="fa-solid fa-filter" 
+              class="text-primary"
+            />
+          </template>
+        </q-input>
+      </div>
     </div>
 
     <!-- Table Section -->
-    <div class="table-container">
+    <div class="announcement-table-container">
+      <div class="announcement-table-header">
+        <div class="announcement-table-title-section">
+          <h3 class="announcement-table-title">Lista de Anuncios</h3>
+          <div class="announcement-table-underline"></div>
+        </div>
+        <div class="announcement-results-count">
+          <span class="announcement-count-badge">
+            <i class="fa-solid fa-list-check"></i>
+            {{ displayedRows.length }} anuncio{{ displayedRows.length !== 1 ? 's' : '' }}
+          </span>
+        </div>
+      </div>
+
       <q-table
-        class="data-table"
+        class="announcement-data-table"
         flat
         :rows="displayedRows"
         :columns="columns"
@@ -97,25 +128,28 @@
         separator="cell"
       >
         <template v-slot:no-data>
-          <div class="no-data-container">
-            <i class="fa-solid fa-bullhorn no-data-icon"></i>
-            <p class="no-data-text">No se encontraron anuncios</p>
-            <p class="no-data-subtext">Intenta ajustar los filtros de búsqueda</p>
+          <div class="announcement-no-data-container">
+            <div class="announcement-no-data-illustration">
+              <i class="fa-solid fa-bullhorn announcement-no-data-icon"></i>
+              <div class="announcement-no-data-circle announcement-no-data-circle-1"></div>
+              <div class="announcement-no-data-circle announcement-no-data-circle-2"></div>
+            </div>
+            <p class="announcement-no-data-text">No se encontraron anuncios</p>
+            <p class="announcement-no-data-subtext">Intenta ajustar los filtros de búsqueda o agrega un nuevo anuncio</p>
           </div>
         </template>
 
         <template v-slot:body-cell-imagen="props">
           <q-td :props="props">
-            <div class="image-container">
+            <div class="announcement-image-container">
               <q-img
                 v-if="props.row.imagen"
                 :src="props.row.imagen"
                 :alt="props.row.titulo"
-                class="table-image"
-                style="height: 60px; width: 80px;"
+                class="announcement-table-image"
                 @error="anuncioStore.handleImageError"
               />
-              <div v-else class="no-image-placeholder">
+              <div v-else class="announcement-no-image-placeholder">
                 <i class="fa-solid fa-image"></i>
                 <span>Sin imagen</span>
               </div>
@@ -125,9 +159,10 @@
 
         <template v-slot:body-cell-titulo="props">
           <q-td :props="props">
-            <div class="anuncio-title">
-              <span class="title-text">{{ props.row.titulo }}</span>
-              <div class="categoria-badge">
+            <div class="announcement-title-content">
+              <span class="announcement-title-text">{{ props.row.titulo }}</span>
+              <div class="announcement-categoria-badge">
+                <i class="fa-solid fa-tag"></i>
                 {{ props.row.categoria }}
               </div>
             </div>
@@ -136,14 +171,24 @@
 
         <template v-slot:body-cell-fechas="props">
           <q-td :props="props">
-            <div class="fechas-info">
-              <div class="fecha-item">
-                <i class="fa-solid fa-calendar-plus q-mr-xs"></i>
-                <span>{{ anuncioStore.formatDate(props.row.fecha_publicacion) }}</span>
+            <div class="announcement-fechas-info">
+              <div class="announcement-fecha-item">
+                <div class="announcement-fecha-icon">
+                  <i class="fa-solid fa-calendar-plus"></i>
+                </div>
+                <div class="announcement-fecha-content">
+                  <div class="announcement-fecha-label">Publicación</div>
+                  <div class="announcement-fecha-value">{{ anuncioStore.formatDate(props.row.fecha_publicacion) }}</div>
+                </div>
               </div>
-              <div class="fecha-item">
-                <i class="fa-solid fa-calendar-minus q-mr-xs"></i>
-                <span>{{ anuncioStore.formatDate(props.row.fecha_expiracion) }}</span>
+              <div class="announcement-fecha-item">
+                <div class="announcement-fecha-icon">
+                  <i class="fa-solid fa-calendar-minus"></i>
+                </div>
+                <div class="announcement-fecha-content">
+                  <div class="announcement-fecha-label">Expiración</div>
+                  <div class="announcement-fecha-value">{{ anuncioStore.formatDate(props.row.fecha_expiracion) }}</div>
+                </div>
               </div>
             </div>
           </q-td>
@@ -152,7 +197,7 @@
         <template v-slot:body-cell-estado="props">
           <q-td :props="props">
             <q-badge
-              :class="['state-badge', anuncioStore.getStateClass(props.row.estado)]"
+              :class="['announcement-state-badge', anuncioStore.getStateClass(props.row.estado)]"
               :label="anuncioStore.formatState(props.row.estado)"
             />
           </q-td>
@@ -160,9 +205,9 @@
 
         <template v-slot:body-cell-actions="props">
           <q-td :props="props">
-            <div class="action-buttons">
+            <div class="announcement-action-buttons">
               <q-btn
-                class="action-btn view-btn"
+                class="announcement-action-btn announcement-view-btn"
                 flat
                 dense
                 round
@@ -175,7 +220,7 @@
               </q-btn>
               
               <q-btn
-                class="action-btn edit-btn"
+                class="announcement-action-btn announcement-edit-btn"
                 flat
                 dense
                 round
@@ -188,7 +233,7 @@
               </q-btn>
               
               <q-btn
-                class="action-btn delete-btn"
+                class="announcement-action-btn announcement-delete-btn"
                 flat
                 dense
                 round
@@ -225,31 +270,31 @@
 
     <!-- Delete Confirmation Dialog -->
     <q-dialog v-model="anuncioStore.showDeleteDialog" persistent>
-      <q-card class="confirm-dialog">
-        <q-card-section class="dialog-header">
-          <div class="dialog-icon-container">
-            <i class="fa-solid fa-exclamation-triangle dialog-icon"></i>
+      <q-card class="announcement-confirm-dialog">
+        <q-card-section class="announcement-dialog-header">
+          <div class="announcement-dialog-icon-container">
+            <i class="fa-solid fa-exclamation-triangle announcement-dialog-icon"></i>
           </div>
-          <h3 class="dialog-title">Confirmar Eliminación</h3>
+          <h3 class="announcement-dialog-title">Confirmar Eliminación</h3>
         </q-card-section>
 
         <q-card-section class="q-pt-none">
-          <p class="dialog-text">
+          <p class="announcement-dialog-text">
             ¿Está seguro que desea eliminar el anuncio <strong>{{ anuncioStore.selectedAnuncio?.titulo }}</strong>?
           </p>
-          <p class="dialog-subtext">
+          <p class="announcement-dialog-subtext">
             Esta acción no se puede deshacer y el anuncio dejará de ser visible.
           </p>
         </q-card-section>
 
-        <q-card-actions class="dialog-actions">
+        <q-card-actions class="announcement-dialog-actions">
           <q-btn 
             flat 
             label="Cancelar" 
             color="grey-7" 
             @click="anuncioStore.closeDeleteDialog" 
             no-caps
-            class="dialog-btn"
+            class="announcement-dialog-btn"
           />
           <q-btn 
             unelevated
@@ -257,7 +302,7 @@
             color="negative" 
             @click="anuncioStore.eliminarAnuncio"
             no-caps
-            class="dialog-btn"
+            class="announcement-dialog-btn announcement-dialog-delete-btn"
           />
         </q-card-actions>
       </q-card>
@@ -280,7 +325,7 @@ const columns = [
     align: 'center',
     field: 'imagen',
     sortable: false,
-    style: 'width: 100px'
+    style: 'width: 120px'
   },
   {
     name: 'titulo',
@@ -296,7 +341,7 @@ const columns = [
     field: 'categoria',
     sortable: true,
     align: 'center',
-    style: 'width: 120px'
+    style: 'width: 140px'
   },
   {
     name: 'fechas',
@@ -304,7 +349,7 @@ const columns = [
     field: 'fechas',
     sortable: false,
     align: 'left',
-    style: 'width: 180px'
+    style: 'width: 200px'
   },
   {
     name: 'estado',
@@ -312,7 +357,7 @@ const columns = [
     field: 'estado',
     sortable: true,
     align: 'center',
-    style: 'width: 100px'
+    style: 'width: 120px'
   },
   {
     name: 'actions',
@@ -320,7 +365,7 @@ const columns = [
     field: 'actions',
     align: 'center',
     sortable: false,
-    style: 'width: 140px'
+    style: 'width: 150px'
   }
 ]
 
@@ -348,8 +393,9 @@ export default {
     return {
       anuncioStore,
       columns,
-      displayedRows // AGREGADO
+      displayedRows
     }
   }
 }
 </script>
+
