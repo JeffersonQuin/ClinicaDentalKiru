@@ -1,18 +1,25 @@
 <template>
-  <div class="page-container">
-    <div class="page-header">
-      <div class="header-content">
-        <div class="title-section">
-          <i class="fa-solid fa-credit-card header-icon"></i>
+  <div class="purchase-page-container">
+    <!-- Header Section -->
+    <div class="purchase-page-header">
+      <div class="purchase-header-background">
+        <div class="purchase-header-shape purchase-header-shape-1"></div>
+        <div class="purchase-header-shape purchase-header-shape-2"></div>
+      </div>
+      <div class="purchase-header-content">
+        <div class="purchase-title-section">
+          <div class="purchase-icon-wrapper">
+            <i class="fa-solid fa-credit-card purchase-header-icon"></i>
+          </div>
           <div>
-            <h1 class="page-title">Gestión de Pagos</h1>
-            <p class="page-subtitle">Administra los pagos y transacciones del sistema dental</p>
+            <h1 class="purchase-page-title">Gestión de Pagos</h1>
+            <p class="purchase-page-subtitle">Administra los pagos y transacciones del sistema dental</p>
           </div>
         </div>
         
-        <div class="header-actions">
+        <div class="purchase-header-actions">
           <q-btn
-            class="primary-btn"
+            class="purchase-primary-btn"
             icon="fa-solid fa-plus"
             label="Registrar Pago"
             @click="abrirDialogoPago"
@@ -22,125 +29,155 @@
           />
           
           <q-btn
+            class="purchase-secondary-btn"
             icon="fa-solid fa-download"
             label="Exportar"
             @click="exportarDatos"
             outline
             no-caps
             size="md"
-            color="primary"
           />
         </div>
       </div>
     </div>
 
-    <!-- Filtros -->
-    <div class="search-section">
-      <div class="search-filters">
+    <!-- Search & Filters Section -->
+    <div class="purchase-search-section">
+      <div class="purchase-search-container">
         <q-input
           v-model="filtros.busqueda"
-          placeholder="Buscar por paciente, concepto..."
+          class="purchase-search-input"
           outlined
-          dense
+          type="search"
+          placeholder="Buscar por paciente, concepto..."
           clearable
-          class="search-input"
         >
           <template v-slot:prepend>
-            <i class="fa-solid fa-search"></i>
+            <i class="fa-solid fa-search purchase-search-icon"></i>
           </template>
         </q-input>
         
-        <q-select
-          v-model="filtros.estado"
-          :options="opcionesEstado"
-          label="Estado"
-          outlined
-          dense
-          clearable
-          emit-value
-          map-options
-          class="filter-select"
-        />
-        
-        <q-select
-          v-model="filtros.metodoPago"
-          :options="opcionesMetodoPago"
-          label="Método de Pago"
-          outlined
-          dense
-          clearable
-          emit-value
-          map-options
-          class="filter-select"
-        />
-        
-        <q-input
-          v-model="filtros.fechaInicio"
-          type="date"
-          label="Fecha Inicio"
-          outlined
-          dense
-          class="filter-select"
-        />
-        
-        <q-input
-          v-model="filtros.fechaFin"
-          type="date"
-          label="Fecha Fin"
-          outlined
-          dense
-          class="filter-select"
-        />
+        <div class="purchase-filter-group">
+          <q-select
+            v-model="filtros.estado"
+            :options="opcionesEstado"
+            label="Estado"
+            outlined
+            dense
+            clearable
+            emit-value
+            map-options
+            class="purchase-filter-select"
+          />
+          
+          <q-select
+            v-model="filtros.metodoPago"
+            :options="opcionesMetodoPago"
+            label="Método de Pago"
+            outlined
+            dense
+            clearable
+            emit-value
+            map-options
+            class="purchase-filter-select"
+          />
+          
+          <q-input
+            v-model="filtros.fechaInicio"
+            type="date"
+            label="Fecha Inicio"
+            outlined
+            dense
+            class="purchase-filter-select"
+          />
+          
+          <q-input
+            v-model="filtros.fechaFin"
+            type="date"
+            label="Fecha Fin"
+            outlined
+            dense
+            class="purchase-filter-select"
+          />
+        </div>
       </div>
     </div>
 
-    <!-- Estadísticas de Pagos -->
-    <div class="stats-section">
-      <div class="stat-card">
-        <div class="stat-icon-container total">
+    <!-- Stats Section -->
+    <div class="purchase-stats-section">
+      <div class="purchase-stat-card">
+        <div class="purchase-stat-icon-container total">
           <i class="fa-solid fa-coins"></i>
         </div>
-        <div class="stat-content">
-          <div class="stat-value">Bs. {{ formatearMonto(resumenPagos.total) }}</div>
-          <div class="stat-label">Total Recaudado</div>
+        <div class="purchase-stat-content">
+          <div class="purchase-stat-value">Bs. {{ formatearMonto(resumenPagos.total) }}</div>
+          <div class="purchase-stat-label">Total Recaudado</div>
         </div>
+        <div class="purchase-stat-glow total"></div>
       </div>
 
-      <div class="stat-card">
-        <div class="stat-icon-container pending">
+      <div class="purchase-stat-card">
+        <div class="purchase-stat-icon-container pending">
           <i class="fa-solid fa-clock"></i>
         </div>
-        <div class="stat-content">
-          <div class="stat-value">Bs. {{ formatearMonto(resumenPagos.pendiente) }}</div>
-          <div class="stat-label">Pagos Pendientes</div>
+        <div class="purchase-stat-content">
+          <div class="purchase-stat-value">Bs. {{ formatearMonto(resumenPagos.pendiente) }}</div>
+          <div class="purchase-stat-label">Pagos Pendientes</div>
         </div>
+        <div class="purchase-stat-glow pending"></div>
       </div>
 
-      <div class="stat-card">
-        <div class="stat-icon-container month">
+      <div class="purchase-stat-card">
+        <div class="purchase-stat-icon-container month">
           <i class="fa-solid fa-calendar-alt"></i>
         </div>
-        <div class="stat-content">
-          <div class="stat-value">Bs. {{ formatearMonto(resumenPagos.mesActual) }}</div>
-          <div class="stat-label">Este Mes</div>
+        <div class="purchase-stat-content">
+          <div class="purchase-stat-value">Bs. {{ formatearMonto(resumenPagos.mesActual) }}</div>
+          <div class="purchase-stat-label">Este Mes</div>
         </div>
+        <div class="purchase-stat-glow month"></div>
       </div>
 
-      <div class="stat-card">
-        <div class="stat-icon-container average">
+      <div class="purchase-stat-card">
+        <div class="purchase-stat-icon-container average">
           <i class="fa-solid fa-chart-line"></i>
         </div>
-        <div class="stat-content">
-          <div class="stat-value">Bs. {{ formatearMonto(resumenPagos.promedio) }}</div>
-          <div class="stat-label">Promedio por Pago</div>
+        <div class="purchase-stat-content">
+          <div class="purchase-stat-value">Bs. {{ formatearMonto(resumenPagos.promedio) }}</div>
+          <div class="purchase-stat-label">Promedio por Pago</div>
         </div>
+        <div class="purchase-stat-glow average"></div>
       </div>
     </div>
 
-    <!-- Tabla de Pagos -->
-    <div class="table-container">
+    <!-- Table Section -->
+    <div class="purchase-table-container">
+      <div class="purchase-table-header">
+        <div class="purchase-table-title-section">
+          <h3 class="purchase-table-title">Lista de Pagos</h3>
+          <div class="purchase-table-underline"></div>
+        </div>
+        <div class="purchase-table-actions">
+          <div class="purchase-results-count">
+            <span class="purchase-count-badge">
+              <i class="fa-solid fa-receipt"></i>
+              {{ pagosFiltrados.length }} pago{{ pagosFiltrados.length !== 1 ? 's' : '' }}
+            </span>
+          </div>
+          <q-btn
+            class="purchase-report-btn"
+            flat
+            icon="fa-solid fa-file-pdf"
+            label="Reporte PDF"
+            no-caps
+            size="sm"
+            @click="generarReportePDF"
+          />
+        </div>
+      </div>
+
       <q-table
-        class="data-table"
+        class="purchase-data-table"
         flat
         :rows="pagosFiltrados"
         :columns="columnasPagos"
@@ -150,30 +187,17 @@
         separator="cell"
         :loading="cargando"
       >
-        <template v-slot:top>
-          <div class="table-header">
-            <span class="table-title">Lista de Pagos</span>
-            <div class="table-actions">
-              <q-btn
-                flat
-                icon="fa-solid fa-file-pdf"
-                label="Reporte PDF"
-                color="negative"
-                no-caps
-                size="sm"
-                @click="generarReportePDF"
-              />
-            </div>
-          </div>
-        </template>
-
         <template v-slot:no-data>
-          <div class="no-data-container">
-            <i class="fa-solid fa-receipt no-data-icon"></i>
-            <p class="no-data-text">No se encontraron pagos registrados</p>
-            <p class="no-data-subtext">Intenta ajustar los filtros de búsqueda o registra el primer pago</p>
+          <div class="purchase-no-data-container">
+            <div class="purchase-no-data-illustration">
+              <i class="fa-solid fa-receipt purchase-no-data-icon"></i>
+              <div class="purchase-no-data-circle purchase-no-data-circle-1"></div>
+              <div class="purchase-no-data-circle purchase-no-data-circle-2"></div>
+            </div>
+            <p class="purchase-no-data-text">No se encontraron pagos registrados</p>
+            <p class="purchase-no-data-subtext">Intenta ajustar los filtros de búsqueda o registra el primer pago</p>
             <q-btn
-              class="primary-btn"
+              class="purchase-primary-btn"
               label="Registrar Primer Pago"
               @click="abrirDialogoPago"
               unelevated
@@ -185,7 +209,7 @@
 
         <template v-slot:body-cell-estado="props">
           <q-td :props="props">
-            <div class="status-badge" :class="getEstadoClass(props.value)">
+            <div class="purchase-status-badge" :class="getEstadoClass(props.value)">
               <i :class="getEstadoIcon(props.value)"></i>
               {{ formatearEstado(props.value) }}
             </div>
@@ -194,13 +218,13 @@
 
         <template v-slot:body-cell-monto="props">
           <q-td :props="props">
-            <span class="amount-cell">Bs. {{ formatearMonto(props.value) }}</span>
+            <span class="purchase-amount-cell">Bs. {{ formatearMonto(props.value) }}</span>
           </q-td>
         </template>
 
         <template v-slot:body-cell-metodoPago="props">
           <q-td :props="props">
-            <div class="method-badge">
+            <div class="purchase-method-badge">
               <i :class="getMetodoIcon(props.value)"></i>
               {{ formatearMetodoPago(props.value) }}
             </div>
@@ -209,9 +233,9 @@
 
         <template v-slot:body-cell-acciones="props">
           <q-td :props="props">
-            <div class="action-buttons">
+            <div class="purchase-action-buttons">
               <q-btn
-                class="action-btn view-btn"
+                class="purchase-action-btn purchase-view-btn"
                 flat
                 dense
                 round
@@ -224,7 +248,7 @@
               </q-btn>
               
               <q-btn
-                class="action-btn edit-btn"
+                class="purchase-action-btn purchase-edit-btn"
                 flat
                 dense
                 round
@@ -237,7 +261,7 @@
               </q-btn>
               
               <q-btn
-                class="action-btn receipt-btn"
+                class="purchase-action-btn purchase-receipt-btn"
                 flat
                 dense
                 round
@@ -254,20 +278,22 @@
       </q-table>
     </div>
 
+    <!-- Dialogs -->
     <!-- Dialog para Nuevo/Editar Pago -->
     <q-dialog v-model="dialogoPago" persistent>
-      <q-card class="pago-dialog">
-        <q-card-section class="dialog-header">
-          <h2 class="dialog-title">
+      <q-card class="purchase-dialog">
+        <q-card-section class="purchase-dialog-header">
+          <div class="purchase-dialog-icon-container">
+            <i class="fa-solid fa-credit-card purchase-dialog-icon"></i>
+          </div>
+          <h2 class="purchase-dialog-title">
             {{ editando ? 'Editar Pago' : 'Registrar Nuevo Pago' }}
           </h2>
         </q-card-section>
 
-        <q-separator />
-
-        <q-card-section class="dialog-body">
-          <q-form @submit.prevent="guardarPago" class="pago-form">
-            <div class="form-grid">
+        <q-card-section class="purchase-dialog-body">
+          <q-form @submit.prevent="guardarPago" class="purchase-form">
+            <div class="purchase-form-grid">
               <q-select
                 v-model="formPago.pacienteId"
                 :options="opcionesPacientes"
@@ -276,6 +302,7 @@
                 emit-value
                 map-options
                 required
+                class="purchase-form-field"
               />
 
               <q-input
@@ -283,6 +310,7 @@
                 label="Concepto *"
                 outlined
                 required
+                class="purchase-form-field"
               />
 
               <q-input
@@ -293,6 +321,7 @@
                 required
                 min="0"
                 step="0.01"
+                class="purchase-form-field"
               />
 
               <q-select
@@ -303,6 +332,7 @@
                 emit-value
                 map-options
                 required
+                class="purchase-form-field"
               />
 
               <q-input
@@ -311,6 +341,7 @@
                 label="Fecha *"
                 outlined
                 required
+                class="purchase-form-field"
               />
 
               <q-select
@@ -321,6 +352,7 @@
                 emit-value
                 map-options
                 required
+                class="purchase-form-field"
               />
 
               <q-input
@@ -328,6 +360,7 @@
                 label="Número de Transacción"
                 outlined
                 hint="Solo para pagos con tarjeta o transferencia"
+                class="purchase-form-field"
               />
 
               <q-input
@@ -336,26 +369,27 @@
                 outlined
                 type="textarea"
                 rows="3"
-                class="full-width"
+                class="purchase-form-field purchase-form-textarea"
               />
             </div>
           </q-form>
         </q-card-section>
 
-        <q-separator />
-
-        <q-card-actions align="right" class="dialog-actions">
-          <q-btn
-            flat
-            label="Cancelar"
+        <q-card-actions align="right" class="purchase-dialog-actions">
+          <q-btn 
+            flat 
+            label="Cancelar" 
             @click="cerrarDialogoPago"
-            color="grey"
+            class="purchase-dialog-btn purchase-dialog-cancel"
+            no-caps
           />
-          <q-btn
-            :label="editando ? 'Actualizar' : 'Guardar'"
+          <q-btn 
+            :label="editando ? 'Actualizar' : 'Guardar'" 
             @click="guardarPago"
-            color="primary"
+            class="purchase-dialog-btn purchase-dialog-confirm"
+            unelevated
             :loading="guardando"
+            no-caps
           />
         </q-card-actions>
       </q-card>
@@ -363,76 +397,83 @@
 
     <!-- Dialog para Detalle del Pago -->
     <q-dialog v-model="dialogoDetalle">
-      <q-card class="detalle-dialog">
-        <q-card-section class="dialog-header">
-          <h2 class="dialog-title">Detalle del Pago</h2>
+      <q-card class="purchase-detail-dialog">
+        <q-card-section class="purchase-dialog-header">
+          <div class="purchase-dialog-icon-container success">
+            <i class="fa-solid fa-receipt purchase-dialog-icon"></i>
+          </div>
+          <h2 class="purchase-dialog-title">Detalle del Pago</h2>
           <q-btn
             flat
             round
             dense
-            icon="close"
+            icon="fa-solid fa-times"
             @click="dialogoDetalle = false"
-            class="close-btn"
+            class="purchase-close-btn"
           />
         </q-card-section>
 
-        <q-separator />
-
-        <q-card-section v-if="pagoSeleccionado">
-          <div class="detalle-grid">
-            <div class="detalle-item">
-              <span class="detalle-label">ID:</span>
-              <span class="detalle-valor">{{ pagoSeleccionado.id }}</span>
+        <q-card-section v-if="pagoSeleccionado" class="purchase-detail-body">
+          <div class="purchase-detail-grid">
+            <div class="purchase-detail-item">
+              <span class="purchase-detail-label">ID:</span>
+              <span class="purchase-detail-value">{{ pagoSeleccionado.id }}</span>
             </div>
             
-            <div class="detalle-item">
-              <span class="detalle-label">Paciente:</span>
-              <span class="detalle-valor">{{ pagoSeleccionado.paciente }}</span>
+            <div class="purchase-detail-item">
+              <span class="purchase-detail-label">Paciente:</span>
+              <span class="purchase-detail-value">{{ pagoSeleccionado.paciente }}</span>
             </div>
             
-            <div class="detalle-item">
-              <span class="detalle-label">Concepto:</span>
-              <span class="detalle-valor">{{ pagoSeleccionado.concepto }}</span>
+            <div class="purchase-detail-item">
+              <span class="purchase-detail-label">Concepto:</span>
+              <span class="purchase-detail-value">{{ pagoSeleccionado.concepto }}</span>
             </div>
             
-            <div class="detalle-item">
-              <span class="detalle-label">Monto:</span>
-              <span class="detalle-valor monto-destacado">Bs. {{ formatearMonto(pagoSeleccionado.monto) }}</span>
+            <div class="purchase-detail-item">
+              <span class="purchase-detail-label">Monto:</span>
+              <span class="purchase-detail-value purchase-amount-highlight">Bs. {{ formatearMonto(pagoSeleccionado.monto) }}</span>
             </div>
             
-            <div class="detalle-item">
-              <span class="detalle-label">Fecha:</span>
-              <span class="detalle-valor">{{ formatearFecha(pagoSeleccionado.fecha) }}</span>
+            <div class="purchase-detail-item">
+              <span class="purchase-detail-label">Fecha:</span>
+              <span class="purchase-detail-value">{{ formatearFecha(pagoSeleccionado.fecha) }}</span>
             </div>
             
-            <div class="detalle-item">
-              <span class="detalle-label">Método de Pago:</span>
-              <span class="detalle-valor">{{ pagoSeleccionado.metodoPago }}</span>
+            <div class="purchase-detail-item">
+              <span class="purchase-detail-label">Método de Pago:</span>
+              <span class="purchase-detail-value">
+                <div class="purchase-method-badge">
+                  <i :class="getMetodoIcon(pagoSeleccionado.metodoPago)"></i>
+                  {{ formatearMetodoPago(pagoSeleccionado.metodoPago) }}
+                </div>
+              </span>
             </div>
             
-            <div class="detalle-item">
-              <span class="detalle-label">Estado:</span>
-              <q-chip
-                :color="getColorEstado(pagoSeleccionado.estado)"
-                text-color="white"
-                :label="formatearEstado(pagoSeleccionado.estado)"
-              />
+            <div class="purchase-detail-item">
+              <span class="purchase-detail-label">Estado:</span>
+              <span class="purchase-detail-value">
+                <div class="purchase-status-badge" :class="getEstadoClass(pagoSeleccionado.estado)">
+                  <i :class="getEstadoIcon(pagoSeleccionado.estado)"></i>
+                  {{ formatearEstado(pagoSeleccionado.estado) }}
+                </div>
+              </span>
             </div>
             
-            <div class="detalle-item" v-if="pagoSeleccionado.numeroTransaccion">
-              <span class="detalle-label">N° Transacción:</span>
-              <span class="detalle-valor">{{ pagoSeleccionado.numeroTransaccion }}</span>
+            <div class="purchase-detail-item" v-if="pagoSeleccionado.numeroTransaccion">
+              <span class="purchase-detail-label">N° Transacción:</span>
+              <span class="purchase-detail-value purchase-transaction-code">{{ pagoSeleccionado.numeroTransaccion }}</span>
             </div>
             
-            <div class="detalle-item detalle-observaciones" v-if="pagoSeleccionado.observaciones">
-              <span class="detalle-label">Observaciones:</span>
-              <span class="detalle-valor">{{ pagoSeleccionado.observaciones }}</span>
+            <div class="purchase-detail-item purchase-detail-observations" v-if="pagoSeleccionado.observaciones">
+              <span class="purchase-detail-label">Observaciones:</span>
+              <span class="purchase-detail-value">{{ pagoSeleccionado.observaciones }}</span>
             </div>
           </div>
         </q-card-section>
       </q-card>
     </q-dialog>
-  </div>i
+  </div>
 </template>
 
 <script>
@@ -700,7 +741,7 @@ export default {
     }
     
     const getEstadoClass = (estado) => {
-      return `status-${estado}`
+      return `purchase-status-${estado}`
     }
     
     const getEstadoIcon = (estado) => {
@@ -894,3 +935,4 @@ export default {
   }
 }
 </script>
+

@@ -1,8 +1,8 @@
 <template>
-  <q-layout view="hHh LpR fFf">
-    <!-- Header del Dashboard -->
-    <q-header elevated class="bg-white text-dark">
-      <q-toolbar class="dashboard-toolbar">
+  <q-layout view="hHh LpR fFf" class="kiru-dashboard-layout">
+    <!-- Header del Dashboard Mejorado -->
+    <q-header elevated class="kiru-header">
+      <q-toolbar class="kiru-toolbar">
         <!-- Botón para toggle del drawer en móvil -->
         <q-btn
           flat
@@ -10,104 +10,146 @@
           round
           icon="menu"
           @click="toggleLeftDrawer"
-          class="lt-md"
+          class="lt-md kiru-menu-btn"
         />
 
-        <!-- Logo y título -->
-        <q-toolbar-title class="dashboard-title">
-          <div class="row items-center no-wrap">
-            <div class="tooth-icon-small q-mr-sm">
-              <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-                <path d="M16 4C12 4 8 6 8 12C8 18 10 24 12 26C13 27 15 28 16 28C17 28 19 27 20 26C22 24 24 18 24 12C24 6 20 4 16 4Z" fill="#FF6B35" stroke="#FF5722" stroke-width="1"/>
+        <!-- Logo y título mejorado -->
+        <q-toolbar-title class="kiru-toolbar-title">
+          <div class="kiru-logo-container">
+            <div class="kiru-logo-icon">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <path d="M16 4C12 4 8 6 8 12C8 18 10 24 12 26C13 27 15 28 16 28C17 28 19 27 20 26C22 24 24 18 24 12C24 6 20 4 16 4Z" fill="#FF6B35" stroke="#FF5722" stroke-width="1.5"/>
                 <circle cx="13" cy="14" r="1.5" fill="white"/>
                 <circle cx="19" cy="14" r="1.5" fill="white"/>
+                <path d="M12 20C13 21 15 22 16 22C17 22 19 21 20 20" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
               </svg>
             </div>
-            <div class="logo-text-small">
-              <div class="brand-name-small">KIRU</div>
+            <div class="kiru-logo-text">
+              <div class="kiru-brand-name">KIRU</div>
+              <div class="kiru-brand-subtitle">Odontología</div>
             </div>
           </div>
         </q-toolbar-title>
 
-        <!-- Breadcrumbs -->
-        <div class="breadcrumbs gt-sm">
-          <q-breadcrumbs>
-            <q-breadcrumbs-el icon="home" :to="getDefaultRoute()" />
+        <!-- Breadcrumbs mejorado -->
+        <div class="kiru-breadcrumbs gt-sm">
+          <q-breadcrumbs class="kiru-breadcrumbs-inner">
+            <q-breadcrumbs-el icon="fa-solid fa-home" :to="getDefaultRoute()" />
             <q-breadcrumbs-el 
               v-if="currentPageTitle" 
               :label="currentPageTitle" 
+              class="text-weight-bold"
             />
           </q-breadcrumbs>
         </div>
 
         <q-space />
 
-        <!-- Notificaciones -->
-        <q-btn flat round dense icon="notifications">
-          <q-badge color="red" floating>3</q-badge>
-          <q-menu>
-            <q-list style="min-width: 300px">
-              <q-item>
+        <!-- Notificaciones mejorado -->
+        <q-btn flat round dense icon="fa-solid fa-bell" class="kiru-notification-btn">
+          <q-badge color="red" floating class="kiru-notification-badge">3</q-badge>
+          <q-menu class="kiru-notification-menu">
+            <q-list class="kiru-notification-list">
+              <q-item class="kiru-notification-header">
                 <q-item-section>
-                  <q-item-label class="text-weight-bold">Notificaciones</q-item-label>
+                  <q-item-label class="kiru-notification-title">Notificaciones</q-item-label>
+                </q-item-section>
+                <q-item-section side>
+                  <q-btn flat dense icon="fa-solid fa-check-double" size="sm" class="text-grey-6" />
                 </q-item-section>
               </q-item>
               <q-separator />
-              <q-item clickable v-ripple>
+              <q-item clickable v-ripple class="kiru-notification-item">
                 <q-item-section avatar>
-                  <q-avatar color="primary" text-color="white" icon="event" />
+                  <q-avatar color="primary" text-color="white" icon="fa-solid fa-calendar-check" />
                 </q-item-section>
                 <q-item-section>
-                  <q-item-label>Nueva cita agendada</q-item-label>
-                  <q-item-label caption>Hace 5 minutos</q-item-label>
+                  <q-item-label class="kiru-notification-message">Nueva cita agendada</q-item-label>
+                  <q-item-label caption class="kiru-notification-time">Hace 5 minutos</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-item clickable v-ripple class="kiru-notification-item">
+                <q-item-section avatar>
+                  <q-avatar color="green" text-color="white" icon="fa-solid fa-user-plus" />
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label class="kiru-notification-message">Nuevo paciente registrado</q-item-label>
+                  <q-item-label caption class="kiru-notification-time">Hace 1 hora</q-item-label>
+                </q-item-section>
+              </q-item>
+              <q-separator />
+              <q-item clickable v-ripple class="kiru-notification-footer">
+                <q-item-section class="text-center text-primary">
+                  Ver todas las notificaciones
                 </q-item-section>
               </q-item>
             </q-list>
           </q-menu>
         </q-btn>
 
-        <!-- Perfil de usuario -->
-        <q-btn flat round dense>
-          <q-avatar size="36px">
+        <!-- Toggle modo oscuro/claro mejorado -->
+        <q-btn
+          flat
+          round
+          dense
+          :icon="$q.dark.isActive ? 'fa-solid fa-sun' : 'fa-solid fa-moon'"
+          :aria-label="$q.dark.isActive ? 'Desactivar modo oscuro' : 'Activar modo oscuro'"
+          @click="$q.dark.toggle()"
+          class="kiru-theme-toggle"
+          v-ripple
+        >
+          <q-tooltip anchor="bottom">Alternar modo oscuro</q-tooltip>
+        </q-btn>
+        
+        <!-- Perfil de usuario mejorado -->
+        <q-btn flat round dense class="kiru-profile-btn">
+          <q-avatar size="40px" class="kiru-user-avatar">
             <img :src="userAvatar" />
+            <div class="kiru-user-status" :class="getUserStatusClass()"></div>
           </q-avatar>
-          <q-menu>
-            <q-list style="min-width: 200px">
-              <q-item>
+          <q-menu class="kiru-profile-menu">
+            <q-list class="kiru-profile-list">
+              <q-item class="kiru-profile-header">
                 <q-item-section avatar>
-                  <q-avatar>
+                  <q-avatar size="60px" class="kiru-profile-avatar">
                     <img :src="userAvatar" />
                   </q-avatar>
                 </q-item-section>
                 <q-item-section>
-                  <q-item-label class="text-weight-bold">{{ userName }}</q-item-label>
-                  <q-item-label caption>{{ userEmail }}</q-item-label>
+                  <q-item-label class="kiru-profile-name">{{ userName }}</q-item-label>
+                  <q-item-label caption class="kiru-profile-email">{{ userEmail }}</q-item-label>
                   <q-item-label caption>
-                    <q-chip size="sm" :color="getRoleColor(userRole)" text-color="white">
+                    <q-chip size="sm" :class="['kiru-role-chip', `kiru-role-${userRole.toLowerCase()}`]">
                       {{ getRoleLabel(userRole) }}
                     </q-chip>
                   </q-item-label>
                 </q-item-section>
               </q-item>
               <q-separator />
-              <q-item clickable v-ripple @click="goToProfile">
+              <q-item clickable v-ripple @click="goToProfile" class="kiru-profile-item">
                 <q-item-section avatar>
-                  <q-icon name="person" />
+                  <q-icon name="fa-solid fa-user" class="kiru-profile-icon" />
                 </q-item-section>
                 <q-item-section>Mi Perfil</q-item-section>
+                <q-item-section side>
+                  <q-icon name="fa-solid fa-chevron-right" size="12px" class="text-grey-5" />
+                </q-item-section>
               </q-item>
-              <q-item clickable v-ripple @click="goToSettings">
+              <q-item clickable v-ripple @click="goToSettings" class="kiru-profile-item">
                 <q-item-section avatar>
-                  <q-icon name="settings" />
+                  <q-icon name="fa-solid fa-cog" class="kiru-profile-icon" />
                 </q-item-section>
                 <q-item-section>Configuración</q-item-section>
+                <q-item-section side>
+                  <q-icon name="fa-solid fa-chevron-right" size="12px" class="text-grey-5" />
+                </q-item-section>
               </q-item>
               <q-separator />
-              <q-item clickable v-ripple @click="handleLogout">
+              <q-item clickable v-ripple @click="handleLogout" class="kiru-logout-item">
                 <q-item-section avatar>
-                  <q-icon name="logout" color="negative" />
+                  <q-icon name="fa-solid fa-right-from-bracket" class="kiru-logout-icon" />
                 </q-item-section>
-                <q-item-section class="text-negative">Cerrar Sesión</q-item-section>
+                <q-item-section class="kiru-logout-text">Cerrar Sesión</q-item-section>
               </q-item>
             </q-list>
           </q-menu>
@@ -115,34 +157,36 @@
       </q-toolbar>
     </q-header>
 
-    <!-- Sidebar / Drawer -->
+    <!-- Sidebar / Drawer Mejorado -->
     <q-drawer
       v-model="leftDrawerOpen"
       show-if-above
-      :width="260"
+      :width="280"
       :breakpoint="1024"
       bordered
-      class="dashboard-drawer"
+      class="kiru-drawer"
     >
-      <q-scroll-area class="fit">
-        <div class="drawer-content">
-          <!-- Información del usuario en el drawer -->
-          <div class="user-info q-pa-md">
-            <div class="row items-center q-gutter-sm">
-              <q-avatar size="50px">
+      <q-scroll-area class="fit kiru-scroll-area">
+        <div class="kiru-drawer-content">
+          <!-- Información del usuario en el drawer mejorado -->
+          <div class="kiru-user-info">
+            <div class="kiru-user-avatar-large">
+              <q-avatar size="64px" class="kiru-user-avatar-img">
                 <img :src="userAvatar" />
               </q-avatar>
-              <div class="col">
-                <div class="text-weight-bold text-body1">{{ userName }}</div>
-                <div class="text-caption text-grey-7">{{ getRoleLabel(userRole) }}</div>
-              </div>
+              <div class="kiru-user-status-large" :class="getUserStatusClass()"></div>
+            </div>
+            <div class="kiru-user-details">
+              <div class="kiru-user-name">{{ userName }}</div>
+              <div class="kiru-user-role">{{ getRoleLabel(userRole) }}</div>
+              <div class="kiru-user-email">{{ userEmail }}</div>
             </div>
           </div>
 
-          <q-separator />
+          <q-separator class="kiru-drawer-separator" />
 
-          <!-- Menú de navegación dinámico -->
-          <q-list padding class="menu-list">
+          <!-- Menú de navegación dinámico mejorado -->
+          <q-list padding class="kiru-menu-list">
             <template v-for="(item, index) in filteredMenu" :key="index">
               <!-- Item con hijos (expandible) -->
               <q-expansion-item
@@ -150,9 +194,19 @@
                 :icon="item.icon"
                 :label="item.title"
                 :default-opened="isCurrentSection(item)"
-                class="menu-expansion-item"
+                class="kiru-menu-expansion-item"
+                expand-icon-class="kiru-expand-icon"
               >
-                <q-list padding>
+                <template v-slot:header>
+                  <q-item-section avatar>
+                    <q-icon :name="item.icon" class="kiru-menu-icon" />
+                  </q-item-section>
+                  <q-item-section>
+                    {{ item.title }}
+                  </q-item-section>
+                </template>
+
+                <q-list class="kiru-submenu-list">
                   <q-item
                     v-for="(child, childIndex) in item.children"
                     :key="childIndex"
@@ -160,13 +214,14 @@
                     v-ripple
                     :to="child.to"
                     exact
-                    class="menu-child-item"
+                    class="kiru-submenu-item"
+                    :class="{ 'kiru-submenu-item-active': $route.path === child.to }"
                   >
                     <q-item-section avatar>
-                      <q-icon :name="child.icon" size="20px" />
+                      <q-icon :name="child.icon" size="18px" class="kiru-submenu-icon" />
                     </q-item-section>
                     <q-item-section>
-                      <q-item-label>{{ child.title }}</q-item-label>
+                      <q-item-label class="kiru-submenu-label">{{ child.title }}</q-item-label>
                     </q-item-section>
                   </q-item>
                 </q-list>
@@ -179,28 +234,34 @@
                 v-ripple
                 :to="item.to"
                 exact
-                class="menu-item"
+                class="kiru-menu-item"
+                :class="{ 'kiru-menu-item-active': $route.path === item.to }"
               >
                 <q-item-section avatar>
-                  <q-icon :name="item.icon" size="24px" />
+                  <q-icon :name="item.icon" class="kiru-menu-icon" />
                 </q-item-section>
                 <q-item-section>
-                  <q-item-label>{{ item.title }}</q-item-label>
+                  <q-item-label class="kiru-menu-label">{{ item.title }}</q-item-label>
+                </q-item-section>
+                <q-item-section side v-if="item.badge" class="kiru-menu-badge-container">
+                  <q-badge :color="item.badgeColor || 'primary'" class="kiru-menu-badge">
+                    {{ item.badge }}
+                  </q-badge>
                 </q-item-section>
               </q-item>
             </template>
           </q-list>
 
-          <q-separator class="q-my-md" />
+          <q-separator class="kiru-drawer-separator" />
 
-          <!-- Botón para volver al sitio público -->
-          <div class="q-pa-md">
+          <!-- Botón para volver al sitio público mejorado -->
+          <div class="kiru-public-site-section">
             <q-btn
               flat
               dense
-              icon="public"
+              icon="fa-solid fa-globe"
               label="Ver Sitio Público"
-              class="full-width"
+              class="kiru-public-site-btn"
               @click="goToPublicSite"
             />
           </div>
@@ -209,18 +270,29 @@
     </q-drawer>
 
     <!-- Contenido principal -->
-    <q-page-container>
+    <q-page-container class="kiru-page-container">
       <router-view />
     </q-page-container>
 
-    <!-- Footer opcional -->
-    <q-footer class="bg-grey-2 text-dark border-top">
-      <q-toolbar class="q-py-sm">
-        <q-toolbar-title class="text-caption text-grey-7">
-          © 2025 KIRU Odontología - Panel de Administración
+    <!-- Footer mejorado -->
+    <q-footer class="kiru-footer">
+      <q-toolbar class="kiru-footer-toolbar">
+        <q-toolbar-title class="kiru-footer-text">
+          <div class="kiru-footer-content">
+            <div class="kiru-footer-copyright">
+              © 2025 KIRU Odontología - Panel de Administración
+            </div>
+            <div class="kiru-footer-version">
+              <q-icon name="fa-solid fa-code-branch" size="14px" class="q-mr-xs" />
+              Versión 1.0.0
+            </div>
+          </div>
         </q-toolbar-title>
-        <div class="text-caption text-grey-7">
-          Versión 1.0.0
+        <div class="kiru-footer-stats">
+          <div class="kiru-footer-stat">
+            <q-icon name="fa-solid fa-users" size="14px" class="q-mr-xs" />
+            <span>24 usuarios activos</span>
+          </div>
         </div>
       </q-toolbar>
     </q-footer>
@@ -243,10 +315,10 @@ const authStore = useAuthStore()
 const leftDrawerOpen = ref(false)
 
 // Datos del usuario desde el store
-const userName = computed(() => authStore.userName)
-const userEmail = computed(() => authStore.userEmail)
-const userAvatar = computed(() => authStore.userAvatar)
-const userRole = computed(() => authStore.userRole)
+const userName = computed(() => authStore.userName || 'Usuario KIRU')
+const userEmail = computed(() => authStore.userEmail || 'usuario@kiru.com')
+const userAvatar = computed(() => authStore.userAvatar || 'https://cdn.quasar.dev/img/avatar.png')
+const userRole = computed(() => authStore.userRole || 'ADMIN')
 
 // Título de la página actual
 const currentPageTitle = computed(() => route.meta.title || '')
@@ -297,17 +369,12 @@ const isCurrentSection = (item) => {
 
 // Obtener ruta por defecto según rol
 const getDefaultRoute = () => {
-  return authStore.getDefaultRoute()
+  return authStore.getDefaultRoute ? authStore.getDefaultRoute() : '/dashboard'
 }
 
-// Obtener color según rol
-const getRoleColor = (role) => {
-  const colors = {
-    ADMIN: 'deep-purple',
-    DENTIST: 'blue',
-    CLIENT: 'teal'
-  }
-  return colors[role] || 'grey'
+// Obtener clase de estado del usuario
+const getUserStatusClass = () => {
+  return 'kiru-status-online' // Siempre online en esta implementación
 }
 
 // Obtener etiqueta del rol
@@ -325,7 +392,8 @@ const goToProfile = () => {
   $q.notify({
     message: 'Función de perfil en desarrollo',
     color: 'info',
-    position: 'top'
+    position: 'top',
+    icon: 'fa-solid fa-user'
   })
 }
 
@@ -334,7 +402,8 @@ const goToSettings = () => {
   $q.notify({
     message: 'Función de configuración en desarrollo',
     color: 'info',
-    position: 'top'
+    position: 'top',
+    icon: 'fa-solid fa-cog'
   })
 }
 
@@ -350,20 +419,26 @@ const handleLogout = () => {
     message: '¿Estás seguro que deseas cerrar sesión?',
     cancel: {
       label: 'Cancelar',
-      flat: true
+      flat: true,
+      color: 'grey'
     },
     ok: {
       label: 'Cerrar Sesión',
-      color: 'negative'
-    }
+      color: 'negative',
+      icon: 'fa-solid fa-right-from-bracket'
+    },
+    persistent: true
   }).onOk(() => {
-    authStore.logout()
+    if (authStore.logout) {
+      authStore.logout()
+    }
     router.push('/login')
     $q.notify({
       message: 'Sesión cerrada exitosamente',
       color: 'positive',
       position: 'top',
-      icon: 'logout'
+      icon: 'fa-solid fa-check',
+      timeout: 2000
     })
   })
 }
@@ -376,4 +451,3 @@ watch(route, () => {
 })
 </script>
 
-<!-- Los estilos están en app.scss global -->

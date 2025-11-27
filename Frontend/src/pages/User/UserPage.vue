@@ -1,17 +1,23 @@
 <template>
-  <div class="page-container">
+  <div class="user-page-container">
     <!-- Header Section -->
-    <div class="page-header">
-      <div class="header-content">
-        <div class="title-section">
-          <i class="fa-solid fa-users header-icon"></i>
+    <div class="user-page-header">
+      <div class="user-header-background">
+        <div class="user-header-shape user-header-shape-1"></div>
+        <div class="user-header-shape user-header-shape-2"></div>
+      </div>
+      <div class="user-header-content">
+        <div class="user-title-section">
+          <div class="user-icon-wrapper">
+            <i class="fa-solid fa-users user-header-icon"></i>
+          </div>
           <div>
-            <h1 class="page-title">Gestión de Usuarios</h1>
-            <p class="page-subtitle">Administra permisos y accesos del personal de tu clínica</p>
+            <h1 class="user-page-title">Gestión de Usuarios</h1>
+            <p class="user-page-subtitle">Administra permisos y accesos del personal de tu clínica</p>
           </div>
         </div>
         <q-btn
-          class="primary-btn"
+          class="user-primary-btn"
           color="primary"
           icon="fa-solid fa-plus"
           label="Agregar Usuario"
@@ -24,70 +30,95 @@
     </div>
 
     <!-- Stats Section -->
-    <div class="stats-section">
-      <div class="stat-card">
-        <div class="stat-icon-container active">
+    <div class="user-stats-section">
+      <div class="user-stat-card">
+        <div class="user-stat-icon-container active">
           <i class="fa-solid fa-user-check"></i>
         </div>
-        <div class="stat-content">
-          <div class="stat-value">{{ activeUsersCount }}</div>
-          <div class="stat-label">Usuarios Activos</div>
+        <div class="user-stat-content">
+          <div class="user-stat-value">{{ activeUsersCount }}</div>
+          <div class="user-stat-label">Usuarios Activos</div>
         </div>
+        <div class="user-stat-glow active"></div>
       </div>
       
-      <div class="stat-card">
-        <div class="stat-icon-container inactive">
+      <div class="user-stat-card">
+        <div class="user-stat-icon-container inactive">
           <i class="fa-solid fa-user-slash"></i>
         </div>
-        <div class="stat-content">
-          <div class="stat-value">{{ inactiveUsersCount }}</div>
-          <div class="stat-label">Usuarios Inactivos</div>
+        <div class="user-stat-content">
+          <div class="user-stat-value">{{ inactiveUsersCount }}</div>
+          <div class="user-stat-label">Usuarios Inactivos</div>
         </div>
+        <div class="user-stat-glow inactive"></div>
       </div>
       
-      <div class="stat-card">
-        <div class="stat-icon-container admin">
+      <div class="user-stat-card">
+        <div class="user-stat-icon-container admin">
           <i class="fa-solid fa-user-shield"></i>
         </div>
-        <div class="stat-content">
-          <div class="stat-value">{{ adminUsersCount }}</div>
-          <div class="stat-label">Administradores</div>
+        <div class="user-stat-content">
+          <div class="user-stat-value">{{ adminUsersCount }}</div>
+          <div class="user-stat-label">Administradores</div>
         </div>
+        <div class="user-stat-glow admin"></div>
       </div>
       
-      <div class="stat-card">
-        <div class="stat-icon-container total">
+      <div class="user-stat-card">
+        <div class="user-stat-icon-container total">
           <i class="fa-solid fa-users"></i>
         </div>
-        <div class="stat-content">
-          <div class="stat-value">{{ filteredRows.length }}</div>
-          <div class="stat-label">Total de Usuarios</div>
+        <div class="user-stat-content">
+          <div class="user-stat-value">{{ filteredRows.length }}</div>
+          <div class="user-stat-label">Total de Usuarios</div>
         </div>
+        <div class="user-stat-glow total"></div>
       </div>
     </div>
 
     <!-- Search Section -->
-    <div class="search-section">
-      <q-input
-        v-model="search"
-        class="search-input"
-        outlined
-        type="search"
-        placeholder="Buscar por nombre, email o tipo de usuario..."
-        @input="filterRows"
-        clearable
-        dense
-      >
-        <template v-slot:prepend>
-          <i class="fa-solid fa-search"></i>
-        </template>
-      </q-input>
+    <div class="user-search-section">
+      <div class="user-search-container">
+        <q-input
+          v-model="search"
+          class="user-search-input"
+          outlined
+          type="search"
+          placeholder="Buscar por nombre, email o tipo de usuario..."
+          @input="filterRows"
+          clearable
+        >
+          <template v-slot:prepend>
+            <i class="fa-solid fa-search user-search-icon"></i>
+          </template>
+          <template v-slot:append>
+            <q-icon 
+              v-if="search" 
+              name="fa-solid fa-filter" 
+              class="text-primary"
+            />
+          </template>
+        </q-input>
+      </div>
     </div>
 
     <!-- Table Section -->
-    <div class="table-container">
+    <div class="user-table-container">
+      <div class="user-table-header">
+        <div class="user-table-title-section">
+          <h3 class="user-table-title">Lista de Usuarios</h3>
+          <div class="user-table-underline"></div>
+        </div>
+        <div class="user-results-count">
+          <span class="user-count-badge">
+            <i class="fa-solid fa-list-check"></i>
+            {{ filteredRows.length }} usuario{{ filteredRows.length !== 1 ? 's' : '' }}
+          </span>
+        </div>
+      </div>
+
       <q-table
-        class="data-table"
+        class="user-data-table"
         flat
         :rows="filteredRows"
         :columns="columns"
@@ -97,61 +128,63 @@
         separator="cell"
       >
         <template v-slot:no-data>
-          <div class="no-data-container">
-            <i class="fa-solid fa-users-slash no-data-icon"></i>
-            <p class="no-data-text">No se encontraron usuarios</p>
-            <p class="no-data-subtext">Intenta ajustar los filtros de búsqueda</p>
+          <div class="user-no-data-container">
+            <div class="user-no-data-illustration">
+              <i class="fa-solid fa-users-slash user-no-data-icon"></i>
+              <div class="user-no-data-circle user-no-data-circle-1"></div>
+              <div class="user-no-data-circle user-no-data-circle-2"></div>
+            </div>
+            <p class="user-no-data-text">No se encontraron usuarios</p>
+            <p class="user-no-data-subtext">Intenta ajustar los filtros de búsqueda o agrega un nuevo usuario</p>
           </div>
         </template>
 
         <template v-slot:body-cell-avatar="props">
           <q-td :props="props">
-            <div class="avatar-container">
-              <q-avatar 
-                size="48px"
-                class="user-avatar"
-                :color="props.row.avatar ? 'transparent' : 'primary'"
-                :text-color="props.row.avatar ? 'transparent' : 'white'"
-              >
-                <img 
-                  v-if="props.row.avatar" 
-                  :src="props.row.avatar" 
-                  :alt="props.row.username"
-                  @error="handleImageError"
-                />
-                <span v-else class="avatar-initials">{{ getInitials(props.row.username) }}</span>
-              </q-avatar>
+            <div class="user-avatar-container">
+              <div class="user-avatar-wrapper">
+                <q-avatar 
+                  size="56px"
+                  class="user-user-avatar"
+                  :color="props.row.avatar ? 'transparent' : getAvatarColor(props.row.username)"
+                  :text-color="props.row.avatar ? 'transparent' : 'white'"
+                >
+                  <img 
+                    v-if="props.row.avatar" 
+                    :src="props.row.avatar" 
+                    :alt="props.row.username"
+                    @error="handleImageError"
+                  />
+                  <span v-else class="user-avatar-initials">{{ getInitials(props.row.username) }}</span>
+                </q-avatar>
+                <div class="user-avatar-status" :class="getStateClass(props.row.state)"></div>
+              </div>
             </div>
           </q-td>
         </template>
 
         <template v-slot:body-cell-username="props">
           <q-td :props="props">
-            <div class="user-info">
-              <span class="user-name">{{ props.row.username }}</span>
+            <div class="user-user-info">
+              <span class="user-user-name">{{ props.row.username }}</span>
+              <span class="user-user-role">{{ formatType(props.row.type) }}</span>
             </div>
           </q-td>
         </template>
 
         <template v-slot:body-cell-email="props">
           <q-td :props="props">
-            <span class="user-email">{{ props.row.email }}</span>
-          </q-td>
-        </template>
-
-        <template v-slot:body-cell-state="props">
-          <q-td :props="props">
-            <q-badge
-              :class="['state-badge', getStateClass(props.row.state)]"
-              :label="formatState(props.row.state)"
-            />
+            <div class="user-email-content">
+              <i class="fa-solid fa-envelope user-email-icon"></i>
+              <span class="user-email-text">{{ props.row.email }}</span>
+            </div>
           </q-td>
         </template>
 
         <template v-slot:body-cell-type="props">
           <q-td :props="props">
             <q-chip
-              :class="['type-chip', getTypeClass(props.row.type)]"
+              :class="['user-type-chip', getTypeClass(props.row.type)]"
               :label="formatType(props.row.type)"
               :icon="getTypeIcon(props.row.type)"
               dense
@@ -159,11 +192,20 @@
           </q-td>
         </template>
 
+        <template v-slot:body-cell-state="props">
+          <q-td :props="props">
+            <q-badge
+              :class="['user-state-badge', getStateClass(props.row.state)]"
+              :label="formatState(props.row.state)"
+            />
+          </q-td>
+        </template>
+
         <template v-slot:body-cell-actions="props">
           <q-td :props="props">
-            <div class="action-buttons">
+            <div class="user-action-buttons">
               <q-btn
-                class="action-btn view-btn"
+                class="user-action-btn user-view-btn"
                 flat
                 dense
                 round
@@ -176,7 +218,7 @@
               </q-btn>
               
               <q-btn
-                class="action-btn edit-btn"
+                class="user-action-btn user-edit-btn"
                 flat
                 dense
                 round
@@ -189,7 +231,7 @@
               </q-btn>
               
               <q-btn
-                class="action-btn delete-btn"
+                class="user-action-btn user-delete-btn"
                 flat
                 dense
                 round
@@ -225,31 +267,31 @@
 
     <!-- Delete Confirmation Dialog -->
     <q-dialog v-model="showDeleteDialog" persistent>
-      <q-card class="confirm-dialog">
-        <q-card-section class="dialog-header">
-          <div class="dialog-icon-container">
-            <i class="fa-solid fa-exclamation-triangle dialog-icon"></i>
+      <q-card class="user-confirm-dialog">
+        <q-card-section class="user-dialog-header">
+          <div class="user-dialog-icon-container">
+            <i class="fa-solid fa-exclamation-triangle user-dialog-icon"></i>
           </div>
-          <h3 class="dialog-title">Confirmar Eliminación</h3>
+          <h3 class="user-dialog-title">Confirmar Eliminación</h3>
         </q-card-section>
 
         <q-card-section class="q-pt-none">
-          <p class="dialog-text">
+          <p class="user-dialog-text">
             ¿Está seguro que desea eliminar al usuario <strong>{{ selectedUser?.username }}</strong>?
           </p>
-          <p class="dialog-subtext">
+          <p class="user-dialog-subtext">
             Esta acción no se puede deshacer y el usuario perderá acceso al sistema.
           </p>
         </q-card-section>
 
-        <q-card-actions class="dialog-actions">
+        <q-card-actions class="user-dialog-actions">
           <q-btn 
             flat 
             label="Cancelar" 
             color="grey-7" 
             v-close-popup 
             no-caps
-            class="dialog-btn"
+            class="user-dialog-btn"
           />
           <q-btn 
             unelevated
@@ -258,7 +300,7 @@
             @click="deleteUser"
             v-close-popup 
             no-caps
-            class="dialog-btn"
+            class="user-dialog-btn user-dialog-delete-btn"
           />
         </q-card-actions>
       </q-card>
@@ -283,7 +325,7 @@ const columns = [
     align: 'center',
     field: 'avatar',
     sortable: false,
-    style: 'width: 70px'
+    style: 'width: 80px'
   },
   {
     name: 'username',
@@ -322,7 +364,7 @@ const columns = [
     field: 'actions',
     align: 'center',
     sortable: false,
-    style: 'width: 140px'
+    style: 'width: 150px'
   }
 ]
 
@@ -348,15 +390,15 @@ const TYPE_TRANSLATIONS = {
 }
 
 const STATE_CLASSES = {
-  active: 'state-active',
-  inactive: 'state-inactive',
-  pending: 'state-pending'
+  active: 'user-state-active',
+  inactive: 'user-state-inactive',
+  pending: 'user-state-pending'
 }
 
 const TYPE_CLASSES = {
-  admin: 'type-admin',
-  user: 'type-user',
-  moderator: 'type-moderator'
+  admin: 'user-type-admin',
+  user: 'user-type-user',
+  moderator: 'user-type-moderator'
 }
 
 const TYPE_ICONS = {
@@ -404,13 +446,53 @@ export default {
     )
 
     // ============================================
+    // Funciones Utilitarias Mejoradas
+    // ============================================
+    
+    const getAvatarColor = (username) => {
+      if (!username) return '#9e9e9e'
+      
+      const colors = [
+        '#f44336', '#e91e63', '#9c27b0', '#673ab7',
+        '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4',
+        '#009688', '#4caf50', '#8bc34a', '#cddc39',
+        '#ffeb3b', '#ffc107', '#ff9800', '#ff5722'
+      ]
+      
+      let hash = 0
+      for (let i = 0; i < username.length; i++) {
+        hash = username.charCodeAt(i) + ((hash << 5) - hash)
+      }
+      
+      return colors[Math.abs(hash) % colors.length]
+    }
+
+    const getInitials = (name) => {
+      if (!name) return '?'
+      
+      const words = name.trim().split(' ')
+      
+      if (words.length === 1) {
+        return words[0].substring(0, 2).toUpperCase()
+      }
+      
+      return (words[0][0] + (words[1]?.[0] || '')).toUpperCase()
+    }
+
+    const handleImageError = (event) => {
+      event.target.style.display = 'none'
+    }
+
+    const formatState = (state) => STATE_TRANSLATIONS[state] || state
+    const formatType = (type) => TYPE_TRANSLATIONS[type] || type
+    const getStateClass = (state) => STATE_CLASSES[state] || 'user-state-default'
+    const getTypeClass = (type) => TYPE_CLASSES[type] || 'user-type-default'
+    const getTypeIcon = (type) => TYPE_ICONS[type] || 'fa-solid fa-user'
+
+    // ============================================
     // Gestión de Búsqueda con Fuse.js
     // ============================================
     
-    /**
-     * Reconstruye el índice de búsqueda de Fuse.js
-     * Excluye usuarios eliminados de la colección
-     */
     const rebuildFuse = () => {
       const collection = rows.value.filter(user => user.state !== 'deleted')
       
@@ -421,10 +503,6 @@ export default {
       }
     }
 
-    /**
-     * Filtra usuarios según el término de búsqueda
-     * Si no hay búsqueda, muestra todos los usuarios activos
-     */
     const filterRows = () => {
       if (!search.value?.trim()) {
         filteredRows.value = rows.value.filter(user => user.state !== 'deleted')
@@ -439,10 +517,6 @@ export default {
     // Operaciones CRUD
     // ============================================
     
-    /**
-     * Carga usuarios desde el JSON
-     * Normaliza los IDs a números e inicializa Fuse.js
-     */
     const loadUsers = () => {
       rows.value = users.users.map(user => ({ 
         ...user, 
@@ -453,10 +527,6 @@ export default {
       fuse = new Fuse(filteredRows.value, FUSE_OPTIONS)
     }
 
-    /**
-     * Crea un nuevo usuario con valores por defecto
-     * Genera un ID único autoincremental
-     */
     const handleUserCreate = (newUser) => {
       const userToAdd = {
         username: newUser.username || 'sin-nombre',
@@ -470,7 +540,6 @@ export default {
         avatar: newUser.avatar || null
       }
 
-      // Genera ID único
       const numericIds = rows.value
         .map(u => Number(u.id))
         .filter(n => !Number.isNaN(n))
@@ -483,10 +552,6 @@ export default {
       filterRows()
     }
 
-    /**
-     * Actualiza un usuario existente
-     * Mantiene la integridad del ID como número
-     */
     const handleUserUpdate = (updatedUser) => {
       const index = rows.value.findIndex(
         u => Number(u.id) === Number(updatedUser.id)
@@ -502,10 +567,6 @@ export default {
       }
     }
 
-    /**
-     * Eliminación logica: marca el estado como 'deleted'
-     * No elimina físicamente el registro
-     */
     const deleteUser = () => {
       const index = rows.value.findIndex(
         u => Number(u.id) === Number(selectedUser.value.id)
@@ -540,41 +601,6 @@ export default {
       selectedUser.value = { ...user }
       showDeleteDialog.value = true
     }
-
-    // ============================================
-    // Funciones Utilitarias
-    // ============================================
-    
-    /**
-     * Genera iniciales para el avatar
-     * Ejemplos: "Juan Perez" → "JP", "Ana" → "AN"
-     */
-    const getInitials = (name) => {
-      if (!name) return '?'
-      
-      const words = name.trim().split(' ')
-      
-      if (words.length === 1) {
-        return words[0].substring(0, 2).toUpperCase()
-      }
-      
-      return (words[0][0] + (words[1]?.[0] || '')).toUpperCase()
-    }
-
-    /**
-     * Maneja errores de carga de imágenes
-     * Oculta la imagen y muestra las iniciales
-     */
-    const handleImageError = (event) => {
-      event.target.style.display = 'none'
-    }
-
-    // Funciones de formato y clases CSS
-    const formatState = (state) => STATE_TRANSLATIONS[state] || state
-    const formatType = (type) => TYPE_TRANSLATIONS[type] || type
-    const getStateClass = (state) => STATE_CLASSES[state] || 'state-default'
-    const getTypeClass = (type) => TYPE_CLASSES[type] || 'type-default'
-    const getTypeIcon = (type) => TYPE_ICONS[type] || 'fa-solid fa-user'
 
     // ============================================
     // Ciclo de Vida
@@ -624,6 +650,7 @@ export default {
       confirmDeleteUser,
       
       // Utilidades
+      getAvatarColor,
       getInitials,
       handleImageError,
       formatState,
@@ -635,3 +662,4 @@ export default {
   }
 }
 </script>
+

@@ -1,160 +1,212 @@
 <template>
-  <div class="page-container">
-    <div class="page-header">
-      <div class="header-content">
-        <div class="title-section">
-          <i class="fa-solid fa-tooth header-icon"></i>
+  <div class="odontogram-page-container">
+    <!-- Header Section -->
+    <div class="odontogram-page-header">
+      <div class="odontogram-header-background">
+        <div class="odontogram-header-shape odontogram-header-shape-1"></div>
+        <div class="odontogram-header-shape odontogram-header-shape-2"></div>
+      </div>
+      <div class="odontogram-header-content">
+        <div class="odontogram-title-section">
+          <div class="odontogram-icon-wrapper">
+            <i class="fa-solid fa-tooth odontogram-header-icon"></i>
+          </div>
           <div>
-            <h1 class="page-title">Odontograma</h1>
-            <p class="page-subtitle">Visualiza y gestiona el tratamiento dental del paciente</p>
+            <h1 class="odontogram-page-title">Odontograma</h1>
+            <p class="odontogram-page-subtitle">Visualiza y gestiona el tratamiento dental del paciente</p>
           </div>
         </div>
       </div>
     </div>
 
-    <SearchPaciente @paciente-seleccionado="cargarOdontograma" />
-
-    <div v-if="pacienteSeleccionado && odontograma" class="odontograma-container q-mt-md">
-      <q-card class="q-mb-md">
-        <q-card-section>
-          <div class="row items-center q-col-gutter-md">
-            <div class="col">
-              <h6 class="text-h6 q-my-none">Odontograma de {{ pacienteSeleccionado.nombre }}</h6>
-              <p class="text-caption text-grey-7 q-mb-none">CI: {{ pacienteSeleccionado.ci }}</p>
-              <p class="text-caption text-grey-7 q-mb-none">Tipo: {{ odontograma.tipo_denticion }}</p>
-            </div>
-            <div class="col-auto">
-              <q-btn flat color="primary" icon="edit" label="Editar" />
-            </div>
-          </div>
-        </q-card-section>
-
-        <q-separator />
-
-        <q-card-section>
-          <div class="row q-col-gutter-md">
-            <div class="col-12 col-md-6">
-              <div class="text-subtitle2 q-mb-xs">Diagnóstico General:</div>
-              <div class="text-body2">{{ odontograma.diagnostico_general }}</div>
-            </div>
-            <div class="col-12 col-md-6">
-              <div class="text-subtitle2 q-mb-xs">Plan de Tratamiento:</div>
-              <div class="text-body2">{{ odontograma.plan_tratamiento }}</div>
-            </div>
-          </div>
-        </q-card-section>
-      </q-card>
-
-      <q-card>
-        <q-card-section>
-          <div class="odontograma-grid">
-            <div class="quadrant quadrant-superior-derecho">
-              <div class="quadrant-label">Superior Derecho</div>
-              <div class="teeth-row">
-                <Tooth
-                  v-for="num in [18, 17, 16, 15, 14, 13, 12, 11]"
-                  :key="num"
-                  :pieza="obtenerPieza(num)"
-                  posicion="superior"
-                  @select-face="handleSelectFace"
-                />
-              </div>
-            </div>
-
-            <div class="quadrant quadrant-superior-izquierdo">
-              <div class="quadrant-label">Superior Izquierdo</div>
-              <div class="teeth-row">
-                <Tooth
-                  v-for="num in [21, 22, 23, 24, 25, 26, 27, 28]"
-                  :key="num"
-                  :pieza="obtenerPieza(num)"
-                  posicion="superior"
-                  @select-face="handleSelectFace"
-                />
-              </div>
-            </div>
-
-            <div class="separator"></div>
-
-            <div class="quadrant quadrant-inferior-derecho">
-              <div class="teeth-row">
-                <Tooth
-                  v-for="num in [48, 47, 46, 45, 44, 43, 42, 41]"
-                  :key="num"
-                  :pieza="obtenerPieza(num)"
-                  posicion="inferior"
-                  @select-face="handleSelectFace"
-                />
-              </div>
-              <div class="quadrant-label">Inferior Derecho</div>
-            </div>
-
-            <div class="quadrant quadrant-inferior-izquierdo">
-              <div class="teeth-row">
-                <Tooth
-                  v-for="num in [31, 32, 33, 34, 35, 36, 37, 38]"
-                  :key="num"
-                  :pieza="obtenerPieza(num)"
-                  posicion="inferior"
-                  @select-face="handleSelectFace"
-                />
-              </div>
-              <div class="quadrant-label">Inferior Izquierdo</div>
-            </div>
-          </div>
-        </q-card-section>
-      </q-card>
-
-      <q-card class="q-mt-md">
-        <q-card-section>
-          <h6 class="text-h6 q-my-none q-mb-md">Resumen de Tratamientos</h6>
-          
-          <q-list bordered separator>
-            <q-item v-for="pieza in piezasConTratamiento" :key="pieza.id">
-              <q-item-section avatar>
-                <q-avatar :color="getColorEstado(pieza.estado_general)" text-color="white">
-                  {{ pieza.numero }}
-                </q-avatar>
-              </q-item-section>
-
-              <q-item-section>
-                <q-item-label>Diente #{{ pieza.numero }}</q-item-label>
-                <q-item-label caption>{{ pieza.diagnostico }}</q-item-label>
-              </q-item-section>
-
-              <q-item-section side>
-                <q-chip 
-                  :color="getColorEstado(pieza.estado_general)" 
-                  text-color="white"
-                  size="sm"
-                >
-                  {{ pieza.estado_general }}
-                </q-chip>
-                <div class="text-caption">Bs. {{ pieza.precio.toFixed(2) }}</div>
-              </q-item-section>
-            </q-item>
-          </q-list>
-
-          <q-separator class="q-my-md" />
-
-          <div class="row items-center justify-between">
-            <div class="text-h6">Total:</div>
-            <div class="text-h5 text-primary">Bs. {{ costoTotal.toFixed(2) }}</div>
-          </div>
-        </q-card-section>
-      </q-card>
+    <!-- Search Component -->
+    <div class="odontogram-search-section">
+      <SearchPaciente @paciente-seleccionado="cargarOdontograma" />
     </div>
 
-    <div v-else class="no-patient q-mt-md">
-      <q-card>
-        <q-card-section class="text-center q-pa-lg">
-          <i class="fa-solid fa-inbox text-grey-5" style="font-size: 48px;"></i>
-          <p class="text-h6 text-grey-7 q-mt-md">Selecciona un paciente</p>
-          <p class="text-body2 text-grey-6">
-            Ingresa el CI del paciente en el campo de búsqueda para cargar su odontograma
-          </p>
-        </q-card-section>
-      </q-card>
+    <!-- Odontogram Content -->
+    <div v-if="pacienteSeleccionado && odontograma" class="odontogram-content-container">
+      <!-- Patient Info Card -->
+      <div class="odontogram-patient-card">
+        <div class="odontogram-card-header">
+          <div class="odontogram-patient-info">
+            <h3 class="odontogram-patient-name">Odontograma de {{ pacienteSeleccionado.nombre }}</h3>
+            <div class="odontogram-patient-details">
+              <span class="odontogram-patient-detail">
+                <i class="fa-solid fa-id-card"></i>
+                CI: {{ pacienteSeleccionado.ci }}
+              </span>
+              <span class="odontogram-patient-detail">
+                <i class="fa-solid fa-teeth"></i>
+                Tipo: {{ odontograma.tipo_denticion }}
+              </span>
+            </div>
+          </div>
+          <q-btn 
+            class="odontogram-edit-btn"
+            flat 
+            icon="fa-solid fa-edit" 
+            label="Editar" 
+            size="md"
+          />
+        </div>
+
+        <div class="odontogram-diagnosis-section">
+          <div class="odontogram-diagnosis-item">
+            <div class="odontogram-diagnosis-label">
+              <i class="fa-solid fa-stethoscope"></i>
+              Diagnóstico General:
+            </div>
+            <div class="odontogram-diagnosis-text">{{ odontograma.diagnostico_general }}</div>
+          </div>
+          <div class="odontogram-diagnosis-item">
+            <div class="odontogram-diagnosis-label">
+              <i class="fa-solid fa-clipboard-list"></i>
+              Plan de Tratamiento:
+            </div>
+            <div class="odontogram-diagnosis-text">{{ odontograma.plan_tratamiento }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Odontogram Grid -->
+      <div class="odontogram-grid-card">
+        <div class="odontogram-grid-container">
+          <div class="odontogram-quadrant odontogram-quadrant-superior-derecho">
+            <div class="odontogram-quadrant-label">
+              <i class="fa-solid fa-arrow-up-right"></i>
+              Superior Derecho
+            </div>
+            <div class="odontogram-teeth-row">
+              <Tooth
+                v-for="num in [18, 17, 16, 15, 14, 13, 12, 11]"
+                :key="num"
+                :pieza="obtenerPieza(num)"
+                posicion="superior"
+                @select-face="handleSelectFace"
+              />
+            </div>
+          </div>
+
+          <div class="odontogram-quadrant odontogram-quadrant-superior-izquierdo">
+            <div class="odontogram-quadrant-label">
+              <i class="fa-solid fa-arrow-up-left"></i>
+              Superior Izquierdo
+            </div>
+            <div class="odontogram-teeth-row">
+              <Tooth
+                v-for="num in [21, 22, 23, 24, 25, 26, 27, 28]"
+                :key="num"
+                :pieza="obtenerPieza(num)"
+                posicion="superior"
+                @select-face="handleSelectFace"
+              />
+            </div>
+          </div>
+
+          <div class="odontogram-separator">
+            <div class="odontogram-separator-line"></div>
+          </div>
+
+          <div class="odontogram-quadrant odontogram-quadrant-inferior-derecho">
+            <div class="odontogram-teeth-row">
+              <Tooth
+                v-for="num in [48, 47, 46, 45, 44, 43, 42, 41]"
+                :key="num"
+                :pieza="obtenerPieza(num)"
+                posicion="inferior"
+                @select-face="handleSelectFace"
+              />
+            </div>
+            <div class="odontogram-quadrant-label">
+              <i class="fa-solid fa-arrow-down-right"></i>
+              Inferior Derecho
+            </div>
+          </div>
+
+          <div class="odontogram-quadrant odontogram-quadrant-inferior-izquierdo">
+            <div class="odontogram-teeth-row">
+              <Tooth
+                v-for="num in [31, 32, 33, 34, 35, 36, 37, 38]"
+                :key="num"
+                :pieza="obtenerPieza(num)"
+                posicion="inferior"
+                @select-face="handleSelectFace"
+              />
+            </div>
+            <div class="odontogram-quadrant-label">
+              <i class="fa-solid fa-arrow-down-left"></i>
+              Inferior Izquierdo
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Treatment Summary -->
+      <div class="odontogram-summary-card">
+        <div class="odontogram-card-header">
+          <h3 class="odontogram-summary-title">
+            <i class="fa-solid fa-list-check"></i>
+            Resumen de Tratamientos
+          </h3>
+        </div>
+
+        <div class="odontogram-treatments-list">
+          <div 
+            v-for="pieza in piezasConTratamiento" 
+            :key="pieza.id" 
+            class="odontogram-treatment-item"
+          >
+            <div class="odontogram-treatment-avatar">
+              <q-avatar 
+                :color="getColorEstado(pieza.estado_general)" 
+                text-color="white"
+                size="48px"
+                class="odontogram-tooth-avatar"
+              >
+                {{ pieza.numero }}
+              </q-avatar>
+              <div class="odontogram-tooth-badge" :class="`odontogram-status-${pieza.estado_general}`"></div>
+            </div>
+
+            <div class="odontogram-treatment-info">
+              <div class="odontogram-treatment-name">Diente #{{ pieza.numero }}</div>
+              <div class="odontogram-treatment-diagnosis">{{ pieza.diagnostico }}</div>
+            </div>
+
+            <div class="odontogram-treatment-details">
+              <q-chip 
+                :class="['odontogram-status-chip', `odontogram-status-${pieza.estado_general}`]"
+                :label="pieza.estado_general"
+                size="sm"
+              />
+              <div class="odontogram-treatment-price">Bs. {{ pieza.precio.toFixed(2) }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="odontogram-total-section">
+          <div class="odontogram-total-content">
+            <div class="odontogram-total-label">Total del Tratamiento:</div>
+            <div class="odontogram-total-amount">Bs. {{ costoTotal.toFixed(2) }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Patient State -->
+    <div v-else class="odontogram-no-patient">
+      <div class="odontogram-empty-state">
+        <div class="odontogram-empty-illustration">
+          <i class="fa-solid fa-tooth odontogram-empty-icon"></i>
+          <div class="odontogram-empty-circle odontogram-empty-circle-1"></div>
+          <div class="odontogram-empty-circle odontogram-empty-circle-2"></div>
+        </div>
+        <h3 class="odontogram-empty-title">Selecciona un paciente</h3>
+        <p class="odontogram-empty-description">
+          Ingresa el CI del paciente en el campo de búsqueda para cargar su odontograma
+        </p>
+      </div>
     </div>
   </div>
 </template>
@@ -267,47 +319,3 @@ const handleSelectFace = (data) => {
 }
 </script>
 
-<style scoped>
-.odontograma-container {
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.odontograma-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto 20px auto;
-  gap: 30px;
-  padding: 20px;
-}
-
-.quadrant {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.quadrant-label {
-  text-align: center;
-  font-weight: 600;
-  color: #616161;
-  font-size: 14px;
-  padding: 8px;
-  background: rgba(33, 150, 243, 0.1);
-  border-radius: 4px;
-}
-
-.teeth-row {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.separator {
-  grid-column: 1 / -1;
-  height: 2px;
-  background: linear-gradient(to right, transparent, #2196F3, transparent);
-  margin: 0 40px;
-}
-</style>

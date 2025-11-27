@@ -1,51 +1,107 @@
 <template>
-  <q-page class="branch-page">
+  <q-page class="branch-branch-page">
     <!-- Hero Section para Sucursales -->
-    <section class="hero-branch">
+    <section class="branch-hero-section">
+      <div class="branch-hero-background">
+        <div class="branch-hero-shape branch-hero-shape-1"></div>
+        <div class="branch-hero-shape branch-hero-shape-2"></div>
+        <div class="branch-hero-shape branch-hero-shape-3"></div>
+      </div>
+      
       <q-container class="q-pa-xl">
         <div class="row items-center q-col-gutter-xl">
           <div class="col-12 col-md-6">
-            <h1 class="text-h2 text-weight-bold text-primary q-mb-md animated fadeInLeft">
-              Nuestras Sucursales
+            <div class="branch-hero-badge animated fadeInDown">
+              <q-icon name="apartment" size="20px" />
+              <span>Ubicaciones Estratégicas</span>
+            </div>
+            
+            <h1 class="branch-hero-title animated fadeInLeft">
+              Nuestras 
+              <span class="branch-hero-highlight">Sucursales</span>
             </h1>
-            <p class="text-h6 text-grey-7 q-mb-lg animated fadeInLeft" style="animation-delay: 0.2s">
+            
+            <p class="branch-hero-subtitle animated fadeInLeft" style="animation-delay: 0.2s">
               Encuentra la sucursal más cercana a ti. Contamos con múltiples ubicaciones estratégicas 
               en Oruro para brindarte la mejor atención dental con la comodidad que mereces.
             </p>
-            <div class="q-gutter-md animated fadeInUp" style="animation-delay: 0.4s">
+            
+            <div class="branch-hero-features animated fadeInUp" style="animation-delay: 0.3s">
+              <div class="branch-feature-item">
+                <q-icon name="location_on" color="primary" size="24px" />
+                <span>Ubicaciones accesibles</span>
+              </div>
+              <div class="branch-feature-item">
+                <q-icon name="access_time" color="primary" size="24px" />
+                <span>Horarios flexibles</span>
+              </div>
+              <div class="branch-feature-item">
+                <q-icon name="local_parking" color="primary" size="24px" />
+                <span>Estacionamiento disponible</span>
+              </div>
+            </div>
+            
+            <div class="branch-hero-actions animated fadeInUp" style="animation-delay: 0.4s">
               <q-btn 
                 color="primary" 
                 size="lg" 
                 label="Agendar Cita" 
                 icon="calendar_today"
                 @click="openAppointmentDialog"
-                push
+                unelevated
                 no-caps
-                class="primary-btn"
+                class="branch-primary-btn"
               />
               <q-btn 
-                outline 
+                flat
                 color="primary" 
                 size="lg" 
                 label="Ver Mapa Completo"
                 @click="openMapDialog"
                 no-caps
-                class="secondary-btn"
-              />
+                class="branch-secondary-btn"
+              >
+                <q-icon name="arrow_forward" size="20px" class="q-ml-sm" />
+              </q-btn>
             </div>
           </div>
           
-          <div class="col-12 col-md-6 text-center">
-            <div class="hero-image-container animated zoomIn" style="animation-delay: 0.3s">
-              <q-img
-                src="/KiruIMG/sucursales.png"
-                alt="Sucursales KIRU"
-                class="hero-image"
-                fit="contain"
-              />
-              <div class="floating-elements">
-                <q-icon name="location_on" color="red" size="2em" class="floating-icon-1" />
-                <q-icon name="schedule" color="blue" size="1.5em" class="floating-icon-2" />
+          <div class="col-12 col-md-6">
+            <div class="branch-hero-image-wrapper animated zoomIn" style="animation-delay: 0.3s">
+              <div class="branch-hero-glow"></div>
+              <div class="branch-hero-image-container">
+                <q-img
+                  src="/KiruIMG/sucursales.png"
+                  alt="Sucursales KIRU"
+                  class="branch-hero-image"
+                  fit="contain"
+                />
+              </div>
+              
+              <div class="branch-floating-elements">
+                <div class="branch-floating-card branch-floating-card-1">
+                  <q-icon name="location_on" color="red" size="24px" />
+                  <div class="branch-floating-text">
+                    <strong>5+</strong>
+                    <span>Sucursales</span>
+                  </div>
+                </div>
+                
+                <div class="branch-floating-card branch-floating-card-2">
+                  <q-icon name="schedule" color="blue" size="24px" />
+                  <div class="branch-floating-text">
+                    <strong>8am-8pm</strong>
+                    <span>Horario</span>
+                  </div>
+                </div>
+                
+                <div class="branch-floating-card branch-floating-card-3">
+                  <q-icon name="map" color="primary" size="24px" />
+                  <div class="branch-floating-text">
+                    <strong>GPS</strong>
+                    <span>Navegación</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -54,24 +110,43 @@
     </section>
 
     <!-- Sección de Sucursales -->
-    <section class="branches-section q-pa-xl">
+    <section class="branch-branches-section">
+      <div class="branch-branches-background">
+        <div class="branch-wave branch-wave-top"></div>
+      </div>
+      
       <q-container>
-        <div class="text-center q-mb-xl animated fadeIn">
-          <h2 class="text-h3 text-weight-bold">Ubicaciones Disponibles</h2>
-          <p class="text-h6 text-grey-7">Selecciona la sucursal que mejor se adapte a tus necesidades</p>
+        <div class="branch-section-header animated fadeIn">
+          <div class="branch-section-badge">
+            <q-icon name="room" size="20px" />
+            <span>Nuestras Ubicaciones</span>
+          </div>
+          <h2 class="branch-section-title">Ubicaciones Disponibles</h2>
+          <p class="branch-section-subtitle">Selecciona la sucursal que mejor se adapte a tus necesidades</p>
+          <div class="branch-title-decoration">
+            <div class="branch-title-line"></div>
+            <q-icon name="place" color="primary" size="32px" />
+            <div class="branch-title-line"></div>
+          </div>
         </div>
         
         <!-- Loading State -->
-        <div v-if="publicarStore.loading" class="text-center q-pa-xl">
-          <q-spinner-gears color="primary" size="50px" />
-          <div class="text-h6 q-mt-md">Cargando sucursales...</div>
+        <div v-if="publicarStore.loading" class="branch-loading-state">
+          <div class="branch-loading-content">
+            <q-spinner-gears color="primary" size="60px" />
+            <div class="branch-loading-text">Cargando sucursales...</div>
+          </div>
         </div>
 
         <!-- Empty State -->
-        <div v-else-if="filteredBranches.length === 0" class="text-center q-pa-xl">
-          <q-icon name="location_off" color="grey-5" size="80px" />
-          <div class="text-h5 q-mt-md text-grey-7">No hay sucursales disponibles</div>
-          <p class="text-grey-6">Próximamente abriremos nuevas sucursales en tu zona.</p>
+        <div v-else-if="filteredBranches.length === 0" class="branch-empty-state">
+          <div class="branch-empty-illustration">
+            <q-icon name="location_off" size="80px" />
+            <div class="branch-empty-circle branch-empty-circle-1"></div>
+            <div class="branch-empty-circle branch-empty-circle-2"></div>
+          </div>
+          <div class="branch-empty-title">No hay sucursales disponibles</div>
+          <p class="branch-empty-text">Próximamente abriremos nuevas sucursales en tu zona.</p>
         </div>
         
         <!-- Sucursales Grid -->
@@ -82,62 +157,69 @@
             class="col-12 col-sm-6 col-lg-4 animated fadeInUp"
             :style="{ animationDelay: `${index * 0.1}s` }"
           >
-            <q-card class="branch-card" flat bordered @click="openBranchDetail(branch)">
-              <div class="branch-image-container">
+            <q-card class="branch-branch-card" @click="openBranchDetail(branch)">
+              <div class="branch-branch-image-wrapper">
+                <div class="branch-branch-gradient"></div>
                 <q-img 
                   :src="branch.imagen || '/default-branch.jpg'" 
                   :alt="branch.nombre" 
-                  class="branch-image"
+                  class="branch-branch-image"
                   @error="handleImageError"
+                  ratio="4/3"
                 />
-                <div class="branch-overlay">
-                  <q-icon name="visibility" color="white" size="2em" />
+                <div class="branch-branch-overlay">
+                  <div class="branch-branch-overlay-content">
+                    <div class="branch-overlay-icon-wrapper">
+                      <q-icon name="visibility" color="white" size="32px" />
+                    </div>
+                    <p class="branch-overlay-text">Ver detalles completos</p>
+                  </div>
                 </div>
-                <div class="branch-status">
+                <div class="branch-branch-status">
                   <q-chip 
                     :color="branch.activo ? 'green' : 'red'" 
                     text-color="white" 
-                    size="sm"
-                    class="status-chip"
+                    size="md"
+                    :icon="branch.activo ? 'check_circle' : 'cancel'"
+                    class="branch-status-chip"
                   >
                     {{ branch.activo ? 'Abierto' : 'Cerrado' }}
                   </q-chip>
                 </div>
               </div>
               
-              <q-card-section class="branch-content">
-                <div class="text-h6 text-weight-bold q-mb-sm branch-title">
+              <q-card-section class="branch-branch-content">
+                <div class="branch-branch-title">
                   {{ branch.nombre }}
                 </div>
-                <div class="branch-location q-mb-md">
-                  <q-icon name="location_on" color="primary" size="16px" class="q-mr-xs" />
-                  <span class="text-grey-7">{{ branch.direccion }}</span>
+                
+                <div class="branch-branch-location">
+                  <q-icon name="location_on" size="18px" />
+                  <span>{{ branch.direccion }}</span>
                 </div>
                 
-                <div class="branch-info q-mb-md">
-                  <div class="info-item">
-                    <q-icon name="place" color="primary" size="16px" class="q-mr-xs" />
-                    <span class="text-caption">{{ branch.ubicacion }}</span>
+                <div class="branch-branch-info">
+                  <div class="branch-info-item">
+                    <q-icon name="place" size="18px" />
+                    <span>{{ branch.ubicacion }}</span>
                   </div>
                 </div>
                 
-                <div class="branch-description q-mb-md">
-                  <div class="text-caption text-grey-7">
-                    {{ truncateDescription(branch.descripcion) }}
-                  </div>
+                <div class="branch-branch-description">
+                  <p>{{ truncateDescription(branch.descripcion) }}</p>
                 </div>
               </q-card-section>
               
               <q-separator />
               
-              <q-card-actions align="right" class="branch-actions">
+              <q-card-actions class="branch-branch-actions">
                 <q-btn 
                   flat 
                   label="Ver Detalles" 
                   color="primary" 
                   icon-right="arrow_forward"
                   no-caps
-                  class="details-btn"
+                  class="branch-details-btn"
                 />
               </q-card-actions>
             </q-card>
@@ -147,24 +229,57 @@
     </section>
 
     <!-- Call to Action Section -->
-    <section class="cta-section q-pa-xl text-center">
+    <section class="branch-cta-section">
+      <div class="branch-cta-background">
+        <div class="branch-cta-shape branch-cta-shape-1"></div>
+        <div class="branch-cta-shape branch-cta-shape-2"></div>
+        <div class="branch-cta-particles">
+          <div class="branch-particle" v-for="i in 20" :key="i"></div>
+        </div>
+      </div>
+      
       <q-container class="animated fadeIn">
-        <h2 class="text-h3 text-weight-bold q-mb-md text-white">
-          ¿No encuentras la sucursal que buscas?
-        </h2>
-        <p class="text-h6 q-mb-lg text-white">
-          Contáctanos y te ayudaremos a encontrar la ubicación más conveniente para ti.
-        </p>
-        <q-btn
-          color="white"
-          text-color="primary"
-          size="lg"
-          label="Contactar"
-          icon="phone"
-          to="/contact"
-          push
-          no-caps
-        />
+        <div class="branch-cta-content">
+          <div class="branch-cta-badge">
+            <q-icon name="support_agent" size="18px" />
+            <span>Estamos Aquí Para Ti</span>
+          </div>
+          
+          <h2 class="branch-cta-title">
+            ¿No encuentras la sucursal que <span class="branch-cta-highlight">buscas</span>?
+          </h2>
+          
+          <p class="branch-cta-text">
+            Contáctanos y te ayudaremos a encontrar la ubicación más conveniente para ti.
+          </p>
+          
+          <div class="branch-cta-features">
+            <div class="branch-cta-feature">
+              <q-icon name="phone_in_talk" size="20px" />
+              <span>Atención telefónica</span>
+            </div>
+            <div class="branch-cta-feature">
+              <q-icon name="email" size="20px" />
+              <span>Respuesta rápida</span>
+            </div>
+            <div class="branch-cta-feature">
+              <q-icon name="chat" size="20px" />
+              <span>Chat en línea</span>
+            </div>
+          </div>
+          
+          <q-btn
+            color="white"
+            text-color="primary"
+            size="xl"
+            label="Contactar"
+            icon="phone"
+            to="/contact"
+            unelevated
+            no-caps
+            class="branch-cta-btn"
+          />
+        </div>
       </q-container>
     </section>
 
@@ -178,33 +293,41 @@
 
     <!-- Dialog de detalle de la sucursal -->
     <q-dialog v-model="branchDialog" maximized transition-show="slide-up" transition-hide="slide-down">
-      <q-card v-if="selectedBranch">
-        <q-card-section class="dialog-header bg-primary text-white">
+      <q-card v-if="selectedBranch" class="branch-dialog-card">
+        <q-card-section class="branch-dialog-header bg-primary text-white">
           <div class="row items-center">
             <div class="col">
-              <div class="text-h6">{{ selectedBranch.nombre }}</div>
-              <div class="text-caption">{{ selectedBranch.ubicacion }}</div>
+              <div class="branch-dialog-title">{{ selectedBranch.nombre }}</div>
+              <div class="branch-dialog-location">
+                <q-icon name="place" size="16px" />
+                {{ selectedBranch.ubicacion }}
+              </div>
             </div>
             <div class="col-auto">
-              <q-btn icon="close" flat round dense v-close-popup color="white" />
+              <q-btn icon="close" flat round dense v-close-popup color="white" size="md" />
             </div>
           </div>
         </q-card-section>
         
-        <q-card-section class="dialog-content q-pt-lg">
+        <q-card-section class="branch-dialog-content">
           <div class="row q-col-gutter-xl">
             <div class="col-12 col-md-6">
-              <q-img
-                :src="selectedBranch.imagen || '/default-branch.jpg'"
-                :alt="selectedBranch.nombre"
-                class="branch-detail-image"
-                @error="handleImageError"
-              />
+              <div class="branch-dialog-image-wrapper">
+                <q-img
+                  :src="selectedBranch.imagen || '/default-branch.jpg'"
+                  :alt="selectedBranch.nombre"
+                  class="branch-dialog-image"
+                  @error="handleImageError"
+                />
+              </div>
               
               <!-- Mapa embebido -->
-              <div class="q-mt-md">
-                <h5 class="text-h6 text-weight-bold q-mb-sm">Ubicación</h5>
-                <div class="map-container">
+              <div class="branch-map-section">
+                <h5 class="branch-map-title">
+                  <q-icon name="map" size="20px" />
+                  Ubicación en el Mapa
+                </h5>
+                <div class="branch-map-container">
                   <iframe
                     :src="generateMapUrl(selectedBranch)"
                     width="100%"
@@ -213,48 +336,85 @@
                     allowfullscreen=""
                     loading="lazy"
                     referrerpolicy="no-referrer-when-downgrade"
-                    class="map-iframe"
+                    class="branch-map-iframe"
                   ></iframe>
                 </div>
               </div>
             </div>
             
             <div class="col-12 col-md-6">
-              <div class="branch-detail-content">
-                <div class="text-h5 text-weight-bold q-mb-md">
+              <div class="branch-dialog-text-content">
+                <h3 class="branch-detail-title">
                   {{ selectedBranch.nombre }}
+                </h3>
+                
+                <div class="branch-detail-badge">
+                  <q-chip 
+                    :color="selectedBranch.activo ? 'green' : 'red'" 
+                    text-color="white" 
+                    :icon="selectedBranch.activo ? 'check_circle' : 'cancel'"
+                    size="lg"
+                  >
+                    {{ selectedBranch.activo ? 'Abierto Ahora' : 'Cerrado' }}
+                  </q-chip>
                 </div>
                 
-                <div class="branch-detail-info q-mb-md">
-                  <div class="detail-row q-mb-sm">
-                    <q-icon name="location_on" color="primary" size="20px" class="q-mr-sm" />
-                    <span class="text-weight-bold">Dirección:</span>
-                    <span class="q-ml-sm">{{ selectedBranch.direccion }}</span>
-                  </div>
+                <div class="branch-detail-info-card">
+                  <h5 class="branch-info-card-title">
+                    <q-icon name="info" size="20px" />
+                    Información de Contacto
+                  </h5>
                   
-                  <div class="detail-row q-mb-sm">
-                    <q-icon name="place" color="primary" size="20px" class="q-mr-sm" />
-                    <span class="text-weight-bold">Ubicación:</span>
-                    <span class="q-ml-sm">{{ selectedBranch.ubicacion }}</span>
-                  </div>
-                  
-                  <div class="detail-row q-mb-sm">
-                    <q-icon name="info" color="primary" size="20px" class="q-mr-sm" />
-                    <span class="text-weight-bold">Estado:</span>
-                    <q-chip 
-                      :color="selectedBranch.activo ? 'green' : 'red'" 
-                      text-color="white" 
-                      size="sm"
-                      class="q-ml-sm"
-                    >
-                      {{ selectedBranch.activo ? 'Abierto' : 'Cerrado' }}
-                    </q-chip>
-                  </div>
+                  <q-list bordered class="rounded-borders">
+                    <q-item class="branch-detail-info-item">
+                      <q-item-section avatar>
+                        <q-avatar color="red-1" text-color="red" icon="location_on" size="48px" />
+                      </q-item-section>
+                      <q-item-section>
+                        <q-item-label caption class="branch-info-label">Dirección</q-item-label>
+                        <q-item-label class="branch-info-value">{{ selectedBranch.direccion }}</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                    
+                    <q-separator />
+                    
+                    <q-item class="branch-detail-info-item">
+                      <q-item-section avatar>
+                        <q-avatar color="blue-1" text-color="blue" icon="place" size="48px" />
+                      </q-item-section>
+                      <q-item-section>
+                        <q-item-label caption class="branch-info-label">Ubicación</q-item-label>
+                        <q-item-label class="branch-info-value">{{ selectedBranch.ubicacion }}</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                    
+                    <q-separator />
+                    
+                    <q-item class="branch-detail-info-item">
+                      <q-item-section avatar>
+                        <q-avatar 
+                          :color="selectedBranch.activo ? 'green-1' : 'red-1'" 
+                          :text-color="selectedBranch.activo ? 'green' : 'red'" 
+                          :icon="selectedBranch.activo ? 'check_circle' : 'cancel'"
+                          size="48px" 
+                        />
+                      </q-item-section>
+                      <q-item-section>
+                        <q-item-label caption class="branch-info-label">Estado</q-item-label>
+                        <q-item-label class="branch-info-value">
+                          {{ selectedBranch.activo ? 'Abierto' : 'Cerrado' }}
+                        </q-item-label>
+                      </q-item-section>
+                    </q-item>
+                  </q-list>
                 </div>
                 
-                <div class="q-mb-md">
-                  <h5 class="text-h6 text-weight-bold q-mb-sm">Descripción</h5>
-                  <p class="text-body1">{{ selectedBranch.descripcion }}</p>
+                <div class="branch-detail-description">
+                  <h5 class="branch-description-label">
+                    <q-icon name="description" size="20px" />
+                    Descripción
+                  </h5>
+                  <p class="branch-description-text">{{ selectedBranch.descripcion }}</p>
                 </div>
                 
                 <div class="branch-detail-actions">
@@ -264,9 +424,9 @@
                     size="lg"
                     icon="calendar_today"
                     @click="openAppointmentDialog"
-                    push
+                    unelevated
                     no-caps
-                    class="q-mr-sm"
+                    class="branch-action-btn-primary"
                     :disable="!selectedBranch.activo"
                   />
                   <q-btn 
@@ -276,8 +436,9 @@
                     icon="directions"
                     :href="generateDirectionsUrl(selectedBranch)"
                     target="_blank"
-                    push
+                    unelevated
                     no-caps
+                    class="branch-action-btn-secondary"
                   />
                 </div>
               </div>
@@ -289,15 +450,23 @@
 
     <!-- Dialog del mapa completo -->
     <q-dialog v-model="mapDialog" maximized transition-show="scale" transition-hide="scale">
-      <q-card>
-        <q-card-section class="row items-center q-pb-none bg-primary text-white">
-          <div class="text-h6">Mapa de Todas las Sucursales</div>
-          <q-space />
-          <q-btn icon="close" flat round dense v-close-popup color="white" />
+      <q-card class="branch-map-dialog-card">
+        <q-card-section class="branch-map-dialog-header bg-primary text-white">
+          <div class="row items-center">
+            <div class="col">
+              <div class="branch-map-dialog-title">
+                <q-icon name="map" size="24px" class="q-mr-sm" />
+                Mapa de Todas las Sucursales
+              </div>
+            </div>
+            <div class="col-auto">
+              <q-btn icon="close" flat round dense v-close-popup color="white" size="md" />
+            </div>
+          </div>
         </q-card-section>
         
-        <q-card-section>
-          <div class="map-container-full">
+        <q-card-section class="branch-map-dialog-content">
+          <div class="branch-map-container-full">
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3825.123456789!2d-67.1101!3d-17.9758!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTfCsDU4JzMzLjAiUyA2N8KwMDYnMzYuNCJX!5e0!3m2!1ses!2sbo!4v1234567890"
               width="100%"
@@ -306,7 +475,7 @@
               allowfullscreen=""
               loading="lazy"
               referrerpolicy="no-referrer-when-downgrade"
-              class="map-iframe-full"
+              class="branch-map-iframe-full"
             ></iframe>
           </div>
         </q-card-section>
@@ -332,7 +501,6 @@ const selectedBranch = ref(null)
 
 // Computed properties
 const filteredBranches = computed(() => {
-  // Filtrar solo sucursales activas
   return publicarStore.sucursalesActivas
 })
 
@@ -343,6 +511,7 @@ onMounted(() => {
 
 // Métodos
 const openAppointmentDialog = () => {
+  branchDialog.value = false
   appointmentDialog.value = true
 }
 
@@ -366,7 +535,6 @@ const generateMapUrl = (branch) => {
   if (branch.latitud && branch.longitud) {
     return `https://maps.google.com/maps?q=${branch.latitud},${branch.longitud}&z=15&output=embed`
   }
-  // Fallback a una ubicación general de Oruro
   return 'https://maps.google.com/maps?q=Oruro,Bolivia&z=13&output=embed'
 }
 

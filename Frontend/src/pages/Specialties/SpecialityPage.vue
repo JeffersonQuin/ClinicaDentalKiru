@@ -1,17 +1,23 @@
 <template>
-  <div class="page-container">
+  <div class="specialty-page-container">
     <!-- Header Section -->
-    <div class="page-header">
-      <div class="header-content">
-        <div class="title-section">
-          <i class="fa-solid fa-tooth header-icon"></i>
+    <div class="specialty-page-header">
+      <div class="specialty-header-background">
+        <div class="specialty-header-shape specialty-header-shape-1"></div>
+        <div class="specialty-header-shape specialty-header-shape-2"></div>
+      </div>
+      <div class="specialty-header-content">
+        <div class="specialty-title-section">
+          <div class="specialty-icon-wrapper">
+            <i class="fa-solid fa-tooth specialty-header-icon"></i>
+          </div>
           <div>
-            <h1 class="page-title">Gestión de Especialidades</h1>
-            <p class="page-subtitle">Configure y administre los servicios odontológicos de su clínica</p>
+            <h1 class="specialty-page-title">Gestión de Especialidades</h1>
+            <p class="specialty-page-subtitle">Configure y administre los servicios odontológicos de su clínica</p>
           </div>
         </div>
         <q-btn
-          class="primary-btn"
+          class="specialty-primary-btn"
           color="primary"
           icon="fa-solid fa-plus"
           label="Agregar Especialidad"
@@ -24,112 +30,144 @@
     </div>
 
     <!-- Search Section -->
-    <div class="search-section">
-      <q-input
-        v-model="search"
-        class="search-input"
-        outlined
-        type="search"
-        placeholder="Buscar especialidades por nombre o descripción..."
-        @input="filterSpecialities"
-        clearable
-        dense
-      >
-        <template v-slot:prepend>
-          <i class="fa-solid fa-search"></i>
-        </template>
-      </q-input>
+    <div class="specialty-search-section">
+      <div class="specialty-search-container">
+        <q-input
+          v-model="search"
+          class="specialty-search-input"
+          outlined
+          type="search"
+          placeholder="Buscar especialidades por nombre o descripción..."
+          @input="filterSpecialities"
+          clearable
+        >
+          <template v-slot:prepend>
+            <i class="fa-solid fa-search specialty-search-icon"></i>
+          </template>
+        </q-input>
+      </div>
     </div>
 
     <!-- Main Content Section -->
-    <div class="content-layout">
+    <div class="specialty-content-layout">
       <!-- Left Side - Info and Stats -->
-      <div class="info-section">
-        <div class="info-card">
-          <div class="info-header">
-            <h2 class="info-title">Panel de Especialidades</h2>
+      <div class="specialty-info-section">
+        <div class="specialty-info-card">
+          <div class="specialty-info-header">
+            <div class="specialty-info-icon-container">
+              <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <h2 class="specialty-info-title">Panel de Especialidades</h2>
           </div>
-          <div class="info-content">
-            <p class="info-description">
+          <div class="specialty-info-content">
+            <p class="specialty-info-description">
               Administre el catálogo completo de especialidades odontológicas disponibles 
               en su clínica. Cada especialidad puede ser editada, visualizada o eliminada 
               según las necesidades de su práctica dental.
             </p>
             
-            <div class="stats-grid">
-              <div class="stat-item">
-                <div class="stat-value">{{ filteredSpecialities.length }}</div>
-                <div class="stat-label">Especialidades Registradas</div>
+            <div class="specialty-stats-grid">
+              <div class="specialty-stat-item">
+                <div class="specialty-stat-icon">
+                  <i class="fa-solid fa-clipboard-list"></i>
+                </div>
+                <div class="specialty-stat-content">
+                  <div class="specialty-stat-value">{{ filteredSpecialities.length }}</div>
+                  <div class="specialty-stat-label">Especialidades Registradas</div>
+                </div>
               </div>
-              <div class="stat-item">
-                <div class="stat-value">{{ totalPages }}</div>
-                <div class="stat-label">Páginas Disponibles</div>
+              <div class="specialty-stat-item">
+                <div class="specialty-stat-icon">
+                  <i class="fa-solid fa-file-invoice"></i>
+                </div>
+                <div class="specialty-stat-content">
+                  <div class="specialty-stat-value">{{ totalPages }}</div>
+                  <div class="specialty-stat-label">Páginas Disponibles</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Branding Circle -->
-        <div class="branding-card">
-          <div class="branding-circle">
+        <div class="specialty-branding-card">
+          <div class="specialty-branding-circle">
+            <div class="specialty-branding-glow"></div>
             <q-img
               src="/KiruIMG/speciality.png"
               spinner-color="primary"
               fit="contain"
-              class="brand-image"
+              class="specialty-brand-image"
             />
           </div>
-          <p class="branding-text">Sistema de Gestión Dental</p>
+          <p class="specialty-branding-text">Sistema de Gestión Dental</p>
+          <div class="specialty-branding-badge">
+            <i class="fa-solid fa-shield-heart"></i>
+            <span>Profesional</span>
+          </div>
         </div>
       </div>
 
       <!-- Right Side - Specialities Grid -->
-      <div class="specialities-section">
-        <div class="section-header">
-          <h3 class="section-title">Catálogo de Especialidades</h3>
-          <div class="results-count">
-            <span class="count-badge">{{ filteredSpecialities.length }} especialidad{{ filteredSpecialities.length !== 1 ? 'es' : '' }}</span>
+      <div class="specialty-specialities-section">
+        <div class="specialty-section-header">
+          <div class="specialty-section-title-wrapper">
+            <h3 class="specialty-section-title">Catálogo de Especialidades</h3>
+            <div class="specialty-title-underline"></div>
+          </div>
+          <div class="specialty-results-count">
+            <span class="specialty-count-badge">
+              <i class="fa-solid fa-list-check"></i>
+              {{ filteredSpecialities.length }} especialidad{{ filteredSpecialities.length !== 1 ? 'es' : '' }}
+            </span>
           </div>
         </div>
 
-        <div class="cards-container">
-          <div v-if="filteredSpecialities.length === 0" class="no-data-container">
-            <i class="fa-solid fa-tooth no-data-icon"></i>
-            <p class="no-data-text">No se encontraron especialidades</p>
-            <p class="no-data-subtext">Intenta ajustar los filtros de búsqueda o agrega una nueva especialidad</p>
+        <div class="specialty-cards-container">
+          <div v-if="filteredSpecialities.length === 0" class="specialty-no-data-container">
+            <div class="specialty-no-data-illustration">
+              <i class="fa-solid fa-tooth specialty-no-data-icon"></i>
+              <div class="specialty-no-data-circle specialty-no-data-circle-1"></div>
+              <div class="specialty-no-data-circle specialty-no-data-circle-2"></div>
+            </div>
+            <p class="specialty-no-data-text">No se encontraron especialidades</p>
+            <p class="specialty-no-data-subtext">Intenta ajustar los filtros de búsqueda o agrega una nueva especialidad</p>
           </div>
           
-          <transition-group v-else name="card-fade" tag="div" class="cards-grid">
+          <transition-group v-else name="specialty-card-fade" tag="div" class="specialty-cards-grid">
             <div 
               v-for="speciality in currentPageSpecialities" 
               :key="speciality.id"
-              class="speciality-card"
+              class="specialty-speciality-card"
             >
-              <div class="card-image-container">
+              <div class="specialty-card-image-container">
                 <q-img 
                   :src="speciality.image || 'https://i.pinimg.com/originals/ea/d5/5a/ead55a380087931b94a3968f54d8fbda.jpg'"
                   :ratio="4/3"
                   spinner-color="primary"
                   @error="handleImageError"
-                  class="card-image"
+                  class="specialty-card-image"
                 >
-                  <div class="image-overlay"></div>
+                  <div class="specialty-image-overlay"></div>
                 </q-img>
+                <div class="specialty-card-badge">
+                  <i class="fa-solid fa-star"></i>
+                </div>
               </div>
               
-              <div class="card-content">
-                <h4 class="card-title">{{ speciality.name }}</h4>
-                <p class="card-description">{{ truncateText(speciality.description, 80) }}</p>
+              <div class="specialty-card-content">
+                <h4 class="specialty-card-title">{{ speciality.name }}</h4>
+                <p class="specialty-card-description">{{ truncateText(speciality.description, 80) }}</p>
                 
-                <div class="card-actions">
+                <div class="specialty-card-actions">
                   <q-btn 
                     flat 
                     dense
                     icon="fa-solid fa-eye"
                     label="Ver"
                     @click="viewSpeciality(speciality)"
-                    class="action-btn view-btn"
-                    color="grey-8"
+                    class="specialty-action-btn specialty-view-btn"
+                    no-caps
                   />
                   <q-btn 
                     flat 
@@ -138,7 +176,8 @@
                     label="Editar"
                     color="primary"
                     @click="editSpeciality(speciality)"
-                    class="action-btn edit-btn"
+                    class="specialty-action-btn specialty-edit-btn"
+                    no-caps
                   />
                   <q-btn 
                     flat 
@@ -147,7 +186,8 @@
                     label="Eliminar"
                     color="negative"
                     @click="confirmDeleteSpeciality(speciality)"
-                    class="action-btn delete-btn"
+                    class="specialty-action-btn specialty-delete-btn"
+                    no-caps
                   />
                 </div>
               </div>
@@ -156,8 +196,8 @@
         </div>
 
         <!-- Pagination Controls -->
-        <div class="pagination-section" v-if="totalPages > 1">
-          <div class="pagination-controls">
+        <div class="specialty-pagination-section" v-if="totalPages > 1">
+          <div class="specialty-pagination-controls">
             <q-btn
               flat
               round
@@ -165,11 +205,11 @@
               icon="fa-solid fa-chevron-left"
               :disable="currentPage === 0"
               @click="previousPage"
-              class="pagination-btn"
+              class="specialty-pagination-btn"
               color="primary"
             />
             
-            <div class="pagination-pages">
+            <div class="specialty-pagination-pages">
               <q-btn
                 v-for="page in visiblePages"
                 :key="page"
@@ -177,7 +217,7 @@
                 dense
                 :label="page + 1"
                 @click="goToPage(page)"
-                :class="['page-btn', { active: currentPage === page }]"
+                :class="['specialty-page-btn', { 'specialty-active': currentPage === page }]"
                 :color="currentPage === page ? 'primary' : 'grey-7'"
               />
             </div>
@@ -189,12 +229,13 @@
               icon="fa-solid fa-chevron-right"
               :disable="currentPage === totalPages - 1"
               @click="nextPage"
-              class="pagination-btn"
+              class="specialty-pagination-btn"
               color="primary"
             />
           </div>
           
-          <div class="pagination-info">
+          <div class="specialty-pagination-info">
+            <i class="fa-solid fa-info-circle"></i>
             Página {{ currentPage + 1 }} de {{ totalPages }} • Mostrando {{ currentPageSpecialities.length }} de {{ filteredSpecialities.length }}
           </div>
         </div>
@@ -221,31 +262,31 @@
 
     <!-- Delete Confirmation Dialog -->
     <q-dialog v-model="showDeleteDialog" persistent>
-      <q-card class="confirm-dialog">
-        <q-card-section class="dialog-header">
-          <div class="dialog-icon-container">
-            <i class="fa-solid fa-exclamation-triangle dialog-icon"></i>
+      <q-card class="specialty-confirm-dialog">
+        <q-card-section class="specialty-dialog-header">
+          <div class="specialty-dialog-icon-container">
+            <i class="fa-solid fa-exclamation-triangle specialty-dialog-icon"></i>
           </div>
-          <h3 class="dialog-title">Confirmar Eliminación</h3>
+          <h3 class="specialty-dialog-title">Confirmar Eliminación</h3>
         </q-card-section>
 
         <q-card-section class="q-pt-none">
-          <p class="dialog-text">
+          <p class="specialty-dialog-text">
             ¿Está seguro que desea eliminar la especialidad <strong>{{ selectedSpeciality?.name }}</strong>?
           </p>
-          <p class="dialog-subtext">
+          <p class="specialty-dialog-subtext">
             Esta acción no se puede deshacer y la especialidad dejará de estar disponible en el sistema.
           </p>
         </q-card-section>
 
-        <q-card-actions class="dialog-actions">
+        <q-card-actions class="specialty-dialog-actions">
           <q-btn 
             flat 
             label="Cancelar" 
             color="grey-7" 
             v-close-popup 
             no-caps
-            class="dialog-btn"
+            class="specialty-dialog-btn"
           />
           <q-btn 
             unelevated
@@ -254,7 +295,7 @@
             @click="deleteSpeciality"      
             v-close-popup 
             no-caps
-            class="dialog-btn"
+            class="specialty-dialog-btn specialty-dialog-delete-btn"
           />
         </q-card-actions>
       </q-card>
@@ -286,21 +327,18 @@ export default {
     const showDeleteDialog = ref(false)
     const selectedSpeciality = ref(null)
 
-    // Computed properties from store
     const totalPages = computed(() => store.totalPages)
     const currentPageSpecialities = computed(() => store.currentPageSpecialities)
     const filteredSpecialities = computed(() => store.filteredSpecialities)
     const visiblePages = computed(() => store.visiblePages)
     const currentPage = computed(() => store.currentPage)
     
-    // Store actions
     const loadSpecialities = () => store.loadSpecialities()
     const filterSpecialities = () => store.filterSpecialities(search.value)
     const nextPage = () => store.nextPage()
     const previousPage = () => store.previousPage()
     const goToPage = (page) => store.goToPage(page)
 
-    // UI functions
     const truncateText = (text, maxLength) => {
       if (!text) return ''
       return text.length <= maxLength ? text : text.substring(0, maxLength) + '...'
@@ -378,6 +416,3 @@ export default {
 }
 </script>
 
-<style scoped>
-/* Agrega tus estilos aquí */
-</style>

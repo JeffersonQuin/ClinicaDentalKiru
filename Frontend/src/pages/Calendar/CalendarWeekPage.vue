@@ -1,249 +1,455 @@
 <template>
-  <div class="page-container">
-    <!-- Header -->
-    <div class="page-header">
-      <div class="header-content">
-        <div class="title-section">
-          <i class="fa-solid fa-calendar-week header-icon"></i>
+  <div class="calendar_week-container">
+    <!-- Header Section -->
+    <div class="calendar_week-header">
+      <div class="calendar_header-background">
+        <div class="calendar_header-shape calendar_header-shape-1"></div>
+        <div class="calendar_header-shape calendar_header-shape-2"></div>
+        <div class="calendar_header-shape calendar_header-shape-3"></div>
+      </div>
+      <div class="calendar_header-content">
+        <div class="calendar_title-section">
+          <div class="calendar_icon-wrapper">
+            <i class="fa-solid fa-calendar-week calendar_header-icon"></i>
+          </div>
           <div>
-            <h1 class="page-title">Calendario Semanal</h1>
-            <p class="page-subtitle">{{ weekTitle }}</p>
+            <h1 class="calendar_page-title">Calendario Semanal</h1>
+            <p class="calendar_page-subtitle">{{ weekTitle }}</p>
           </div>
         </div>
-        <q-btn
-          flat
-          icon="fa-solid fa-arrow-left"
-          label="Volver"
-          color="grey-8"
-          @click="salir"
-          no-caps
-          size="md"
-        />
+        <div class="calendar_header-actions">
+          <q-btn
+            class="calendar_back-btn"
+            flat
+            icon="fa-solid fa-arrow-left"
+            label="Volver al Inicio"
+            color="white"
+            @click="salir"
+            no-caps
+            size="md"
+          />
+        </div>
       </div>
     </div>
 
-    <!-- Estadísticas -->
-    <div class="stats-section">
-      <div class="stat-card">
-        <div class="stat-icon-container total">
+    <!-- Stats Section -->
+    <div class="calendar_stats-section">
+      <div class="calendar_stat-card">
+        <div class="calendar_stat-icon-container total">
           <i class="fa-solid fa-calendar-check"></i>
         </div>
-        <div class="stat-content">
-          <div class="stat-value">{{ reservasCompletas.length }}</div>
-          <div class="stat-label">Reservas Totales</div>
+        <div class="calendar_stat-content">
+          <div class="calendar_stat-value">{{ reservasCompletas.length }}</div>
+          <div class="calendar_stat-label">Reservas Totales</div>
         </div>
+        <div class="calendar_stat-glow total"></div>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon-container alert">
+      <div class="calendar_stat-card">
+        <div class="calendar_stat-icon-container today">
           <i class="fa-solid fa-clock"></i>
         </div>
-        <div class="stat-content">
-          <div class="stat-value">{{ getWeekEventsCount() }}</div>
-          <div class="stat-label">Eventos esta Semana</div>
+        <div class="calendar_stat-content">
+          <div class="calendar_stat-value">{{ getWeekEventsCount() }}</div>
+          <div class="calendar_stat-label">Eventos esta Semana</div>
         </div>
+        <div class="calendar_stat-glow today"></div>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon-container city">
+      <div class="calendar_stat-card">
+        <div class="calendar_stat-icon-container upcoming">
           <i class="fa-solid fa-calendar-alt"></i>
         </div>
-        <div class="stat-content">
-          <div class="stat-value">7</div>
-          <div class="stat-label">Días Visualizados</div>
+        <div class="calendar_stat-content">
+          <div class="calendar_stat-value">7</div>
+          <div class="calendar_stat-label">Días Visualizados</div>
         </div>
+        <div class="calendar_stat-glow upcoming"></div>
       </div>
     </div>
 
-    <!-- Navegación -->
-    <div class="search-section">
-      <div class="search-filters">
-        <q-btn-group outline>
+    <!-- Navigation Section -->
+    <div class="calendar_navigation-section">
+      <div class="calendar_navigation-container">
+        <div class="calendar_week-navigation">
           <q-btn
-            outline
+            class="calendar_nav-btn"
+            flat
             icon="fa-solid fa-chevron-left"
             label="Semana Anterior"
             @click="prevWeek"
             color="primary"
             no-caps
+            size="md"
           />
+          
+          <div class="calendar_current-week">
+            <span class="calendar_week-display">{{ weekTitle }}</span>
+            <q-btn
+              class="calendar_today-btn"
+              flat
+              icon="fa-solid fa-calendar-day"
+              label="Hoy"
+              @click="goToToday"
+              color="primary"
+              no-caps
+              size="sm"
+            />
+          </div>
+          
           <q-btn
-            outline
+            class="calendar_nav-btn"
+            flat
             icon="fa-solid fa-chevron-right"
             label="Semana Siguiente"
             @click="nextWeek"
             color="primary"
             no-caps
+            size="md"
           />
-        </q-btn-group>
-        
-        <q-btn-group outline>
-          <q-btn
-            outline
-            label="Día"
-            @click="goToDay"
-            :color="view==='day' ? 'primary' : 'grey-8'"
-            no-caps
-          />
-          <q-btn
-            outline
-            label="Semana"
-            @click="goToWeek"
-            :color="view==='week' ? 'primary' : 'grey-8'"
-            no-caps
-          />
-          <q-btn
-            outline
-            label="Mes"
-            @click="goToMonth"
-            :color="view==='month' ? 'primary' : 'grey-8'"
-            no-caps
-          />
-        </q-btn-group>
+        </div>
+
+        <div class="calendar_view-switcher">
+          <q-btn-group class="calendar_view-buttons" outline>
+            <q-btn
+              outline
+              label="Día"
+              @click="goToDay"
+              :color="view==='day' ? 'primary' : 'grey-7'"
+              no-caps
+              size="md"
+            />
+            <q-btn
+              outline
+              label="Semana"
+              @click="goToWeek"
+              :color="view==='week' ? 'primary' : 'grey-7'"
+              no-caps
+              size="md"
+            />
+            <q-btn
+              outline
+              label="Mes"
+              @click="goToMonth"
+              :color="view==='month' ? 'primary' : 'grey-7'"
+              no-caps
+              size="md"
+            />
+          </q-btn-group>
+        </div>
       </div>
     </div>
 
-    <!-- Calendario -->
-    <div class="table-container">
-      <div class="table-header">
-        <span class="table-title">Horario Semanal</span>
-        <div class="table-actions">
+    <!-- Calendar Grid -->
+    <div class="calendar_main-container">
+      <div class="calendar_table-header">
+        <div class="calendar_table-title-section">
+          <h3 class="calendar_table-title">Horario Semanal</h3>
+          <div class="calendar_table-underline"></div>
+        </div>
+        <div class="calendar_table-actions">
+          <div class="calendar_legend">
+            <div class="legend-item">
+              <div class="legend-color cita"></div>
+              <span>Citas Médicas</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color reserva"></div>
+              <span>Reservas</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color bloqueado"></div>
+              <span>Horarios Bloqueados</span>
+            </div>
+          </div>
           <q-btn
+            class="calendar_info-btn"
             flat
             icon="fa-solid fa-info-circle"
             color="primary"
             no-caps
             size="sm"
           >
-            <q-tooltip>Click en celdas vacías para bloquear/desbloquear</q-tooltip>
+            <q-tooltip class="calendar_tooltip">
+              <div class="tooltip-content">
+                <i class="fa-solid fa-lightbulb"></i>
+                <span>Click en celdas vacías para bloquear/desbloquear horarios</span>
+              </div>
+            </q-tooltip>
           </q-btn>
         </div>
       </div>
-      
-      <div class="calendar-grid week-grid">
-        <div class="calendar-row week-header">
-          <div class="calendar-cell hour-label"><strong>Hora</strong></div>
-          <div v-for="(day, idx) in weekDays" :key="idx" class="calendar-cell day-label">
-            {{ day }} {{ weekDates[idx].getDate() }}
+
+      <!-- Weekly Calendar Grid -->
+      <div class="calendar_week-grid-container">
+        <div class="calendar_week-grid">
+          <!-- Header Row -->
+          <div class="calendar_week-header-row">
+            <div class="time-header-cell">Hora</div>
+            <div
+              v-for="(day, idx) in weekDays"
+              :key="idx"
+              class="day-header-cell"
+              :class="{
+                'today': isToday(weekDates[idx]),
+                'weekend': isWeekend(weekDates[idx])
+              }"
+            >
+              <div class="day-name">{{ day }}</div>
+              <div class="day-date">{{ weekDates[idx].getDate() }}</div>
+              <div class="day-month">{{ weekDates[idx].toLocaleString('es-ES', { month: 'short' }) }}</div>
+            </div>
           </div>
-        </div>
-        
-        <div v-for="hour in hours" :key="hour" class="calendar-row">
-          <div class="calendar-cell hour-label">
-            {{ hour }}
-          </div>
+
+          <!-- Time Slots -->
           <div
-            v-for="(date, dIdx) in weekDates"
-            :key="dIdx"
-            class="calendar-cell"
-            :class="{ 
-              'not-current': !isCurrentMonth(date),
-              'bloqueado': estaHorarioBloqueado(date.toISOString().slice(0, 10), hour)
+            v-for="hour in hours"
+            :key="hour"
+            class="calendar_time-row"
+            :class="{
+              'current-hour': isCurrentHour(hour),
+              'madrugada': isMadrugada(hour),
+              'mañana': isManana(hour),
+              'tarde': isTarde(hour),
+              'noche': isNoche(hour)
             }"
-            @dragover.prevent
-            @drop="onDrop(date, hour)"
-            @click="handleCellClick(date, hour)"
           >
-            <div class="cell-events">
-              <template v-if="getEvents(date, hour).length">
-                <div
-                  v-for="event in getEvents(date, hour)"
-                  :key="event.id"
-                  class="event-card"
-                  draggable="true"
-                  @dragstart="onDragStart(event, date, hour)"
-                  @click.stop="showDetail(event)"
-                  :title="event.type === 'cita' ? 'Cita' : 'Reserva'"
-                >
-                  <span class="event-title">{{ event.title }}</span>
-                  <span class="event-type">{{ event.type === 'cita' ? 'Cita' : 'Reserva' }}</span>
-                  <span class="event-email" v-if="event.email">{{ event.email }}</span>
-                </div>
-              </template>
-              <template v-else>
-                <span 
-                  class="libre-label"
-                  :class="{ 'bloqueado-label': estaHorarioBloqueado(date.toISOString().slice(0, 10), hour) }"
-                >
-                  {{ estaHorarioBloqueado(date.toISOString().slice(0, 10), hour) ? 'Bloqueado' : 'libre' }}
-                </span>
-              </template>
+            <div class="time-slot-label">
+              <div class="time-display">{{ hour }}</div>
+              <div class="time-period" v-if="showTimePeriod(hour)">{{ getTimePeriod(hour) }}</div>
+            </div>
+            
+            <div
+              v-for="(date, dIdx) in weekDates"
+              :key="dIdx"
+              class="time-slot-cell"
+              :class="{ 
+                'not-current': !isCurrentMonth(date),
+                'bloqueado': estaHorarioBloqueado(date.toISOString().slice(0, 10), hour),
+                'has-event': getEvents(date, hour).length > 0,
+                'today': isToday(date),
+                'weekend': isWeekend(date)
+              }"
+              @dragover.prevent
+              @drop="onDrop(date, hour)"
+              @click="handleCellClick(date, hour)"
+            >
+              <div class="time-slot-content">
+                <template v-if="getEvents(date, hour).length">
+                  <div
+                    v-for="event in getEvents(date, hour)"
+                    :key="event.id"
+                    class="week-event-card"
+                    :class="event.type"
+                    draggable="true"
+                    @dragstart="onDragStart(event, date, hour)"
+                    @click.stop="showDetail(event)"
+                  >
+                    <div class="event-type-indicator" :class="event.type"></div>
+                    <div class="event-details">
+                      <div class="event-time">{{ hour }}</div>
+                      <div class="event-title">{{ event.title }}</div>
+                      <div class="event-type-badge" :class="event.type">
+                        {{ event.type === 'cita' ? 'Cita' : 'Reserva' }}
+                      </div>
+                    </div>
+                  </div>
+                </template>
+                <template v-else>
+                  <div 
+                    class="empty-slot"
+                    :class="{ 'bloqueado-slot': estaHorarioBloqueado(date.toISOString().slice(0, 10), hour) }"
+                  >
+                    <i 
+                      class="slot-icon"
+                      :class="estaHorarioBloqueado(date.toISOString().slice(0, 10), hour) ? 
+                      'fa-solid fa-lock' : 'fa-solid fa-calendar-plus'"
+                    ></i>
+                    <span class="slot-label">
+                      {{ estaHorarioBloqueado(date.toISOString().slice(0, 10), hour) ? 'Bloqueado' : 'Disponible' }}
+                    </span>
+                  </div>
+                </template>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Modal de confirmación -->
+    <!-- Modals -->
+    <!-- Move Confirmation Dialog -->
     <q-dialog v-model="showConfirmDialog" persistent>
-      <q-card class="confirm-dialog">
-        <q-card-section class="dialog-header">
-          <div class="dialog-icon-container">
-            <i class="fa-solid fa-exclamation-triangle dialog-icon"></i>
+      <q-card class="calendar_confirm-dialog">
+        <q-card-section class="calendar_dialog-header">
+          <div class="calendar_dialog-icon-container warning">
+            <i class="fa-solid fa-calendar-arrow-up calendar_dialog-icon"></i>
           </div>
-          <h3 class="dialog-title">¿Seguro que quieres modificar la fecha y hora?</h3>
+          <h3 class="calendar_dialog-title">Confirmar Cambio de Horario</h3>
         </q-card-section>
+
         <q-card-section class="q-pt-none">
-          <p class="dialog-text">
-            <b>{{ confirmEvent?.title }}</b> será movido a <b>{{ formatDate(confirmToDate) }}</b> a las <b>{{ confirmToHour }}</b>.
+          <p class="calendar_dialog-text">
+            ¿Está seguro que desea reprogramar <strong>{{ confirmEvent?.title }}</strong>?
           </p>
+          <div class="calendar_dialog-details">
+            <div class="calendar_detail-item">
+              <i class="fa-solid fa-arrow-right-arrow-left"></i>
+              <span>
+                De: {{ formatDate(draggedFromDate.toISOString().slice(0, 10)) }} {{ draggedFromHour }} → 
+                A: {{ formatDate(confirmToDate) }} {{ confirmToHour }}
+              </span>
+            </div>
+            <div class="calendar_detail-item">
+              <i class="fa-solid fa-tag"></i>
+              <span>Tipo: {{ confirmEvent?.type === 'cita' ? 'Cita Médica' : 'Reserva' }}</span>
+            </div>
+          </div>
         </q-card-section>
-        <q-card-actions class="dialog-actions">
+
+        <q-card-actions class="calendar_dialog-actions">
           <q-btn 
             flat 
             label="Cancelar" 
             color="grey-7" 
             v-close-popup 
             no-caps
-            class="dialog-btn"
+            class="calendar_dialog-btn"
           />
           <q-btn 
             unelevated
-            label="Confirmar" 
+            label="Confirmar Cambio" 
             color="primary" 
             @click="confirmMoveEvent"
             v-close-popup 
             no-caps
-            class="dialog-btn"
+            class="calendar_dialog-btn calendar_dialog-confirm-btn"
           />
         </q-card-actions>
       </q-card>
     </q-dialog>
 
-    <!-- Modal de detalle -->
+    <!-- Event Detail Dialog -->
     <q-dialog v-model="showDetailDialog">
-      <q-card class="confirm-dialog">
-        <q-card-section class="dialog-header">
-          <div class="dialog-icon-container" :class="detailEvent?.type === 'cita' ? 'total' : 'alert'">
+      <q-card class="calendar_detail-dialog">
+        <q-card-section class="calendar_dialog-header">
+          <div class="calendar_dialog-icon-container" :class="detailEvent?.type">
             <i :class="detailEvent?.type === 'cita' ? 'fa-solid fa-user-doctor' : 'fa-solid fa-calendar-check'"></i>
           </div>
-          <h3 class="dialog-title">Detalle {{ detailEvent?.type === 'cita' ? 'Cita' : 'Reserva' }}</h3>
+          <h3 class="calendar_dialog-title">
+            {{ detailEvent?.type === 'cita' ? 'Detalle de Cita' : 'Detalle de Reserva' }}
+          </h3>
         </q-card-section>
-        <q-card-section>
-          <div v-if="detailEvent">
-            <div><b>Fecha:</b> {{ formatDate(detailEvent.date) }}</div>
-            <div><b>Hora:</b> {{ detailEvent.hour }}</div>
-            <div v-if="detailEvent.type === 'cita'">
-              <div><b>Paciente:</b> {{ getPacienteName(detailEvent.pacienteId) }}</div>
-            </div>
-            <div v-else>
-              <div><b>Nombre:</b> {{ detailEvent.title }}</div>
-              <div v-if="detailEvent.email"><b>Email:</b> {{ detailEvent.email }}</div>
-              <div v-if="detailEvent.servicio"><b>Servicio:</b> {{ detailEvent.servicio }}</div>
-              <div v-if="detailEvent.sucursal"><b>Sucursal:</b> {{ detailEvent.sucursal }}</div>
-              <div v-if="detailEvent.dependiente">
-                <b>Dependiente:</b> {{ detailEvent.dependiente.nombreCompleto }} ({{ detailEvent.dependiente.parentesco }})
+
+        <q-card-section class="calendar_detail-content">
+          <div v-if="detailEvent" class="detail-grid">
+            <div class="detail-item">
+              <div class="detail-icon">
+                <i class="fa-solid fa-calendar-day"></i>
+              </div>
+              <div class="detail-info">
+                <div class="detail-label">Fecha</div>
+                <div class="detail-value">{{ formatDate(detailEvent.date) }}</div>
               </div>
             </div>
-            <div><b>Tipo:</b> {{ detailEvent.type === 'cita' ? 'Cita' : 'Reserva' }}</div>
+            
+            <div class="detail-item">
+              <div class="detail-icon">
+                <i class="fa-solid fa-clock"></i>
+              </div>
+              <div class="detail-info">
+                <div class="detail-label">Hora</div>
+                <div class="detail-value">{{ detailEvent.hour }}</div>
+              </div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-icon">
+                <i class="fa-solid fa-tag"></i>
+              </div>
+              <div class="detail-info">
+                <div class="detail-label">Tipo</div>
+                <div class="detail-value badge" :class="detailEvent.type">
+                  {{ detailEvent.type === 'cita' ? 'Cita Médica' : 'Reserva' }}
+                </div>
+              </div>
+            </div>
+
+            <template v-if="detailEvent.type === 'cita'">
+              <div class="detail-item">
+                <div class="detail-icon">
+                  <i class="fa-solid fa-user-injured"></i>
+                </div>
+                <div class="detail-info">
+                  <div class="detail-label">Paciente</div>
+                  <div class="detail-value">{{ getPacienteName(detailEvent.pacienteId) }}</div>
+                </div>
+              </div>
+            </template>
+            
+            <template v-else>
+              <div class="detail-item">
+                <div class="detail-icon">
+                  <i class="fa-solid fa-user"></i>
+                </div>
+                <div class="detail-info">
+                  <div class="detail-label">Nombre</div>
+                  <div class="detail-value">{{ detailEvent.title }}</div>
+                </div>
+              </div>
+              
+              <div class="detail-item" v-if="detailEvent.email">
+                <div class="detail-icon">
+                  <i class="fa-solid fa-envelope"></i>
+                </div>
+                <div class="detail-info">
+                  <div class="detail-label">Email</div>
+                  <div class="detail-value">{{ detailEvent.email }}</div>
+                </div>
+              </div>
+              
+              <div class="detail-item" v-if="detailEvent.servicio">
+                <div class="detail-icon">
+                  <i class="fa-solid fa-stethoscope"></i>
+                </div>
+                <div class="detail-info">
+                  <div class="detail-label">Servicio</div>
+                  <div class="detail-value">{{ detailEvent.servicio }}</div>
+                </div>
+              </div>
+              
+              <div class="detail-item" v-if="detailEvent.sucursal">
+                <div class="detail-icon">
+                  <i class="fa-solid fa-building"></i>
+                </div>
+                <div class="detail-info">
+                  <div class="detail-label">Sucursal</div>
+                  <div class="detail-value">{{ detailEvent.sucursal }}</div>
+                </div>
+              </div>
+              
+              <div class="detail-item" v-if="detailEvent.dependiente">
+                <div class="detail-icon">
+                  <i class="fa-solid fa-users"></i>
+                </div>
+                <div class="detail-info">
+                  <div class="detail-label">Dependiente</div>
+                  <div class="detail-value">
+                    {{ detailEvent.dependiente.nombreCompleto }} 
+                    <span class="dependiente-relation">({{ detailEvent.dependiente.parentesco }})</span>
+                  </div>
+                </div>
+              </div>
+            </template>
           </div>
         </q-card-section>
-        <q-card-actions class="dialog-actions">
+
+        <q-card-actions class="calendar_dialog-actions">
           <q-btn 
-            flat 
+            unelevated
             label="Cerrar" 
             color="primary" 
             v-close-popup 
             no-caps
-            class="dialog-btn"
+            class="calendar_dialog-btn"
           />
         </q-card-actions>
       </q-card>
@@ -311,6 +517,55 @@ export default {
       return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()
     }
 
+    const isToday = (date) => {
+      const today = new Date()
+      return date.toDateString() === today.toDateString()
+    }
+
+    const isWeekend = (date) => {
+      const day = date.getDay()
+      return day === 0 || day === 6
+    }
+
+    const isCurrentHour = (hour) => {
+      const now = new Date()
+      const currentHour = now.getHours().toString().padStart(2, '0') + ':00'
+      const isToday = weekDates.value.some(date => date.toDateString() === now.toDateString())
+      return isToday && hour === currentHour
+    }
+
+    const isMadrugada = (hour) => {
+      const hourNum = parseInt(hour.split(':')[0])
+      return hourNum >= 0 && hourNum < 6
+    }
+
+    const isManana = (hour) => {
+      const hourNum = parseInt(hour.split(':')[0])
+      return hourNum >= 6 && hourNum < 12
+    }
+
+    const isTarde = (hour) => {
+      const hourNum = parseInt(hour.split(':')[0])
+      return hourNum >= 12 && hourNum < 18
+    }
+
+    const isNoche = (hour) => {
+      const hourNum = parseInt(hour.split(':')[0])
+      return hourNum >= 18 && hourNum < 24
+    }
+
+    const showTimePeriod = (hour) => {
+      return hour === '00:00' || hour === '06:00' || hour === '12:00' || hour === '18:00'
+    }
+
+    const getTimePeriod = (hour) => {
+      if (hour === '00:00') return 'Madrugada'
+      if (hour === '06:00') return 'Mañana'
+      if (hour === '12:00') return 'Tarde'
+      if (hour === '18:00') return 'Noche'
+      return ''
+    }
+
     const getPacienteName = (id) => {
       const paciente = pacientes.pacientes.find(p => Number(p.id) === Number(id))
       return paciente ? `${paciente.nombre} ${paciente.apellidoPaterno}` : 'No encontrado'
@@ -370,6 +625,10 @@ export default {
     const nextWeek = () => {
       currentWeekStart.value.setDate(currentWeekStart.value.getDate() + 7)
       currentWeekStart.value = new Date(currentWeekStart.value)
+    }
+
+    const goToToday = () => {
+      currentWeekStart.value = getStartOfWeek(new Date())
     }
     
     const salir = () => {
@@ -471,11 +730,21 @@ export default {
       hours,
       prevWeek,
       nextWeek,
+      goToToday,
       view,
       salir,
       getEvents,
       getWeekEventsCount,
       isCurrentMonth,
+      isToday,
+      isWeekend,
+      isCurrentHour,
+      isMadrugada,
+      isManana,
+      isTarde,
+      isNoche,
+      showTimePeriod,
+      getTimePeriod,
       onDragStart,
       onDrop,
       showConfirmDialog,
@@ -499,12 +768,3 @@ export default {
 }
 </script>
 
-<style scoped>
-/* Los estilos están en app.scss global */
-.event-email {
-  font-size: 0.7rem;
-  color: #666;
-  display: block;
-  margin-top: 2px;
-}
-</style>
