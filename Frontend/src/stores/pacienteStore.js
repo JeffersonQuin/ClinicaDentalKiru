@@ -2,15 +2,18 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import Fuse from 'fuse.js'
-import pacientesData from 'src/data/pacientes.json'
+import axios from 'axios'
 
-// Opciones de configuración para Fuse.js (búsqueda difusa)
+// 🔗 Ajusta tu backend aquí
+const API_URL = 'http://localhost:5050/pacientes'
+
+// Configuración Fuse.js
 const FUSE_OPTIONS = {
   keys: [
-    'nombre', 
-    'apellidoPaterno', 
-    'apellidoMaterno', 
-    'ci', 
+    'nombre',
+    'apellidoPaterno',
+    'apellidoMaterno',
+    'ci',
     'gmail',
     'ciudad',
     'profesion',
@@ -24,6 +27,7 @@ const FUSE_OPTIONS = {
 }
 
 export const usePacienteStore = defineStore('paciente', () => {
+
   // State
   const pacientes = ref([])
   const searchQuery = ref('')
@@ -33,31 +37,26 @@ export const usePacienteStore = defineStore('paciente', () => {
   const loading = ref(false)
   let fuse = null
 
-  // Getters (Computed)
+  // Getters Computed
   const pacientesFiltrados = computed(() => {
     let result = pacientes.value.filter(p => p.state !== 'deleted')
 
-    // Aplicar filtro de ciudad
     if (cityFilter.value) {
       result = result.filter(p => p.ciudad === cityFilter.value)
     }
 
-    // Aplicar filtro de alertas
-    if (alertFilter.value) {
-      if (alertFilter.value === 'with') {
-        result = result.filter(p => p.alertasClinicas && p.alertasClinicas.trim() !== '')
-      } else if (alertFilter.value === 'without') {
-        result = result.filter(p => !p.alertasClinicas || p.alertasClinicas.trim() === '')
-      }
+    if (alertFilter.value === 'with') {
+      result = result.filter(p => p.alertasClinicas && p.alertasClinicas.trim() !== '')
     }
 
-    // Aplicar búsqueda si existe
-    if (searchQuery.value?.trim()) {
-      const results = fuse.search(searchQuery.value.trim())
-      const resultItems = results.map(result => result.item)
-      result = result.filter(patient => 
-        resultItems.some(item => item.id === patient.id)
-      )
+    if (alertFilter.value === 'without') {
+      result = result.filter(p => !p.alertasClinicas || p.alertasClinicas.trim() === '')
+    }
+
+    if (searchQuery.value.trim()) {
+      const fuseResults = fuse.search(searchQuery.value)
+      const matched = fuseResults.map(r => r.item.id)
+      result = result.filter(p => matched.includes(p.id))
     }
 
     return result
@@ -65,123 +64,100 @@ export const usePacienteStore = defineStore('paciente', () => {
 
   const totalPacientes = computed(() => pacientesFiltrados.value.length)
 
-  const pacientesConAlertas = computed(() => {
-    return pacientes.value.filter(p => 
-      p.alertasClinicas && 
-      p.alertasClinicas.trim() !== '' && 
-      p.state !== 'deleted'
-    ).length
-  })
-
   const ciudadesUnicas = computed(() => {
-    const cities = new Set(pacientes.value
-      .filter(p => p.state !== 'deleted')
-      .map(p => p.ciudad)
+    return Array.from(
+      new Set(
+        pacientes.value.filter(p => p.state !== 'deleted').map(p => p.ciudad)
+      )
     )
-    return cities.size
   })
 
-  const opcionesCiudad = computed(() => {
-    const cities = new Set(pacientes.value
-      .filter(p => p.state !== 'deleted')
-      .map(p => p.ciudad)
-    )
-    return Array.from(cities).sort()
-  })
-
-  const opcionesAlerta = computed(() => [
-    { label: 'Con alertas', value: 'with' },
-    { label: 'Sin alertas', value: 'without' }
-  ])
-
-  // Actions
-  const cargarPacientes = () => {
-    pacientes.value = pacientesData.pacientes.map(p => ({
-      ...p,
-      id: Number(p.id)
-    }))
-    inicializarFuse()
-  }
-
+  // 🔹 Inicializar Fuse
   const inicializarFuse = () => {
-    const collection = pacientes.value.filter(p => p.state !== 'deleted')
-    fuse = new Fuse(collection, FUSE_OPTIONS)
+    fuse = new Fuse(
+      pacientes.value.filter(p => p.state !== 'deleted'),
+      FUSE_OPTIONS
+    )
   }
 
-  const actualizarFuse = () => {
-    const collection = pacientes.value.filter(p => p.state !== 'deleted')
-    if (fuse && typeof fuse.setCollection === 'function') {
-      fuse.setCollection(collection)
-    } else {
-      fuse = new Fuse(collection, FUSE_OPTIONS)
+  const actualizarFuse = () => inicializarFuse()
+
+  // ────────────────────────────────
+  // 🔥 1. GET → cargar desde la API
+  // ────────────────────────────────
+  const cargarPacientes = async () => {
+    loading.value = true
+    try {
+      const { data } = await axios.get(API_URL)
+      pacientes.value = data.data
+      inicializarFuse()
+    } catch (error) {
+      console.error('Error cargando pacientes:', error)
+    } finally {
+      loading.value = false
     }
   }
 
-  const agregarPaciente = (nuevoPaciente) => {
+  // ────────────────────────────────
+  // 🔥 2. POST → crear paciente
+  // ────────────────────────────────
+  const agregarPaciente = async (nuevoPaciente) => {
     loading.value = true
-    
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const pacienteToAdd = {
-          ...nuevoPaciente,
-          id: generarNuevoId()
-        }
-        
-        pacientes.value.push(pacienteToAdd)
-        actualizarFuse()
-        loading.value = false
-        resolve(pacienteToAdd)
-      }, 1000)
-    })
-  }
-
-  const actualizarPaciente = (pacienteActualizado) => {
-    loading.value = true
-    
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const index = pacientes.value.findIndex(p => 
-          Number(p.id) === Number(pacienteActualizado.id)
-        )
-        
-        if (index > -1) {
-          pacientes.value[index] = { ...pacienteActualizado }
-          actualizarFuse()
-        }
-        
-        loading.value = false
-        resolve(pacienteActualizado)
-      }, 1000)
-    })
-  }
-
-  const eliminarPaciente = (pacienteId) => {
-    const index = pacientes.value.findIndex(p => Number(p.id) === Number(pacienteId))
-    if (index > -1) {
-      pacientes.value[index].state = 'deleted'
+    try {
+      const { data } = await axios.post(API_URL, nuevoPaciente)
+      pacientes.value.push(data.data)
       actualizarFuse()
+      return data.data
+    } catch (error) {
+      console.error('Error agregando paciente:', error)
+    } finally {
+      loading.value = false
     }
   }
 
-  const seleccionarPaciente = (paciente) => {
-    selectedPatient.value = { ...paciente }
+  // ────────────────────────────────
+  // 🔥 3. PUT → actualizar paciente
+  // ────────────────────────────────
+  const actualizarPaciente = async (paciente) => {
+    loading.value = true
+    try {
+      const { data } = await axios.put(`${API_URL}/${paciente.id}`, paciente)
+
+      const index = pacientes.value.findIndex(p => p.id === paciente.id)
+      if (index > -1) pacientes.value[index] = data.data
+
+      actualizarFuse()
+      return data.data
+    } catch (error) {
+      console.error('Error actualizando paciente:', error)
+    } finally {
+      loading.value = false
+    }
   }
 
-  const limpiarPacienteSeleccionado = () => {
-    selectedPatient.value = null
+  // ────────────────────────────────
+  // 🔥 4. DELETE → eliminar paciente
+  // ────────────────────────────────
+  const eliminarPaciente = async (pacienteId) => {
+    try {
+      await axios.delete(`${API_URL}/${pacienteId}`)
+
+      const index = pacientes.value.findIndex(p => p.id === pacienteId)
+      if (index > -1) pacientes.value[index].state = 'deleted'
+
+      actualizarFuse()
+    } catch (error) {
+      console.error('Error eliminando paciente:', error)
+    }
   }
 
-  const establecerBusqueda = (query) => {
-    searchQuery.value = query
-  }
+  // seleccionar/limpiar etc
+  const seleccionarPaciente = (p) => selectedPatient.value = { ...p }
+  const limpiarPacienteSeleccionado = () => selectedPatient.value = null
 
-  const establecerFiltroCiudad = (ciudad) => {
-    cityFilter.value = ciudad
-  }
-
-  const establecerFiltroAlerta = (alerta) => {
-    alertFilter.value = alerta
-  }
+  const establecerBusqueda = q => searchQuery.value = q
+  const establecerFiltroCiudad = c => cityFilter.value = c
+  const establecerFiltroAlerta = a => alertFilter.value = a
 
   const limpiarFiltros = () => {
     searchQuery.value = ''
@@ -189,75 +165,57 @@ export const usePacienteStore = defineStore('paciente', () => {
     alertFilter.value = null
   }
 
-  // Helper functions
-  const generarNuevoId = () => {
-    const numericIds = pacientes.value
-      .map(p => Number(p.id))
-      .filter(n => !Number.isNaN(n))
-    
-    const maxId = numericIds.length ? Math.max(...numericIds) : 0
-    return maxId + 1
-  }
-
+  // Helpers útiles
   const calcularEdad = (fechaNacimiento) => {
     if (!fechaNacimiento) return '--'
-    
-    const birthDate = new Date(fechaNacimiento)
+
+    const birth = new Date(fechaNacimiento)
     const today = new Date()
-    let age = today.getFullYear() - birthDate.getFullYear()
-    const monthDiff = today.getMonth() - birthDate.getMonth()
-    
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--
-    }
-    
-    return age
+
+    let edad = today.getFullYear() - birth.getFullYear()
+    const m = today.getMonth() - birth.getMonth()
+
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) edad--
+
+    return edad
   }
 
-  const formatearFecha = (dateString) => {
-    if (!dateString) return 'Nunca'
-    
+  const formatearFecha = (d) => {
+    if (!d) return 'Nunca'
     try {
-      const date = new Date(dateString)
-      return date.toLocaleDateString('es-ES')
+      return new Date(d).toLocaleDateString('es-ES')
     } catch {
-      return 'Fecha inválida'
+      return 'Inválida'
     }
   }
 
-  // Inicializar store
+  // 📌 IMPORTANT: cargar desde la API al iniciar el store
   cargarPacientes()
 
   return {
-    // State
     pacientes,
+    pacientesFiltrados,
+    totalPacientes,
+    ciudadesUnicas,
     searchQuery,
     cityFilter,
     alertFilter,
     selectedPatient,
     loading,
 
-    // Getters
-    pacientesFiltrados,
-    totalPacientes,
-    pacientesConAlertas,
-    ciudadesUnicas,
-    opcionesCiudad,
-    opcionesAlerta,
-
-    // Actions
     cargarPacientes,
     agregarPaciente,
     actualizarPaciente,
     eliminarPaciente,
+
     seleccionarPaciente,
     limpiarPacienteSeleccionado,
+
     establecerBusqueda,
     establecerFiltroCiudad,
     establecerFiltroAlerta,
     limpiarFiltros,
 
-    // Helper functions
     calcularEdad,
     formatearFecha
   }
